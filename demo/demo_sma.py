@@ -7,7 +7,7 @@ Created on Wed Jun  1 11:37:46 2016
 
 import numpy as np
 import matplotlib.pyplot as plt
-from sma_fit import sma_fit
+from smafit import smafit
 import statsmodels.formula.api as smf
 
 # Create 100 normally distributed points with slope 2, intercept 1
@@ -27,9 +27,9 @@ ypure = np.copy(y)
 y[idxout] = [400,300,450,420]
 
 # SMA fit, use robust methods to minimize effect of outliers
-s,i,stds,stdi,cis,cii = sma_fit(x,y,cl=0.95,robust=True)
+s,i,stds,stdi,cis,cii = smafit(x,y,cl=0.95,robust=True)
 # SMA fit on the "pure" data without outliers
-#sp,ip,stdsp,stdip,cisp,ciip = sma_fit(x,ypure,cl=0.95)
+#sp,ip,stdsp,stdip,cisp,ciip = smafit(x,ypure,cl=0.95)
 
 # OLS for comparison
 res = smf.ols('y ~ x + 1',{'x':x, 'y':y}).fit()

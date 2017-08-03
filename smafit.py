@@ -6,7 +6,7 @@ Created on Fri May 20 19:13:26 2016
 @author: cdholmes
 """
 
-def sma_fit(X0,Y0,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
+def smafit(X0,Y0,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
     """Standard Major-Axis (SMA) line fitting
     
     Calculate standard major axis, aka reduced major axis, fit to 
@@ -156,7 +156,7 @@ def sma_fit(X0,Y0,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
 
         else:
 
-            raise NotImplemented("sma_fit.py hasn't implemented rmethod={:%s}".format(rmethod))
+            raise NotImplemented("smafit.py hasn't implemented rmethod={:%s}".format(rmethod))
     else:
     
         if (intercept):
