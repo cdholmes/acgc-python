@@ -45,6 +45,7 @@ Created on Mon Apr 24 17:39:51 2017
 """
 
 import numpy as np
+from sklearn.covariance import MinCovDet
 
 def wmean(x,w):
     '''Weighted mean 
@@ -85,41 +86,58 @@ def wvar(x,w,ddof=1):
 
 
 
-def wcov(x,y,w,ddof=1):
+def wcov(x,y,w=None,ddof=1,robust=False):
     '''Weighted covariance 
     
     Calculate the covariance of x and y using weights w. If ddof=1 (default),
     then the result is the unbiased (sample) covariance when w=1.
     
     Args:
-        x,y: array of values 
-        w : array of weights for each element of x
-        ddof: scalar differential degrees of freedom (Default ddof=1)
+        x,y    : array of values 
+        w      : array of weights for each element of x; can be ommitted if robust=True
+        ddof   : scalar differential degrees of freedom (Default ddof=1)
+        robust : (boolean) robust weights will be internally calculated using FastMCD;
+                 only used if robust=True and w is empty
         
     Returns:
         scalar : weighted covariance   
     '''
     n = len(x)   
     assert len(y) == n, 'y must be the same length as x'
+
+    # Use FastMCD to calculate weights; Another method could be used here
+    if (w==None and robust):
+        w = MinCovDet().fit( np.array([x,y]).T ).support_
+    
+    if (len(w) == 0): raise SystemExit 'must specify weights w or select robust=True'
     assert len(w) == n, 'w must be the same length as x and y'
     w = wscale(w)
     return np.sum( ( x - wmean(x,w) ) * ( y - wmean(y,w) ) * w ) / (np.sum(w) - ddof)
     
-def wcorr(x,y,w):
+def wcorr(x,y,w=None,robust=False):
     '''Weighted correlation coeffient
     
     Calculate the Pearson linear correlation coefficient of x and y using weights w. 
     This is derived from the weighted covariance and weighted variance.
     
     Args:
-        x,y: array of values 
-        w : array of weights for each element of x
+        x,y    : array of values 
+        w      : array of weights for each element of x
+        robust : (boolean) robust weights will be internally calculated using FastMCD;
+                 only used if robust=True and w is empty
         
     Returns:
         scalar : weighted covariance   
     '''
+
     n = len(x)   
     assert len(y) == n, 'y must be the same length as x'
+
+    # Use FastMCD to calculate weights; Another method could be used here
+    if (w==None):
+        w = MinCovDet().fit( np.array([x,y]).T ).support_
+    
+    if (len(w) == 0): raise SystemExit 'must specify weights w or select robust=True'
     assert len(w) == n, 'w must be the same length as x and y'
     w = wscale(w)
     return wcov(x,y,w) / np.sqrt( wvar(x,w) * wvar(y,w) )
