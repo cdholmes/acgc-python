@@ -12,7 +12,7 @@ CONTENTS:
 boxcar.py        - Boxcar (running mean) filters
 boxcarpoly.py
 gctools.py       - Functions to retrieve properties of GEOS-Chem grids
-ncdf_tools.py    - High-level functions for reading and writing netCDF files
-sma_fit.py       - Standard Major Axis (SMA) line fitting, including robust methods and error analysis
+nctools.py       - High-level functions for reading and writing netCDF files
+smafit.py        - Standard Major Axis (SMA) line fitting, including robust methods and error analysis
 time_tools.py    - Functions for calculating with dates. e.g. converting dates to fractional years
 wstats.py        - Weighted statistics. e.g. weighted mean, weighted R2, etc.
