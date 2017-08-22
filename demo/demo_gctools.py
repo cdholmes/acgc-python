@@ -7,7 +7,7 @@ Created on Wed Apr 12 15:00:41 2017
 """
 
 import gctools as gc
-import ncdf_tools as nct
+import nctools as nct
 import matplotlib.pyplot as plt
 import numpy as np
 
