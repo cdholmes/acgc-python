@@ -6,7 +6,7 @@ Created on Fri May 20 19:13:26 2016
 @author: cdholmes
 """
 
-def smafit(X0,Y0,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
+def smafit(X0,Y0,W0=None,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
     """Standard Major-Axis (SMA) line fitting
     
     Calculate standard major axis, aka reduced major axis, fit to 
@@ -17,7 +17,11 @@ def smafit(X0,Y0,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
     Warton et al. (2006). Robust fits use the FastMCD covariance estimate 
     from Rousseeuw and Van Driessen (1999). While there are many alternative 
     robust covariance estimators (e.g. other papers by D.I. Warton using M-estimators), 
-    the FastMCD algorithm is default in Matlab. 
+    the FastMCD algorithm is default in Matlab. When the standard error or 
+    uncertainty of each point is known, then weighted SMA may be preferrable to 
+    robust SMA. The conventional choice of weights for each point i is 
+    W_i = 1 / ( var(X_i) + var(Y_i) ), where var() is the variance 
+    (squared standard error).
     
     References 
     Warton, D. I., Wright, I. J., Falster, D. S. and Westoby, M.: 
@@ -30,6 +34,7 @@ def smafit(X0,Y0,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
     ----------
     X, Y : array_like
         Input values, Must have same length.
+    W    : optional array of weights for each X-Y point, typically W_i = 1/(var(X_i)+var(Y_i)) 
     cl   : float (default = 0.95)
         Desired confidence level for output. 
     intercept : boolean (default=True)
@@ -42,6 +47,7 @@ def smafit(X0,Y0,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
         'MCD' or 'FastMCD' for Fast MCD
         'Huber' for Huber's T: reduce, not eliminate, influence of outliers
         'Biweight' for Tukey's Biweight: reduces then eliminates influence of outliers
+
         
     Returns
     -------
@@ -67,11 +73,14 @@ def smafit(X0,Y0,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
         
     # Make sure arrays have the same length
     assert ( len(X0) == len(Y0) ), 'Arrays X and Y must have the same length'
+    assert ( len(W0) == len(X0) or W0 == None ), 'Array W must have the same length as X and Y'
 
     # Make sure cl is within the range 0-1
     assert (cl < 1), 'cl must be less than 1'
     assert (cl > 0), 'cl must be greater than 0'    
     
+    if (W0==None):
+        W0 = np.zeros_like(X0) + 1
     
     # Drop any NaN elements of X or Y    
     # Infinite values are allowed but will make the result undefined
@@ -79,6 +88,7 @@ def smafit(X0,Y0,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
     
     X = X0[idx]
     Y = Y0[idx]
+    W = W0[idx]
     
     # Number of observations
     N = len(X)
@@ -89,6 +99,7 @@ def smafit(X0,Y0,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
     else:
         dfmod = 1
     
+   
     # Choose whether to use methods robust to outliers
     if (robust):
         
@@ -163,10 +174,10 @@ def smafit(X0,Y0,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
             # Average values
             Xmean = np.mean(X)
             Ymean = np.mean(Y)
-        
-            # Covariance matrix
-            cov = np.cov( X, Y, ddof=1 )
   
+            # Covariance matrix
+            cov = np.cov( X, Y, ddof=1, aweights=W )
+    
             # Variance
             Vx = cov[0,0]
             Vy = cov[1,1]
@@ -180,10 +191,12 @@ def smafit(X0,Y0,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
             Xmean = 0
             Ymean = 0
             
+            sumW = np.sum(W)
+            
             # Sum of squares in place of variance and covariance
-            Vx = np.sum( X**2 ) / (N-1)
-            Vy = np.sum( Y**2 ) / (N-1)
-            Vxy= np.sum( X*Y  ) / (N-1)
+            Vx = np.sum( X**2 * W ) / (N-1) / sumW
+            Vy = np.sum( Y**2 * W ) / (N-1) / sumW
+            Vxy= np.sum( X*Y  * W ) / (N-1) / sumW
         
     # Standard deviation
     Sx = np.sqrt( Vx )
