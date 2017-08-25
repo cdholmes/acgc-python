@@ -171,12 +171,15 @@ def smafit(X0,Y0,W0=None,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
     else:
     
         if (intercept):
+            
+            wsum = np.sum(W)
+            
             # Average values
-            Xmean = np.mean(X)
-            Ymean = np.mean(Y)
+            Xmean = np.sum(X * W) / wsum
+            Ymean = np.sum(Y * W) / wsum
   
             # Covariance matrix
-            cov = np.cov( X, Y, ddof=1, aweights=W )
+            cov = np.cov( X, Y, ddof=1, aweights=W**2 )
     
             # Variance
             Vx = cov[0,0]
@@ -191,12 +194,12 @@ def smafit(X0,Y0,W0=None,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
             Xmean = 0
             Ymean = 0
             
-            sumW = np.sum(W)
+            wsum = np.sum(W)
             
             # Sum of squares in place of variance and covariance
-            Vx = np.sum( X**2 * W ) / (N-1) / sumW
-            Vy = np.sum( Y**2 * W ) / (N-1) / sumW
-            Vxy= np.sum( X*Y  * W ) / (N-1) / sumW
+            Vx = np.sum( X**2 * W ) / wsum
+            Vy = np.sum( Y**2 * W ) / wsum
+            Vxy= np.sum( X*Y  * W ) / wsum
         
     # Standard deviation
     Sx = np.sqrt( Vx )
