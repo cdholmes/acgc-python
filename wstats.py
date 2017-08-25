@@ -106,10 +106,10 @@ def wcov(x,y,w=None,ddof=1,robust=False):
     assert len(y) == n, 'y must be the same length as x'
 
     # Use FastMCD to calculate weights; Another method could be used here
-    if (w==None and robust):
+    if (robust and w==None):
         w = MinCovDet().fit( np.array([x,y]).T ).support_
     
-    if (len(w) == 0): raise SystemExit 'must specify weights w or select robust=True'
+    if (len(w) == 0): raise SystemExit('must specify weights w or select robust=True')
     assert len(w) == n, 'w must be the same length as x and y'
     w = wscale(w)
     return np.sum( ( x - wmean(x,w) ) * ( y - wmean(y,w) ) * w ) / (np.sum(w) - ddof)
@@ -137,7 +137,7 @@ def wcorr(x,y,w=None,robust=False):
     if (w==None):
         w = MinCovDet().fit( np.array([x,y]).T ).support_
     
-    if (len(w) == 0): raise SystemExit 'must specify weights w or select robust=True'
+    if (len(w) == 0): raise SystemExit('must specify weights w or select robust=True')
     assert len(w) == n, 'w must be the same length as x and y'
     w = wscale(w)
     return wcov(x,y,w) / np.sqrt( wvar(x,w) * wvar(y,w) )
