@@ -11,7 +11,9 @@ combinations of time points.
 """
 
 import numpy as np
-    
+from numba import jit
+
+@jit
 def sen_slope( X, Y ):
 
     if (len( X ) != len( Y )):
