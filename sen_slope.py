@@ -7,6 +7,9 @@ Estimate the trend in a time series using Sen's method.
 This non-parametric method finds the median slope among all
 combinations of time points.
 
+See also scipy.stats.theilslopes, which provides confidence intervals.
+However, this function is faster for large datasets due to Numba 
+
 @author: cdholmes
 """
 
@@ -24,7 +27,7 @@ def sen_slope( X, Y ):
     n = len( X )
 
     # Array to hold all slope estimates
-    slopes = np.zeros(  n * ( n-1 ) / 2 )
+    slopes = np.zeros(  np.ceil( n * ( n-1 ) / 2 ).astype('int') )
     slopes[:] = np.nan
 
     count = 0
@@ -37,8 +40,7 @@ def sen_slope( X, Y ):
 
             slopes[count] = slopeij
 
-            count = count+1
-
+            count += 1
 
     # Thiel-Sen estimate is the median slope, neglecting NaN
     sen = np.nanmedian( slopes )
