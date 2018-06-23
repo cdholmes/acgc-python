@@ -11,7 +11,8 @@ import scipy.stats as stats
 
 lowess = sm.nonparametric.lowess
 x = np.sort(np.random.uniform(low = -2*np.pi, high = 2*np.pi, size=1000))
-y = np.sin(x) + stats.cauchy.rvs(size=len(x))#np.random.normal(size=len(x))
+ytrue = np.sin(x)
+y = ytrue + stats.cauchy.rvs(size=len(x))#np.random.normal(size=len(x))
 yfit = lowess(y, x, frac=1./3)
 z = lowess(y, x)
 u = lowess(y, x, frac=1/3, it=0)
@@ -30,6 +31,7 @@ ystd = np.sqrt(yvar[:,1])
 import matplotlib.pyplot as p
 p.clf()
 p.plot(x,y,'.',label='obs')
+p.plot(x,ytrue,label='true')
 p.fill_between(x,yfit-ystd,yfit+ystd,alpha=0.5)
 p.plot(x,yfit,'r',label='LOWESS, f=1/3')
 p.plot(x,z[:,1],'g',label='LOWESS, f=1')
