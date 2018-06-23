@@ -47,43 +47,73 @@ Created on Mon Apr 24 17:39:51 2017
 import numpy as np
 from sklearn.covariance import MinCovDet
 
-def wmean(x,w):
+def wmean(x,w=None,robust=False):
     '''Weighted mean 
     
     Calculate the mean of x using weights w.
     
     Args:
         x : array of values to be averaged
-        w : array of weights for each element of x
+        w      : array of weights for each element of x; can be ommitted if robust=True
+        robust : (boolean) robust weights will be internally calculated using FastMCD;
+                 only used if robust=True and w is empty
         
     Returns:
         scalar : weighted mean    
     '''
-    n = len(x)
-    assert len(w) == n, 'w must be the same length as x'
+    if (w!=None):
+        assert len(w) == len(x), 'w must be the same length as x'
+
+    # Use FastMCD to calculate weights; Another method could be used here
+    if (robust and w==None):
+        w = MinCovDet().fit( np.array([x,x]).T ).support_
+    
+    if (len(w) == 0): raise SystemExit('must specify weights w or select robust=True')
+    assert len(w) == len(x), 'w must be the same length as x'
+
     return np.sum( x * w ) / np.sum(w)
 
+def wstd(x,w=None,ddof=1,robust=False):
+    '''Weighted standard deviation
+    
+    Calculate the standard deviation of x using weights w. If ddof=1 (default),
+    then the result is the unbiased (sample) standard deviation when w=1.
+    
+    Args:
+        x    : array of values 
+        w      : array of weights for each element of x; can be ommitted if robust=True
+        ddof   : scalar differential degrees of freedom (Default ddof=1)
+        robust : (boolean) robust weights will be internally calculated using FastMCD;
+                 only used if robust=True and w is empty
+        
+    Returns:
+        scalar : weighted variance   
+    '''
+    if (w!=None):
+        assert len(w) == len(x), 'w must be the same length as x'
+        
+    return np.sqrt( wcov(x,x,w,ddof,robust) )
 
-def wvar(x,w,ddof=1):
+def wvar(x,w=None,ddof=1,robust=False):
     '''Weighted variance 
     
     Calculate the variance of x using weights w. If ddof=1 (default),
     then the result is the unbiased (sample) variance when w=1.
     
     Args:
-        x : array of values 
-        w : array of weights for each element of x
-        ddof: scalar differential degrees of freedom (Default ddof=1)
+        x    : array of values 
+        w      : array of weights for each element of x; can be ommitted if robust=True
+        ddof   : scalar differential degrees of freedom (Default ddof=1)
+        robust : (boolean) robust weights will be internally calculated using FastMCD;
+                 only used if robust=True and w is empty
         
     Returns:
         scalar : weighted variance   
     '''
-    n = len(x)   
-    assert len(w) == n, 'w must be the same length as x'
-
-    w = wscale(w)
-    return np.sum( ( x - wmean(x,w) )**2 * w ) / (np.sum(w) - ddof)
-
+    if (w!=None):
+        assert len(w) == len(x), 'w must be the same length as x'
+        
+    return wcov(x,x,w,ddof,robust)
 
 
 def wcov(x,y,w=None,ddof=1,robust=False):
@@ -91,6 +121,8 @@ def wcov(x,y,w=None,ddof=1,robust=False):
     
     Calculate the covariance of x and y using weights w. If ddof=1 (default),
     then the result is the unbiased (sample) covariance when w=1.
+    
+    Implements weighted covariance as defined by NIST Dataplot (https://www.itl.nist.gov/div898/software/dataplot/refman2/ch2/weighvar.pdf)
     
     Args:
         x,y    : array of values 
@@ -111,8 +143,12 @@ def wcov(x,y,w=None,ddof=1,robust=False):
     
     if (len(w) == 0): raise SystemExit('must specify weights w or select robust=True')
     assert len(w) == n, 'w must be the same length as x and y'
+
     w = wscale(w)
-    return np.sum( ( x - wmean(x,w) ) * ( y - wmean(y,w) ) * w ) / (np.sum(w) - ddof)
+    nw = np.count_nonzero(w)
+
+    return np.sum( ( x - wmean(x,w) ) * ( y - wmean(y,w) ) * w ) / \
+        ( np.sum(w) / nw * (nw - ddof) )
     
 def wcorr(x,y,w=None,robust=False):
     '''Weighted correlation coeffient
