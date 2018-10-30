@@ -5,39 +5,51 @@ Created on Mon Jun 15 17:43:20 2015
 @author: cdholmes
 """
 
-#conda install basemap
+#conda install cartopy
 
-from mpl_toolkits.basemap import Basemap
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature 
+
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Setup map projection and continent outlines
+# Create artificial point data
+# number of points
+npoint = 50
+# random latitude, longitude and value
+plat  = np.random.rand(npoint) * 180 - 90
+plon  = np.random.rand(npoint) * 360 - 180
+pdata = np.random.rand(npoint) 
+
+# Clear the figure
+plt.figure(1)
 plt.clf()
-m = Basemap(projection='kav7',lon_0=180)
-m.drawmapboundary(fill_color='1')#blue water: '#99ffff')
-m.fillcontinents(color='0.8',zorder=0)
+
+# data coordinates: Use PlateCarree for data in lat-lon coordinates
+datacoord = ccrs.PlateCarree()
+
+#Setup map projection and continent outlines
+ax = plt.axes(projection=ccrs.PlateCarree())
+ax = plt.axes(projection=ccrs.Robinson())
+
+# Change map extent, if needed
+#ax.set_extent([-180, 180, -90, 90], ccrs.PlateCarree())
+
+# Add data points
+plt.scatter( plon, plat, c=pdata, s=50, marker='o', transform=datacoord )
 
 # draw parallels and meridians, but don't bother labelling them.
-m.drawparallels(np.arange(-90.,99.,30.),labels=np.ones(7,dtype=bool))
-m.drawmeridians(np.arange(-180.,180.,60.),labels=np.ones(7,dtype=bool))
+ax.gridlines(draw_labels=False)
 
-# create artificial data
-N=50
-lat = np.random.rand(N) * 180 - 90
-lon = np.random.rand(N) * 360
-c2h6 = np.random.rand(N) * 3000
+# Add coasts and states; Use ‘110m’ or ‘50m’ resolution
+ax.coastlines(resolution='110m')
 
-# convert lat-lon to plot coordinates
-x, y = m(lon,lat)
-
-# scatterplot; could also use plt.scatter
-m.scatter(x, y, marker='o', c=c2h6, s=50)
-#m.scatter(lon, lat, latlon=True, marker='o', c=c2h6, s=50)
+# Fill the continents
+ax.add_feature(cfeature.LAND, facecolor='0.75')
 
 # add colorbar
-m.colorbar(location='bottom')
-plt.clim(0,2500)
+plt.colorbar()#location='bottom')
+plt.clim(0,1)
 
-#plt.title('Locations of %s ARGO floats active between %s and %s' %\
-#        (10,date1,date2),fontsize=12)
+plt.title('Artificial data')
 #plt.show()
