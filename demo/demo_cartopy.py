@@ -10,12 +10,38 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature 
 import numpy as np
 
-# Create artificial data
+#########################################################
+# Create artificial gridded data
+
+# Number of points in x and y directions
 n = 20
-lat  = np.linspace(-90,90,n+1)
-lon  = np.linspace(-180,180,2*n+1)
-lon2d, lat2d = np.meshgrid( lon,lat)
+
+# Edges of the latitude-longitude grid
+latedge  = np.linspace(-90,90,n+1)
+lonedge  = np.linspace(-180,180,2*n+1)
+
+# Centers of the latitude-longitude grid
+lat      = np.convolve(latedge, [0.5,0.5], 'valid' )
+lon      = np.convolve(lonedge, [0.5,0.5], 'valid' )
+lon2d, lat2d = np.meshgrid( lon, lat )
+
+# Artificial data
 data = np.exp( -lat2d**2/90**2 -lon2d**2/120**2 )
+
+
+#########################################################
+# Create artificial point data
+
+# number of points
+npoint = 50
+
+# random latitude longitude and value
+plat  = np.random.rand(npoint) * 25 + 25
+plon  = np.random.rand(npoint) * 50 - 120
+pdata = np.random.rand(npoint) 
+
+##########################################################
+# Set up map and plot data
 
 # Open a figure
 plt.figure(1)
@@ -25,8 +51,8 @@ plt.clf()
 datacoord = ccrs.PlateCarree()
 
 # Map projection for Global 
-#ax = plt.axes(projection=ccrs.PlateCarree())
-#ax = plt.axes(projection=ccrs.Robinson())
+ax = plt.axes(projection=ccrs.PlateCarree())
+ax = plt.axes(projection=ccrs.Robinson())
 
 # Map projection for North Pole
 ax = plt.axes(projection=ccrs.NorthPolarStereo())
@@ -37,10 +63,11 @@ ax = plt.axes(projection=ccrs.LambertConformal())
 # Set lat-lon of map edges. These are reasonable for CONUS
 ax.set_extent([-120, -73, 25, 50], ccrs.PlateCarree())
 
-
-
-# Add your data
+# Add your gridded data
 plt.pcolormesh(lon, lat, data, transform=datacoord)
+
+# Add your point data
+plt.scatter(plon, plat, marker='o', c=pdata, s=50, transform=datacoord)
 
 # Add a colorbar 
 plt.colorbar()
@@ -48,6 +75,5 @@ plt.colorbar()
 # Add coasts and states; Use ‘110m’ or ‘50m’ resolution
 ax.coastlines(resolution='110m')
 ax.add_feature(cfeature.STATES.with_scale('110m'))
-
 
 
