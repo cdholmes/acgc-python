@@ -19,6 +19,7 @@ n = 20
 # Edges of the latitude-longitude grid
 latedge  = np.linspace(-90,90,n+1)
 lonedge  = np.linspace(-180,180,2*n+1)
+lon2de, lat2de = np.meshgrid( lonedge, latedge )
 
 # Centers of the latitude-longitude grid
 lat      = np.convolve(latedge, [0.5,0.5], 'valid' )
@@ -27,7 +28,6 @@ lon2d, lat2d = np.meshgrid( lon, lat )
 
 # Artificial data
 data = np.exp( -lat2d**2/90**2 -lon2d**2/120**2 )
-
 
 #########################################################
 # Create artificial point data
@@ -60,11 +60,17 @@ ax.set_extent([-180, 180, 60, 90], ccrs.PlateCarree())
 
 # Map projection for CONUS 
 ax = plt.axes(projection=ccrs.LambertConformal())
+#ax = plt.axes(projection=ccrs.LambertConformal(central_longitude=-96,central_latitude=39,standard_parallels=(33,45)))
+# Set lat-lon of map edges. These are reasonable for CONUS
+ax.set_extent([-120, -73, 25, 50], ccrs.PlateCarree())
+
+# Alternate map projection for CONUS
+ax = plt.axes(projection=ccrs.AlbersEqualArea(central_longitude=-96,central_latitude=37.5,standard_parallels=(29.5,45.5)))
 # Set lat-lon of map edges. These are reasonable for CONUS
 ax.set_extent([-120, -73, 25, 50], ccrs.PlateCarree())
 
 # Add your gridded data
-plt.pcolormesh(lon, lat, data, transform=datacoord)
+plt.pcolormesh(lon2de, lat2de, data, transform=datacoord)
 
 # Add your point data
 plt.scatter(plon, plat, marker='o', c=pdata, s=50, transform=datacoord)
