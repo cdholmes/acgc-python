@@ -19,6 +19,7 @@ n = 20
 # Edges of the latitude-longitude grid
 latedge  = np.linspace(-90,90,n+1)
 lonedge  = np.linspace(-180,180,2*n+1)
+latedge[0] = -89.9999 # Offset south pole to avoid singularity in LambertConformal projection
 lon2de, lat2de = np.meshgrid( lonedge, latedge )
 
 # Centers of the latitude-longitude grid
@@ -53,6 +54,7 @@ datacoord = ccrs.PlateCarree()
 # Map projection for Global 
 ax = plt.axes(projection=ccrs.PlateCarree())
 ax = plt.axes(projection=ccrs.Robinson())
+ax = plt.axes(projection=ccrs.InterruptedGoodeHomolosine())
 
 # Map projection for North Pole
 ax = plt.axes(projection=ccrs.NorthPolarStereo())
@@ -64,13 +66,8 @@ ax = plt.axes(projection=ccrs.LambertConformal())
 # Set lat-lon of map edges. These are reasonable for CONUS
 ax.set_extent([-120, -73, 25, 50], ccrs.PlateCarree())
 
-# Alternate map projection for CONUS
-ax = plt.axes(projection=ccrs.AlbersEqualArea(central_longitude=-96,central_latitude=37.5,standard_parallels=(29.5,45.5)))
-# Set lat-lon of map edges. These are reasonable for CONUS
-ax.set_extent([-120, -73, 25, 50], ccrs.PlateCarree())
-
 # Add your gridded data
-plt.pcolormesh(lon2de, lat2de, data, transform=datacoord)
+plt.pcolormesh(lonedge, latedge, data, transform=datacoord)
 
 # Add your point data
 plt.scatter(plon, plat, marker='o', c=pdata, s=50, transform=datacoord)
@@ -82,4 +79,4 @@ plt.colorbar()
 ax.coastlines(resolution='110m')
 ax.add_feature(cfeature.STATES.with_scale('110m'))
 
-
+plt.show()
