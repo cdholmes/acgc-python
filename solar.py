@@ -1,4 +1,10 @@
 #!/usr/local/bin/env python3
+''' Module to calculate solar zenith angle, solar declination, and equation of time 
+Results should be accurate to < 0.1 degree, but other modules should be used for 
+high-precision calculations.
+
+C.D. Holmes 9 Nov 2018
+'''
 
 import numpy as np
 import pandas as pd
