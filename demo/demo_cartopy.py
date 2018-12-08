@@ -48,8 +48,8 @@ pdata = np.random.rand(npoint)
 plt.figure(1)
 plt.clf()
 
-# data coordinates: Use PlateCarree for data in lat-lon coordinates
-datacoord = ccrs.PlateCarree()
+# data coordinates: Use Geodetic (or PlateCarree) for data in lat-lon coordinates
+datacoord = ccrs.Geodetic()
 
 # Map projection for Global 
 ax = plt.axes(projection=ccrs.PlateCarree())
