@@ -9,6 +9,71 @@ Created on Wed Apr 12 10:14:12 2017
 import numpy as np
 from numba import jit
 
+def set_center_edge( center, edge, name ):
+    # Resolve any conflict between center and edge requests
+    if ( (center==False) and (edge==False) ):
+        # If neither center nor edge is specified, default to center
+        center=True
+    elif ( (center==True) and (edge==True)):
+        # If both center and edge are specified, then raise error
+        print(name+': Choose either edge=True or center=True')
+        raise SystemExit()
+    else:
+        # At this point, either center=True or edge=True, but not both
+        center = not edge
+
+    return center, edge    
+
+def get_lon(res=4, center=False, edge=False):
+    # Return the longitude of grid centers or edges. 
+    # GMAO grids assumed
+    # res = 2 for 2x2.5
+    # res = 4 for 4x5
+    
+    # Resolve any conflict between center and edge
+    center, edge = set_center_edge( center, edge, 'get_lon' )
+
+    # Longitude edges
+    if (res==2):
+        lonedge = np.arange(-181.25,180,2.5)
+    elif (res==4):
+        lonedge = np.arange(-182.5,180,5)
+    else:
+        raise NotImplementedError( 'Resolution '+str(res)+' is not defined' )
+        
+    # Get grid centers, if needed
+    if (center):
+        lon = ( lonedge[0:-1] + lonedge[1:] ) / 2
+    else:
+        lon = lonedge
+    
+    return lon
+    
+def get_lat(res=4, center=False, edge=False):
+    # Return the latitude of grid centers or edges. 
+    # GMAO grids assumed
+    # res = 2 for 2x2.5
+    # res = 4 for 4x5
+    
+    # Resolve any conflict between center and edge
+    center, edge = set_center_edge( center, edge, 'get_lat' )
+
+    # Latitude edges
+    if (res==2):
+        latedge = np.hstack([-90, np.arange(-89,90,2),90])
+    elif (res==4):
+        latedge = np.hstack([-90, np.arange(-88,90,4),90])
+    else:
+        raise NotImplementedError( 'Resolution '+str(res)+' is not defined' )
+
+    # Get grid centers, if needed
+    if (center):
+        lat = ( latedge[0:-1] + latedge[1:] ) / 2
+    else:
+        lat = latedge
+    
+    return lat
+
 def get_lev_p(Psurf=1013.25, nlev=47, edge=False ):
     
     # Get A,B values for vertical coordinate
