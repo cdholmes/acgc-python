@@ -8,13 +8,28 @@ Created on Fri May 22 14:58:14 2015
 import numpy as np
 import statsmodels.api as sm
 import scipy.stats as stats
-
 lowess = sm.nonparametric.lowess
+
+#############################
+### Create the pseudo-data
+
+# X coordinate
 x = np.sort(np.random.uniform(low = -2*np.pi, high = 2*np.pi, size=1000))
+# Y value, truth
 ytrue = np.sin(x)
-y = ytrue + stats.cauchy.rvs(size=len(x))#np.random.normal(size=len(x))
+# Y value with noise; Cauchy gives extreme noise
+y = ytrue + np.random.normal(size=len(x)) 
+y = ytrue + stats.cauchy.rvs(size=len(x)) 
+
+
+#############################
+### Fit the data with lowess
+
+# Lowess, using window width of 1/3
 yfit = lowess(y, x, frac=1./3)
+# Lowess using a very wide window
 z = lowess(y, x)
+# Lowess without robust re-weighting of outliers; no outliers are downweighted
 u = lowess(y, x, frac=1/3, it=0)
 
 # keep just the fitted values
@@ -23,11 +38,13 @@ yfit = yfit[:,1]
 yresid = y-yfit
 
 # Find the variance and standard deviation around the fitted line
-yvar = lowess(yresid**2,x,frac=1/3)
+yvar = lowess(yresid**2, x, frac=1/3)
 ystd = np.sqrt(yvar[:,1])
 
 
-    
+#############################
+### Plot the results    
+
 import matplotlib.pyplot as p
 p.clf()
 p.plot(x,y,'.',label='obs')
