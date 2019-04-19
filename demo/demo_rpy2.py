@@ -9,7 +9,7 @@ Created on Fri Jun  5 13:36:57 2015
 
 import rpy2.robjects as robjects
 import numpy as np
-import matplotlib.pyplot as p
+import matplotlib.pyplot as plt
 from scipy.stats import t 
 
 #from rpy2.robjects.packages import importr
@@ -44,10 +44,10 @@ y = np.cos(x*2*np.pi/365) + 0.3*np.random.standard_cauchy(N)#0.3*np.random.randn
 from loess import loess
 yfit, ystd, yste = loess(x,y,span=0.3)
 
-p.clf()
-p.plot(x,y,'.')
-p.fill_between(x,yfit-ystd,yfit+ystd,alpha=0.5)
-p.plot(x,yfit,'-')
+plt.clf()
+plt.plot(x,y,'.')
+plt.fill_between(x,yfit-ystd,yfit+ystd,alpha=0.5)
+plt.plot(x,yfit,'-')
 
-p.ylim([-5,5])
+plt.ylim([-5,5])
 

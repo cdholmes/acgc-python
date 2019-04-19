@@ -10,7 +10,7 @@ Created on Thu Apr 23 11:57:32 2015
 import numpy as np
 import scipy.stats
 from sen_slope import sen_slope 
-import matplotlib.pyplot as p
+import matplotlib.pyplot as plt
 
 
 x = np.random.randn(600)
@@ -22,5 +22,5 @@ b, bs = sen_slope(x,y)
 print(b,np.std(bs)/np.sqrt(len(bs)*2))
 print(out[0],(out[3]-out[2])/2)
 
-p.clf()
-p.plot(x,y,'o')
+plt.clf()
+plt.plot(x,y,'o')

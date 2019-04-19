@@ -15,7 +15,8 @@ y = np.sin(x) + 0.1*np.random.normal(size=len(x))
 # Calculate boxcar smoothing
 z = boxcar(y, 10)
 
-import matplotlib.pyplot as p
-p.clf()
-p.plot(x,y)
-p.plot(x,z)
+import matplotlib.pyplot as plt
+plt.clf()
+plt.plot(x,y,label='noisy')
+plt.plot(x,z,label='smoothed')
+plt.legend()

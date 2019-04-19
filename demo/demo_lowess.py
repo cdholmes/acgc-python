@@ -45,13 +45,13 @@ ystd = np.sqrt(yvar[:,1])
 #############################
 ### Plot the results    
 
-import matplotlib.pyplot as p
-p.clf()
-p.plot(x,y,'.',label='obs')
-p.plot(x,ytrue,label='true')
-p.fill_between(x,yfit-ystd,yfit+ystd,alpha=0.5)
-p.plot(x,yfit,'r',label='LOWESS, f=1/3')
-p.plot(x,z[:,1],'g',label='LOWESS, f=1')
-p.plot(x,u[:,1],'c',label='LOWESS, f=1/3, it=0')
-p.ylim([-5,5])
-p.legend()
+import matplotlib.pyplot as plt
+plt.clf()
+plt.plot(x,y,'.',label='obs',)
+plt.plot(x,ytrue,label='true')
+plt.fill_between(x,yfit-ystd,yfit+ystd,alpha=0.5)
+plt.plot(x,yfit,'r',label='LOWESS, f=1/3')
+plt.plot(x,z[:,1],'g',label='LOWESS, f=1')
+plt.plot(x,u[:,1],'c',label='LOWESS, f=1/3, it=0')
+plt.ylim([-5,5])
+plt.legend()

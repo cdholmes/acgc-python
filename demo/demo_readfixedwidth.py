@@ -7,7 +7,7 @@ Created on Fri May 22 16:12:41 2015
 
 import numpy as np
 import pandas
-import matplotlib.pyplot as p
+import matplotlib.pyplot as plt
 from tapply import tapply
 import datetime as dt
 
@@ -45,19 +45,19 @@ for i in range(len(timeiduniq)):
     time[i] = tt.year + np.float(doy)/doy1 + tt.hour/24/doy1
     print(i,timeiduniq[i],tt,time[i])
 
-p.clf()
-#p.plot(data['value']) # plot raw data, replicates included
+plt.clf()
+#plt.plot(data['value']) # plot raw data, replicates included
 
 # plot time series of observations
-p.subplot(2,1,1)
-p.plot(time,valuemean)
-p.xlabel('time')
-p.ylabel('C2H6, ppt')
-p.title('Barrow, Alaska')
+plt.subplot(2,1,1)
+plt.plot(time,valuemean)
+plt.xlabel('time')
+plt.ylabel('C2H6, ppt')
+plt.title('Barrow, Alaska')
 
 # plot time series of observations errorbars
-p.subplot(2,1,2)
-p.errorbar(time,valuemean,yerr=valuestd)
-p.xlabel('time')
-p.ylabel('C2H6, ppt')
-p.title('Barrow, Alaska')
+plt.subplot(2,1,2)
+plt.errorbar(time,valuemean,yerr=valuestd)
+plt.xlabel('time')
+plt.ylabel('C2H6, ppt')
+plt.title('Barrow, Alaska')

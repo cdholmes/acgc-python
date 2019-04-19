@@ -6,7 +6,7 @@ Created on Sun May  3 09:26:32 2015
 """
 
 import numpy as np
-import matplotlib.pyplot as p
+import matplotlib.pyplot as plt
 
 n0=10
 s0=10
@@ -29,11 +29,11 @@ for i in range(N):
     nn[i] = n1
     ss[i] = s1
 
-p.clf()
-p.subplot(2,1,1)
-p.plot(np.arange(N)*dt,nn)
-p.plot(np.arange(N)*dt,ss)
-p.subplot(2,1,2)
-p.plot(np.arange(N)*dt,nn/ss)
+plt.clf()
+plt.subplot(2,1,1)
+plt.plot(np.arange(N)*dt,nn)
+plt.plot(np.arange(N)*dt,ss)
+plt.subplot(2,1,2)
+plt.plot(np.arange(N)*dt,nn/ss)
 
     

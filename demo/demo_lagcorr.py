@@ -6,7 +6,7 @@ Created on Thu May 14 17:47:41 2015
 """
 
 import numpy as np
-import matplotlib.pyplot as p
+import matplotlib.pyplot as plt
 import scipy.stats as stats
 from boxcar import boxcar
 from tapply import tapply
@@ -44,16 +44,16 @@ for i in range(NL):
     # true correlation between a and b, if seasonal cycle were removed perfectly
     corrt[i] = stats.spearmanr(a[i:-1],(a+noise)[0:-(i+1)])[0]
     
-p.clf()
-p.subplot(3,1,1)
-p.plot(b)
-p.plot(c)
-p.plot(boxcar(b,width))
-p.plot(boxcarpoly(b,width,order=2))
-p.subplot(3,1,2)
-p.plot(bds)
-p.plot(cds)
-p.subplot(3,1,3)
-p.plot(corr)
-p.plot(corrt)
-p.plot(corrp>0.05)
+plt.clf()
+plt.subplot(3,1,1)
+plt.plot(b)
+plt.plot(c)
+plt.plot(boxcar(b,width))
+plt.plot(boxcarpoly(b,width,order=2))
+plt.subplot(3,1,2)
+plt.plot(bds)
+plt.plot(cds)
+plt.subplot(3,1,3)
+plt.plot(corr)
+plt.plot(corrt)
+plt.plot(corrp>0.05)

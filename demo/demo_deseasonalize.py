@@ -6,7 +6,7 @@ Created on Fri Jun  5 18:33:31 2015
 """
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as p
+import matplotlib.pyplot as plt
 #import seaborn
 
 
@@ -53,17 +53,17 @@ a = np.sin(t*2*np.pi/12) + t/48 + 0.2*np.random.randn(t.size) +5
 a[10:20] =np.nan
 a_ds = ds(a,t)
 a_ds2 = ds(a,tt)
-p.clf()
-p.subplot(2,1,1)
-p.plot(t,a,label='original')
-p.plot(t,a_ds,label='ds')
-p.plot(t,a_ds2,label='ds w/datetime (same)')
+plt.clf()
+plt.subplot(2,1,1)
+plt.plot(t,a,label='original')
+plt.plot(t,a_ds,label='ds')
+plt.plot(t,a_ds2,label='ds w/datetime (same)')
 
 import statsmodels.formula.api as smf
 mod = smf.ols(formula='a~t',data=pd.DataFrame({'a':a,'t':t}))
 res = mod.fit()
-p.plot(t[np.isfinite(a)],res.fittedvalues,label='fit')
-p.legend(loc='best')
+plt.plot(t[np.isfinite(a)],res.fittedvalues,label='fit')
+plt.legend(loc='best')
 print(res.summary())
 print(res.params)
 print(res.bse)
@@ -74,11 +74,11 @@ print(smf.ols(formula='a~t',data=pd.DataFrame({'a':a_ds,'t':t})).fit().summary()
 ## deal with missing values. see issue
 #dta.co2.interpolate(inplace=True)
 #res = sm.tsa.seasonal_decompose(dta.co2)
-#p.subplot(2,1,2)
-#p.plot(dta.index,dta.co2,label='obs')
-#p.plot(dta.index,res.trend,label='trend')
-#p.plot(dta.index,res.trend+res.resid,label='trend+resid')
-#p.plot(dta.index,ds(dta.co2.values,dta.index),label='myds')
-#p.legend(loc='best')
+#plt.subplot(2,1,2)
+#plt.plot(dta.index,dta.co2,label='obs')
+#plt.plot(dta.index,res.trend,label='trend')
+#plt.plot(dta.index,res.trend+res.resid,label='trend+resid')
+#plt.plot(dta.index,ds(dta.co2.values,dta.index),label='myds')
+#plt.legend(loc='best')
 
 

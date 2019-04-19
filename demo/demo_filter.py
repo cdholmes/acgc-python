@@ -6,7 +6,7 @@ Created on Mon Feb 23 17:23:09 2015
 """
 
 import numpy as np
-import matplotlib.pyplot as p
+import matplotlib.pyplot as plt
 import scipy.signal as sig
 
 # time interval, days
@@ -57,40 +57,45 @@ yfilt = sig.lfilter(b,a,y)
 yfiltfir = sig.lfilter(bfir,1,y)
 
 ## Plot
-p.clf()
+plt.clf()
 
-p.subplot(4,1,1)
-p.semilogx(w/np.pi*nyquist, 20 * np.log10(abs(h)),'b')
-p.semilogx(wfir/np.pi*nyquist,20 * np.log10(abs(hfir)),'r')
-p.legend(['Butterworth filter','FIR filter'],loc='lower right')
-p.xlabel('Frequency, 1/day')
-p.ylabel('Attenuation, dB')
-p.xlim([1/(N*dt),nyquist])
+plt.subplot(4,1,1)
+plt.semilogx(w/np.pi*nyquist, 20 * np.log10(abs(h)),'b')
+plt.semilogx(wfir/np.pi*nyquist,20 * np.log10(abs(hfir)),'r')
+plt.legend(['Butterworth filter','FIR filter'],loc='lower right')
+plt.xlabel('Frequency, 1/day')
+plt.ylabel('Attenuation, dB')
+plt.xlim([1/(N*dt),nyquist])
 
-p.subplot(4,1,2)
-p.plot(w/np.pi*nyquist, np.unwrap(np.angle(h)),'b')
-p.plot(wfir/np.pi*nyquist, np.unwrap(np.angle(hfir)),'r')
+plt.subplot(4,1,2)
+plt.semilogx(w/np.pi*nyquist, np.unwrap(np.angle(h)),'b')
+plt.semilogx(wfir/np.pi*nyquist, np.unwrap(np.angle(hfir)),'r')
+plt.xlabel('Frequency, 1/day')
+plt.ylabel('Phase shift, degree')
+plt.xlim([1/(N*dt),nyquist])
 
-p.subplot(4,1,3)
-p.plot(t,y,'k')
-p.plot(t,yfilt,'b')
-p.plot(t,yfiltfir,'r')
-p.xlabel('time, day')
-p.ylabel('signal')
-p.legend(['Unfiltered','Butterworth filter','FIR filter'])
+plt.subplot(4,1,3)
+plt.plot(t,y,'k')
+plt.plot(t,yfilt,'b')
+plt.plot(t,yfiltfir,'r')
+plt.xlabel('time, day')
+plt.ylabel('signal')
+plt.legend(['Unfiltered','Butterworth filter','FIR filter'])
 
-p.subplot(4,1,4)
+plt.subplot(4,1,4)
 # calculate spectral power density
 f,pow = sig.periodogram(y,fs)
 f,powfilt = sig.periodogram(yfilt,fs)
 f,powfiltfir = sig.periodogram(yfiltfir,fs)
-p.loglog(f,pow,'k')
-p.plot(f,powfilt,'b')
-p.plot(f,powfiltfir,'r')
-p.ylim([1e-5,1e3])
-p.xlim([1/(N*dt),nyquist])
-p.xlabel('frequency, 1/day')
-p.ylabel('power density')
-p.legend(['Unfiltered','Butterworth filter','FIR filter'],loc='upper center')
-p.text(1/7,10,'7 day cycle')
-p.text(1/365,10,'365-day cycle')
+plt.loglog(f,pow,'k')
+plt.plot(f,powfilt,'b')
+plt.plot(f,powfiltfir,'r')
+plt.ylim([1e-6,1e3])
+plt.xlim([1/(N*dt),nyquist])
+plt.xlabel('frequency, 1/day')
+plt.ylabel('power density')
+plt.legend(['Unfiltered','Butterworth filter','FIR filter'],loc='upper center')
+plt.text(1/7,10,'7 day cycle')
+plt.text(1/365,10,'365-day cycle')
+
+plt.tight_layout()

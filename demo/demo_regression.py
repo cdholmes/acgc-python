@@ -6,7 +6,7 @@ Created on Thu Feb 12 14:37:08 2015
 """
 
 import numpy as np
-import matplotlib.pyplot as p
+import matplotlib.pyplot as plt
 #from scipy import stats
 import pandas as pandas
 import statsmodels.formula.api as smf
@@ -90,9 +90,9 @@ model_rlm = smf.rlm('y ~ 1 + t + np.square(t)',data, M=sm.robust.norms.TukeyBiwe
 result_rlm = model_rlm.fit()
 
 # Display data and best fit
-p.clf()
-p.plot(t,y,'o',label='data')
-p.plot(t,model.predict(result.params), label='OLS')
-p.plot(t,model_qr.predict(result_qr.params),label='QuantReg')
-p.plot(t,model_rlm.predict(result_rlm.params), label='RLM')
-p.legend(loc='lower left')
+plt.clf()
+plt.plot(t,y,'o',label='data')
+plt.plot(t,model.predict(result.params), label='OLS')
+plt.plot(t,model_qr.predict(result_qr.params),label='QuantReg')
+plt.plot(t,model_rlm.predict(result_rlm.params), label='RLM')
+plt.legend(loc='lower left')
