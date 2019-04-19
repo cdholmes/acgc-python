@@ -13,7 +13,11 @@ import datetime as dt
 
 file = 'c2h6_brw_surface-flask_1_arl_event.txt'
 
-data = pandas.read_fwf('c2h6_brw_surface-flask_1_arl_event.txt', comment='#', delimiter=' ',na_values='-999.990',
+# Both read_fwf and read_csv can read fixed-width files in many cases
+#data = pandas.read_fwf('c2h6_brw_surface-flask_1_arl_event.txt', comment='#', delimiter=' ',na_values='-999.990',
+#                       names=['siteID','year','month','day','hour','minute','second','sampleID','method','chemformula','labname','value','uncertainty','flag','instrument','labyear','labmonth','labday','labhour','labminute','labsecond','latitude','longitude','altitude','eventnum'])
+
+data = pandas.read_csv('c2h6_brw_surface-flask_1_arl_event.txt', comment='#', delim_whitespace=True, na_values='-999.990',
                        names=['siteID','year','month','day','hour','minute','second','sampleID','method','chemformula','labname','value','uncertainty','flag','instrument','labyear','labmonth','labday','labhour','labminute','labsecond','latitude','longitude','altitude','eventnum'])
 
 # construct a unique number for each sample collection time
