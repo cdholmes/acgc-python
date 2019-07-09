@@ -73,7 +73,8 @@ def smafit(X0,Y0,W0=None,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
         
     # Make sure arrays have the same length
     assert ( len(X0) == len(Y0) ), 'Arrays X and Y must have the same length'
-    assert ( len(W0) == len(X0) or W0 == None ), 'Array W must have the same length as X and Y'
+    if (W0 != None ):
+        assert ( len(W0) == len(X0) ), 'Array W must have the same length as X and Y'
 
     # Make sure cl is within the range 0-1
     assert (cl < 1), 'cl must be less than 1'
@@ -110,7 +111,7 @@ def smafit(X0,Y0,W0=None,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
             if (not intercept):
                 # intercept=False could possibly be supported by calculating
                 # using mcd.support_ as weights in an explicit variance/covariance calculation
-                raise NotImplemented('FastMCD method only supports SMA with intercept')
+                raise NotImplementedError('FastMCD method only supports SMA with intercept')
             
             # Fit robust model of mean and covariance
             mcd = MinCovDet().fit( np.array([X,Y]).T )
@@ -167,7 +168,7 @@ def smafit(X0,Y0,W0=None,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
 
         else:
 
-            raise NotImplemented("smafit.py hasn't implemented rmethod={:%s}".format(rmethod))
+            raise NotImplementedError("smafit.py hasn't implemented rmethod={:%s}".format(rmethod))
     else:
     
         if (intercept):
