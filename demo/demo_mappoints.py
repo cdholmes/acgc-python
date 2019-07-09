@@ -28,9 +28,12 @@ plt.clf()
 # data coordinates: Use PlateCarree for data in lat-lon coordinates
 datacoord = ccrs.PlateCarree()
 
+# Projection
+projcoord = ccrs.PlateCarree()
+projcoord = ccrs.Robinson()
+
 #Setup map projection and continent outlines
-ax = plt.axes(projection=ccrs.PlateCarree())
-ax = plt.axes(projection=ccrs.Robinson())
+ax = plt.axes(projection=projcoord)
 
 # Change map extent, if needed
 #ax.set_extent([-180, 180, -90, 90], ccrs.PlateCarree())
@@ -50,6 +53,12 @@ ax.add_feature(cfeature.LAND, facecolor='0.75')
 # add colorbar
 plt.colorbar()#location='bottom')
 plt.clim(0,1)
+
+# Optional: Convert the points into the projection coordinate system
+xyz = projcoord.transform_points( datacoord, plon, plat )
+# Optional: Plot the points using projection coordinates; Note: Now we don't need "transform"
+x=xyz[:,0]; y=xyz[:,1]
+plt.scatter( x, y, s=50, marker='o', facecolor='none', edgecolor='black' )
 
 plt.title('Artificial data')
 #plt.show()
