@@ -62,7 +62,10 @@ def read_icartt( files, usePickle=False ):
                 tname, tunit = [s.strip() for s in f.readline().split(',')[0:2]]
 
                 # Raise exception if the time unit is not seconds; may need to be handled differently below
-                if (not tunit in ['s','seconds','seconds (from midnight UTC)']):
+                if (tunit in ['s','seconds','seconds (from midnight UTC)']):
+                    # Use unit expected by pandas
+                    tunit = 's'
+                else:
                     print(tunit)
                     raise Exception( 'read_icartt: time expected in seconds (s); unit in file: ',tunit )
 
