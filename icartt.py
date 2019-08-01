@@ -64,7 +64,7 @@ def read_icartt( files, usePickle=False ):
                 # Raise exception if the time unit is not seconds; may need to be handled differently below
                 if (tunit != 's'):
                     print(tunit)
-                    raise Exception( 'read_icartt: time expected in seconds (s)' )
+                    raise Exception( 'read_icartt: time expected in seconds (s); unit in file: ',tunit )
 
             # Read data
             obs = pd.read_csv(file,skiprows=nheader-1,na_values=' -99999')
