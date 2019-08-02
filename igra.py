@@ -36,7 +36,7 @@ def read_igra_stations(file):
 
     return stations
 
-def read_igra_file(file,derived=False,readprofiles=True):
+def read_igra_file( file, derived=False, readprofiles=True ):
     # Read sounding file
     # If derived=True, then read the IGRA-derived files
     # If derived=False, then read the IGRA sounding
@@ -135,6 +135,7 @@ def read_igra_file(file,derived=False,readprofiles=True):
                     frzhgt     = float( line[79:85] )
                     lclpress   = float( line[85:91] ) / 100
                     lclhgt     = float( line[91:97] )
+                    lfcpress   = float( line[97:103] ) / 100
                     lfchgt     = float( line[103:109] )
                     lnbpress   = float( line[109:115] ) / 100
                     lnbhgt     = float( line[115:121] )
@@ -145,20 +146,50 @@ def read_igra_file(file,derived=False,readprofiles=True):
                     CAPE       = float( line[145:151] )
                     CIN        = float( line[151:157] )
 
+                    # Profile metadata 
+                    info = { 'siteID':    siteID,
+                             'time':      time,
+                             'syntime':   syntime,
+                             'numlev':    numlev,
+                             'pw':        pw,
+                             'pInversion':invpress,
+                             'zInversion':invhgt,
+                             'dTinversion':invtempdif,
+                             'pMix':      mixpress,
+                             'zMix':      mixhgt,
+                             'pFreeze':   frzpress,
+                             'zFreeze':   frzhgt,
+                             'pLCL':      lclpress,
+                             'zLCL':      lclhgt,
+                             'pLFC':      lfcpress,
+                             'zLFC':      lfchgt,
+                             'pLNB':      lnbpress,
+                             'zLNB':      lnbhgt,
+                             'LI':      LI,
+                             'SI':      SI,
+                             'KI':      KI,
+                             'TTI':     TTI,
+                             'CAPE':    CAPE,
+                             'CIN':     CIN }
+
                 else:
                     
                     p_src  =        line[37:45]
                     np_src =        line[46:54]
                     lat    = float( line[55:62] ) / 1e4
                     lon    = float( line[63:71] ) / 1e4
-                    
-                # Form a dataframe
-                info = pd.DataFrame( {'siteID':  siteID,
-                                      'time':    time,
-                                      'syntime': syntime,
-                                      'numlev':  numlev },
-                                     index=[0] )
 
+                    # Profile metadata 
+                    info = { 'siteID':  siteID,
+                             'time':    time,
+                             'syntime': syntime,
+                             'numlev':  numlev }
+
+                # Replace missing data
+                for key in info.keys():
+                    if (info[key] in [-99999, -9999.9, -999.99]):
+                        info[key] = np.nan
+                
                 # Print some info every 100 entries
                 if (np.mod( pnum, 100 )==0):
                     print('{:4d}-{:02d}-{:02d} {:02d}:{:02d}'.format(
@@ -183,14 +214,17 @@ def read_igra_file(file,derived=False,readprofiles=True):
                     profile[['T','Tgrad','Tpot','Tpotgrad','Tvirt','Tvirtpot']] /= 10 
 
                     # Convert vapor pressure, hPa*1000 -> hPa
-                    profile[['e','es']] = profile[['e','es']] / 1000
+                    profile[['e','es']] /= 1000
 
                     # Convert %*10 -> %
-                    profile[['RH','RH']] = profile[['RH','RH']] / 10
+                    profile[['RH','RHrep']] /= 10
 
                     # Convert m/s*10 -> m/s
-                    profile[['u','ugrad','v','vgrad']] = profile[['u','ugrad','v','vgrad']] / 10
+                    profile[['u','ugrad','v','vgrad']] /= 10
 
+                    # Add profile to data
+                    info.update({'profile': profile})
+                    
                 elif (readprofiles):
 
                     # Read the sounding
@@ -224,33 +258,31 @@ def read_igra_file(file,derived=False,readprofiles=True):
                     # Dewpoint, K
                     profile['Td'] = profile['T'] - profile['dpdp']
 
+                    # Add profile to data
+                    info.update({'profile': profile})
+                    
                 else:
                     # Don't read the profile
                     # Skip the lines containing the profile
                     for i in range(numlev):
                         next(f)
-                    profile = pd.DataFrame([])
                     
                 # Increment line counter
                 lnum += numlev
-        
-                # Define the empty data frame
-#                if first:
-#                    data = pd.DataFrame(columns=info.columns+['profile'])
-#                    first= False
 
-                # Append profile to data frame
-                data.loc[time] = \
-                    {'siteID':  siteID.upper(),
-                     'time':    time,
-                     'syntime': syntime,
-                     'profile': profile }
-                return data
                 # Increment profile number
                 pnum += 1
         
+                # Create an empty dataframe on first pass
+                if first:
+                    data = pd.DataFrame(columns=info.keys())
+                    first= False
+
+                # Add this datapoint; Use nominal time for the index
+                data.loc[syntime] = info
+                    
         # Save data as pickle file
-        #data.to_pickle(file+'.pkl')
+        data.to_pickle(file+'.pkl')
 
     return data        
 
