@@ -4,11 +4,13 @@
 
 import numpy  as np
 import pandas as pd
+import datetime as dt
 import os
+import glob
 
 metroot = '/data/MetData/ARL/'
 
-# Read trajectory file
+# Read trajectory file output from HYSPLIT
 def read_tdump(file):
 
     # Open the file
@@ -34,8 +36,11 @@ def read_tdump(file):
         vnames = line.split()[1:]
         
         # Read the data
-        df = pd.read_csv( fid, delim_whitespace=True, header=None, index_col=False,
-                names=['tnum','metnum','year','month','day','hour','minute','fcasthr','thour','lat','lon','alt']+vnames )
+        df = pd.read_csv( fid, delim_whitespace=True,
+                          header=None, index_col=False,
+                names=['tnum','metnum',
+                       'year','month','day','hour','minute','fcasthr',
+                       'thour','lat','lon','alt']+vnames )
         
         # Convert year to 4-digits
         df.loc[:,'year'] += 2000
@@ -46,73 +51,206 @@ def read_tdump(file):
         #print(df.iloc[-1,:])
         return df
 
+# Directory and File names for GDAS 1 degree meteorology, for given date    
 def get_gdas1_filename( time ):
 
     # Directory for GDAS 1 degree
     dirname = metroot+'gdas1/'
 
     # Filename template
-    filetmp = 'gdas1.{mon:s}{yy:s}.w{week:d}'
+    filetmp = 'gdas1.{mon:s}{yy:%y}.w{week:d}'
 
     # week number in the month
     wnum = ((time.day-1) // 7) + 1
 
     # GDAS 1 degree file
-    filename = filetmp.format( mon=time.strftime("%b").lower(), yy=time.strftime("%y"), week=wnum )
+    filename = filetmp.format( mon=time.strftime("%b").lower(), yy=time, week=wnum )
 
     return dirname, filename
 
-def get_gdas0p5_filename( time ):
+# Directory and file names for given meteorology and date
+def get_met_filename( metversion, time ):
 
-    # Directory for GDAS 0.5 degree
-    dirname  = metroot+'gdas0p5/'
+    # Ensure that time is a datetime object
+    if (not isinstance( time, dt.date) ):
+        raise TypeError( "get_met_filename: time must be a datetime object" )
+    
+    # Directory and filename template
+    if (metversion == 'gdas1' ):
+        # Special treatment
+        dirname, filename = get_gdas1_filename( time )
+    elif (metversion == 'gdas0p5'):
+        dirname = metroot+'gdas0p5/'
+        filename = '{date:%Y%m%d}_gdas0p5'
+    elif (metversion == 'nam3' ):
+        dirname = metroot+'nam3/'
+        filename = '{date:%Y%m%d}_hysplit.namsa.CONUS'
+    elif (metversion == 'nam12' ):
+        dirname = metroot+'nam12/'
+        filename = '{date:%Y%m%d}_hysplit.t00z.namsa'
+    else:
+        raise NotImplementedError(
+            "get_met_filename: {metversion:s} unrecognized".format(metversion) )
 
-    # Filename template
-    filetmp = '{date:s}_gdas0p5'
-
-    # GDAS 0.5 degree file
-    filename = filetmp.format( date=time.strftime("%Y%m%d") )
+    # Build the filename
+    filename = filename.format( time )
 
     return dirname, filename
 
-def get_met_filename( date, metversion='gdas0p5' ):
+# Get a list of met directories and files
+# When there are two met version provided, the first result will be used
+def get_met_filelist( metversion, time ):
 
-    # If metversion is a single string, then get value from appropriate function
     if isinstance( metversion, str ):
 
-        if (metversion == 'gdas1'):
-            dirname, filename = get_gdas1_filename( date )
-        elif (metversion == 'gdas0p5'):
-            dirname, filename = get_gdas0p5_filename( date )
-        else:
-            raise NotImplementedError( "get_met_filename: {metversion:s} unrecognized".format(metversion) )
-
+        # If metversion is a single string, then get value from appropriate function
+        dirname, filename = get_met_filename( metversion, time )
+        
     elif isinstance( metversion, list ):
+
+        # If metversion is a list, then get files for each met version in list
 
         dirname  = None
         filename = None
 
-        # Loop over all the metversion and use the first one with a file present
+        # Loop over all the metversions
+        # Use the first one with a file present
         for met in metversion:
 
             # Find filename for this met version
-            d, f = get_met_filename( date, met )
+            d, f = get_met_filename( met, time )
 
-            # If the file exists, use this and exit; otherwise keep looking
-            if ( os.path.isfile( d+f ) ):
-                dirname  = d
-                filename = f
-                break
+            # If the file exists, use this and exit;
+            # otherwise keep looking
+            if isinstance( f, str ):
+                if ( os.path.isfile( d+f ) ):
+                    dirname  = d
+                    filename = f
+                    break
+            elif isinstance( f, list ):
+                if ( os.path.isfile( d[0]+f[0] ) ):
+                    dirname  = d
+                    filename = f
+                    break
 
+        # Raise an error if 
         if (filename is None):
-            raise FileNotFoundError( "get_met_filename: no files found for "+','.join(metversion) )
+            raise FileNotFoundError(
+                "get_met_filename: no files found for " + ','.join(metversion) )
 
     else:
-        raise TypeError( "get_met_filename: metversion must be a string or list" )
+        raise TypeError( "get_met_filelist: metversion must be a string or list" )
 
     return dirname, filename
 
-def write_control( time, lat, lon, alt, trajhours, fname='CONTROL.000', metversion=['gdas0p5','gdas1'] ):
+def get_forecast_template( metversion ):
+    # Get filename template for forecast meteorology
+    
+    if (metversion == 'namsfCONUS'):
+        # Filename template
+        filetemplate = 'hysplit.t{:%H}z.namsf??.CONUS'
+        nexpected = 8
+    else:
+        filetemplate = 'hysplit.t{:%H}z.'+metversion
+        nexpected = 1
+
+    return filetemplate, nexpected
+    
+def get_forecast_filename( metversion, cycle ): 
+    # Find files for a particular met version and forecast cycle
+    
+    dirname  = metroot + 'forecast/{:%Y%m%d}/'.format(cycle)
+    filename, nexpected  = get_forecast_template( metversion )
+
+    # Filename for this cycle
+    filename = filename.format(cycle)
+
+    # Find all the files that match these criteria
+    files = glob.glob( dirname + filename )
+
+    # Check if we found the expected number of files
+    if ( len(files) == nexpected ):
+
+        # When we find then, sort and combine into one list
+        files = sorted( files )
+        
+        # Split into directory and file names
+        dirnames  = [ os.path.dirname(f)+'/' for f in files ]
+        filenames = [ os.path.basename(f)    for f in files ]
+        
+        # Return
+        return dirnames, filenames
+        
+    # Raise an error if no forecasts are found
+    raise FileNotFoundError('ARL forecast meteorology found' )
+    
+def get_forecast_filename_latest( metversion ):
+    # Find files for the latest available forecast cycle for the requested met version.
+    
+    # Filename template for forecast files
+    filetemplate, nexpected = get_forecast_template( metversion )
+
+    # Find all of the forecast directories, most recent first
+    dirs = [item for item
+            in sorted( glob.glob( metroot+'forecast/????????' ), reverse=True )
+            if os.path.isdir(item) ]
+
+    for d in dirs:
+        
+        # Loop backwards over the forecast cycles
+        for hh in [18,12,6,0]:
+            
+            # Check if the forecast files exist
+            files = glob.glob(d+'/'+filetemplate.format(dt.time(hh)))
+            #'hysplit.t{:02d}z.{:s}'.format(hh,metsearch))
+
+            # Check if we found the expected number of files
+            if ( len(files) == nexpected ):
+
+                # When we find then, sort and combine into one list
+                files = sorted( files )
+                
+                # Split into directory and file names
+                dirnames  = [ os.path.dirname(f)+'/' for f in files ]
+                filenames = [ os.path.basename(f)    for f in files ]
+                
+                # Return
+                return dirnames, filenames
+
+    # Raise an error if no forecasts are found
+    raise FileNotFoundError('No ARL forecast meteorology found' )
+
+def get_forecast_filelist( metversion=['namsfCONUS','namf'], cycle=None ):
+
+    # If metversion is a single string, then get value from appropriate function
+    if isinstance( metversion, str ):
+
+        if (cycle is None):
+            dirnames, filenames = get_forecast_filename_latest( metversion )
+        else:
+            dirnames, filenames = get_forecast_filename( metversion, cycle )
+            
+    else:
+
+        dirnames  = []
+        filenames = []
+        
+        # Loop over the list of met types, combine them all
+        for met in metversion:
+
+            # Get directory and file names for one version
+            d, f = get_forecast_filelist( met, cycle )
+
+            # Combine them into one list
+            dirnames  = dirnames  + d
+            filenames = filenames + f            
+            
+    return dirnames, filenames
+
+
+def write_control( time, lat, lon, alt, trajhours,
+                   fname='CONTROL.000', metversion=['gdas0p5','gdas1'],
+                   forecast=False, forecastcycle=None ):
 
     # Write a control file for trajectory starting at designated time and coordinates
 
@@ -126,24 +264,31 @@ def write_control( time, lat, lon, alt, trajhours, fname='CONTROL.000', metversi
         d0 = 0
         d1 = ndays
 
-    # List of met directories and met files that will be used
-    metdirs  = []
-    metfiles = []
-    for d in range(d0,d1):
-        # date of met data
-        metdate = time.date() + pd.Timedelta( d, "D" )
+    if (forecast is True):
+        # Get the forecast meteorology
+        metdirs, metfiles = get_forecast_filelist( metversion, forecastcycle )
+        
+        # Check if the forecast meteorology covers the entire trajectory duration
+    else:
 
-        dirname, filename = get_met_filename( metdate, metversion )
+        # List of met directories and met files that will be used
+        metdirs  = []
+        metfiles = []
+        for d in range(d0,d1):
+            # date of met data
+            metdate = time.date() + pd.Timedelta( d, "D" )
 
-        # Add the file, if it isn't already in the list
-        if ( filename not in metfiles ):
-            metdirs.append(  dirname  )
-            metfiles.append( filename )
+            dirname, filename = get_met_filelist( metversion, metdate )
 
-    # Number of met file
+            # Add the file, if it isn't already in the list
+            if ( filename not in metfiles ):
+                metdirs.append(  dirname  )
+                metfiles.append( filename )
+
+    # Number of met files
     nmet = len( metfiles )
 
-    # Runs will fail if the initial time is not bracketed met data.
+    # Runs will fail if the initial time is not bracketed by met data.
     # When met resolution changes on the first day, this condition may not be met.
     # Starting the midnight trajectories at one 00:01 avoids this problem.
     if (time.hour==0 and time.minute == 0):
