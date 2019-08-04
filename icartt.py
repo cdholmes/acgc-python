@@ -11,7 +11,7 @@ import numpy  as np
 import pandas as pd
 import os
 
-def read_icartt( files, usePickle=False ):
+def read_icartt( files, usePickle=False, timeIndex=False ):
 
     # Files input must be string or list of strings
     if isinstance( files, str ):
@@ -88,6 +88,10 @@ def read_icartt( files, usePickle=False ):
             # Add flight number
             obs['file'] = n+1
 
+            # Use time variable for index
+            if (timeIndex):
+                obs.index = obs.time
+                
             # Save pickle
             if (usePickle):         
                 obs.to_pickle(pklfile)
