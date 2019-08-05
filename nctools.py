@@ -5,13 +5,13 @@ Created on Mon Jun 29 15:49:33 2015
 @author: cdholmes
 """
 
-import netCDF4 as ncdf
+import netCDF4 as nc
 
-def get_ncdf_var(filename,varname):
+def get_nc_var(filename,varname):
     """ Read a variable from a netCDF file"""
     
     # Open file for reading
-    ncfile = ncdf.Dataset(filename,'r')
+    ncfile = nc.Dataset(filename,'r')
     
     # Get the desired variable
     data = ncfile.variables[varname][:]
@@ -21,11 +21,11 @@ def get_ncdf_var(filename,varname):
     
     return data
     
-def get_ncdf_att(filename,varname,attname,glob=False):
+def get_nc_att(filename,varname,attname,glob=False):
     """ Read an attribute from a netCDF file"""
     
     # Open file for reading
-    ncfile = ncdf.Dataset(filename,'r')
+    ncfile = nc.Dataset(filename,'r')
     
     # Get the desired attribute
     if (glob):
@@ -38,11 +38,11 @@ def get_ncdf_att(filename,varname,attname,glob=False):
     
     return data
     
-def get_ncdf_varnames(filename):
+def get_nc_varnames(filename):
     """ Read variable names from a netCDF file"""
     
     # Open file for reading
-    ncfile = ncdf.Dataset(filename,'r')
+    ncfile = nc.Dataset(filename,'r')
     
     # Get the desired variable
     data = list(ncfile.variables.keys())
@@ -52,11 +52,11 @@ def get_ncdf_varnames(filename):
     
     return data
     
-def get_ncdf_attnames(filename,varname,glob=False):
+def get_nc_attnames(filename,varname,glob=False):
     """ Read attributes from a netCDF file"""
     
     # Open file for reading
-    ncfile = ncdf.Dataset(filename,'r')
+    ncfile = nc.Dataset(filename,'r')
     
     # Get the attribute names
     if (glob):
@@ -69,11 +69,11 @@ def get_ncdf_attnames(filename,varname,glob=False):
     
     return data
 
-def put_ncdf_var(filename,varname,value):
+def put_nc_var(filename,varname,value):
     """ Assign a new value to an existing variable"""
     
     # Open file for reading
-    ncfile = ncdf.Dataset(filename,'w')
+    ncfile = nc.Dataset(filename,'w')
     
     # Set value
     ncfile.variables[varname][:] = value
@@ -82,11 +82,11 @@ def put_ncdf_var(filename,varname,value):
     ncfile.close()
      
 
-def put_ncdf_att(filename,varname,attname,value,glob=False):
+def put_nc_att(filename,varname,attname,value,glob=False):
     """ Assign a new value to an existing attribute"""
     
     # Open file for reading
-    ncfile = ncdf.Dataset(filename,'w')
+    ncfile = nc.Dataset(filename,'w')
     
     # Set attribute
     if (glob):
@@ -100,13 +100,13 @@ def put_ncdf_att(filename,varname,attname,value,glob=False):
 ###############################################
 ### EVERYTHING AFTER HERE IN DEVELOPMENT
  
-def define_geo_dim( var, fid ):
+def create_geo_dim( var, fid, **kwargs ):
     
     try:
         assert ('name' in var), \
-            'Var structure must contain "name" key: define_geo_dim'
+            'Var structure must contain "name" key: create_geo_dim'
         assert ('value' in var), \
-            'Var structure must contain "value" key: define_geo_dim'
+            'Var structure must contain "value" key: create_geo_dim'
     except AssertionError:
         # Close file and exit
         fid.close()
@@ -121,49 +121,59 @@ def define_geo_dim( var, fid ):
 
     ncDim = fid.createDimension( var['name'], size )
     
-    return ncDim    
+    ncVar = create_geo_var( var, fid, (var['name']), **kwargs )
 
-def get_ncdf_type( value, classic=True ):
+    return ncDim, ncVar    
+
+def get_nc_type( value, name='', classic=True ):
     
     # Variable type for numpy arrays or native python
     try:
         vartype = value.dtype.str
-        
     except:
         vartype = type(value)
     
-    
+    # Remove brackets
     vartype = vartype.replace('<','').replace('>','')
 
-def define_geo_var( var, fid, dimIDs, compress=True, verbose=False ):
+    # Raise error if the type isn't allowed
+    if (classic and (vartype in ['u1', 'u2', 'u4', 'u8', 'i8'])):
+        raise TypeError( 'Variable {:s} cannot have type {:s} in netCDF classic files'.format(
+            name, vartype ) )
+
+    return vartype
+
+def create_geo_var( var, fid, dimIDs, compress=True, classic=True, time=False, verbose=False ):
     
     try:
         assert ('name' in var), \
-            'Var structure must contain "name" key: define_geo_var'
+            'Var structure must contain "name" key: create_geo_var'
         assert ('value' in var), \
-            'Var structure must contain "value" key: define_geo_var'
+            'Var structure must contain "value" key: create_geo_var'
     except AssertionError:
         # Close file and exit
         fid.close()
         raise SystemExit
 
-    # Format strings
-#    fmt1 = 'Defined tracer    {:5d} = {:s}'
-#    fmt3 = 'Defined attribute {:5d} = {:s} {:s}'
-        
+    # If this is a time variable, then convert
+    if (time):
+        if ('calendar' in var.keys()):
+            calendar = var['calendar']
+        else:
+            calendar = 'standard'
+        var['value'] = nc.date2num( var['value'], units=var['units'], calendar=calendar)    
     
-    #***** Enable other variable types
-    #var['value'].dtype.str
-    vartype = var['value'].dtype.str
-    vartype = vartype.replace('<','').replace('>','')
-    
-    print( var['name'], var['value'].dtype, vartype, dimIDs )
-    
+    # Variable type
+    vartype = get_nc_type( var['value'], var['name'], classic )
+  
     #*** Check whether the data type is allowed in classic data type
     
     # Create the variable
-    ncVar = fid.createVariable( var['name'], 'i8', dimIDs, 
+    ncVar = fid.createVariable( var['name'], vartype, dimIDs, 
                              zlib=compress, complevel=2 )
+
+    # Write variable values 
+    ncVar[:] = var['value'][:]
 
     # These keys are not attributes, so remove them
     var.pop('name',None)
@@ -175,14 +185,15 @@ def define_geo_var( var, fid, dimIDs, compress=True, verbose=False ):
     
     return ncVar
     
-def write_geo_ncdf(filename, var1=None, xDim=None, yDim=None, 
-                   zDim=None, zUnits=None, tDim=None, tUnits=None,
-                   classic=True, nc4=True, compress=True, verbose=False, globalAtt=None ):
+def write_geo_nc(filename, variables,
+                xDim=None, yDim=None, 
+                zDim=None, zUnits=None, tDim=None, tUnits=None,
+                globalAtt=None,
+                classic=True, nc4=True, compress=True, 
+                clobber=False, verbose=False ):
     """ Create a NetCDF file with geospatial data. Output file is CF-COARDS compliant""" 
     
     from datetime import datetime 
-    
-    ### Setup
     
     # NetCDF file type
     if (nc4):
@@ -192,23 +203,18 @@ def write_geo_ncdf(filename, var1=None, xDim=None, yDim=None,
             ncfmt = 'NETCDF4'
     else:
         ncfmt = 'NETCDF3_64BIT_OFFSET'
-
-    ### Create
-    
-    
+   
     ### Open file for output
     
-    f = ncdf.Dataset( filename, 'w', format=ncfmt  )
+    f = nc.Dataset( filename, 'w', format=ncfmt, clobber=clobber )
     f.Conventions = "COARDS/CF"
     f.History = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + \
-        ' : Created by write_geo_ncdf (python)'
+        ' : Created by write_geo_nc (python)'
     
     # Write global attributes, if any
     if (globalAtt is not None):
         f.setncatts(globalAtt)
-    
-
-    
+       
     ### Define dimensions
     
     dimList = []
@@ -222,9 +228,8 @@ def write_geo_ncdf(filename, var1=None, xDim=None, yDim=None,
                     'long_name': 'longitude',
                     'units': 'degrees_east'}    
         
-        ncDim = define_geo_dim( xDim, f )
-        ncVar = define_geo_var( xDim, f, (xDim['name']), compress, verbose=verbose )
-
+        ncDim, ncVar = create_geo_dim( xDim, f, compress=compress, classic=classic, verbose=verbose )
+ 
         dimList.append( ncDim )
         varList.append( ncVar )
         dimSize.append( len(varList[-1][:]) )
@@ -236,9 +241,8 @@ def write_geo_ncdf(filename, var1=None, xDim=None, yDim=None,
                     'long_name': 'latitude',
                     'units': 'degrees_north'}
 
-        ncDim = define_geo_dim( yDim, f )
-        ncVar = define_geo_var( yDim, f, (yDim['name']), compress, verbose=verbose )
-
+        ncDim, ncVar = create_geo_dim( yDim, f, compress=compress, classic=classic, verbose=verbose )
+ 
         dimList.append( ncDim )
         varList.append( ncVar )
         dimSize.append( len(varList[-1][:]) )
@@ -261,8 +265,7 @@ def write_geo_ncdf(filename, var1=None, xDim=None, yDim=None,
                     'long_name': lname,
                     'units': zUnits}
 
-        ncDim = define_geo_dim( zDim, f )
-        ncVar = define_geo_var( zDim, f, (zDim['name']), compress, verbose=verbose )
+        ncDim, ncVar = create_geo_dim( zDim, f, compress=compress, classic=classic, verbose=verbose )
 
         dimList.append( ncDim )
         varList.append( ncVar )
@@ -278,12 +281,40 @@ def write_geo_ncdf(filename, var1=None, xDim=None, yDim=None,
                     'units': tUnits,
                     'unlimited': True }
 
-        ncDim = define_geo_dim( tDim, f )
-        ncVar = define_geo_var( tDim, f, (tDim['name']), compress, verbose=verbose )
+        ncDim, ncVar = create_geo_dim( tDim, f, compress=compress, classic=classic, time=True, verbose=verbose )
 
         dimList.append( ncDim )
         varList.append( ncVar )
         dimSize.append( len(varList[-1][:]) )
+
+   ### Define variables
+
+    for var in variables:
+
+        if (type(var) is not dict):
+            raise TypeError( 'All variables must be passed as dicts' )
+
+        # Shape of the variable
+        vShape = var['value'].shape
+        
+        # Match dimensions of variable with defined dimensions
+        dID = []
+        for s in vShape:
+
+            # Find the dimensions that match the variable dimension
+            try:
+                i = dimSize.index(s)
+            except ValueError:
+                # No dimensions match
+                raise ValueError( 'Cannot match dimensions for variable {:s}'.format( var['name'] ) )
+
+            # List of the dimension names
+            dID.append(dimList[i].name)
+
+        # Create the variable
+        ncVar = create_geo_var( var, f, dID, compress=compress, classic=classic, verbose=verbose )
+
+        varList.append( ncVar )
 
     # Close the file
     f.close()
