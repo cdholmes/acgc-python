@@ -7,8 +7,155 @@ import pandas as pd
 import datetime as dt
 import os
 import glob
+import netCDF4 as nc
 
 metroot = '/data/MetData/ARL/'
+
+def tdump2nc( inFile, outFile, clobber=False, globalAtt=None ):
+    # Convert a HYSPLIT tdump file to netCDF
+    # Works with single point or ensemble trajectories
+
+    import nctools as nct
+
+    # Trajectory points
+    traj = read_tdump( inFile )
+
+    # Trajectory numbers; convert to int32
+    tnums = traj.tnum.unique().astype('int32')
+
+    # Number of trajectories (usually 1 or 27)
+    ntraj = len( tnums )
+
+    # Trajectory start time
+    starttime = traj.time[0] 
+
+    # Time along trajectory, hours since trajectory start
+    ttime  = traj.thour.unique().astype('f4')
+
+    # Number of times along trajectory
+    nttime = len( ttime )
+
+    # Empty arrays
+    lat    = np.zeros( (ntraj, nttime), np.float32 )
+    lon    = np.zeros( (ntraj, nttime), np.float32 )
+    altMSL = np.zeros( (ntraj, nttime), np.float32 )
+    altAGL = np.zeros( (ntraj, nttime), np.float32 )
+    p      = np.zeros( (ntraj, nttime), np.float32 )
+    T      = np.zeros( (ntraj, nttime), np.float32 )
+    Q      = np.zeros( (ntraj, nttime), np.float32 )
+    precip = np.zeros( (ntraj, nttime), np.float32 )
+    inBL   = np.zeros( (ntraj, nttime), np.int8 ) 
+
+    # Check if optional variables are present
+    doP        = ('PRESSURE' in traj.columns)
+    doMSL      = ('TERR_MSL' in traj.columns)
+    doBL       = ('MIXDEPTH' in traj.columns)
+    doT        = ('AIR_TEMP' in traj.columns)
+    doQ        = ('SPCHUMID' in traj.columns)
+    doPrecip   = ('RAINFALL' in traj.columns)
+
+    for t in tnums:
+        # Find entries for this trajectory 
+        idx = traj.tnum==t
+
+        # Save the coordinates
+        lat[t-1,:]    = traj.lat[idx]
+        lon[t-1,:]    = traj.lon[idx]
+        altAGL[t-1,:] = traj.alt[idx]
+
+        # Add optional variables
+        if (doP):
+            p[t-1,:] = traj.PRESSURE[idx]
+        if (doT):
+            T[t-1,:]      = traj.AIR_TEMP[idx]
+        if (doQ):
+            Q[t-1,:]      = traj.SPCHUMID[idx]
+        if (doPrecip):
+            precip[t-1,:] = traj.RAINFALL[idx]
+        if (doMSL):
+            altMSL[t-1,:] = traj.alt[idx] + traj.TERR_MSL[idx]
+        if (doBL):
+            inBL[t-1,:]   = (traj.alt[idx] < traj.MIXDEPTH[idx])
+    
+    # Put output variables into a list
+    variables = [
+        {'name':'lat',
+            'long_name':'latitude of trajectory',
+            'units':'degrees_north',
+            'value':np.expand_dims(lat,axis=0)},
+        {'name':'lon',
+           'long_name':'longitude of trajectory',
+           'units':'degrees_east',
+           'value':np.expand_dims(lon, axis=0)},
+        {'name':'altAGL',
+           'long_name':'altitude of trajectory above ground level',
+           'units':'m',
+           'value':np.expand_dims(altAGL, axis=0)} ]
+
+    # Add optional variables to output list
+    if (doMSL):
+        variables.append( 
+           {'name':'altMSL',
+           'long_name':'altitude of trajectory above mean sea level',
+           'units':'m',
+           'value':np.expand_dims(altMSL,axis=0)} )
+    if (doP):
+        variables.append(
+            {'name':'p',
+           'long_name':'pressure of trajectory',
+           'units':'hPa',
+           'value':np.expand_dims(p,axis=0)} )
+    if (doT):
+        variables.append(
+            {'name':'T',
+           'long_name':'temperature of trajectory',
+           'units':'K',
+           'value':np.expand_dims(T,axis=0)} )
+    if (doQ):
+        variables.append(
+            {'name':'q',
+           'long_name':'specific humidity of trajectory',
+           'units':'g/kg',
+           'value':np.expand_dims(Q,axis=0)} )
+    if (doPrecip):
+        variables.append(
+            {'name':'precipitation',
+           'long_name':'precipitation on trajectory',
+           'units':'mm',
+           'value':np.expand_dims(precip,axis=0)} )
+    if (doBL):
+        variables.append(
+            {'name':'inBL',
+           'long_name':'trajectory in boundary layer flag',
+           'units':'unitless',
+           'value':np.expand_dims(inBL,axis=0)} )
+
+    # Construct global attributes
+    # Start with default and add any provided by user input
+    gAtt = {'Content': 'HYSPLIT trajectory'}
+    if (type(globalAtt) is dict):
+        gAtt.update(globalAtt)
+
+    # Create the output file
+    nct.write_geo_nc( outFile, variables,
+        xDim={'name':'trajnum',
+            'long_name':'trajectory number',
+            'units':'unitless',
+            'value':tnums},
+        yDim={'name':'trajtime',
+            'long_name':'time since trajectory start',
+            'units':'hours',
+            'value':ttime},
+        tDim={'name':'time',
+            'long_name':'time of trajectory start',
+            'units':'hours since 2000-01-01 00:00:00',
+            'calendar':'standard',
+            'value':np.array([starttime]),
+            'unlimited':True},
+        globalAtt=gAtt,
+        nc4=True, classic=True, clobber=clobber )
+
+
 
 # Read trajectory file output from HYSPLIT
 def read_tdump(file):
