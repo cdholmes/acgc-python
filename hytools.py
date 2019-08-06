@@ -215,6 +215,29 @@ def get_gdas1_filename( time ):
 
     return dirname, filename
 
+# Directory and File names for hrrr meteorology, for given date
+def get_hrrr_filename( time ):
+
+    # Directory
+    dirname = metroot+'hrrr/'
+
+    # Filename template
+    filename = '{date:%Y%m%d}_*_hrrr'.format( date=time )
+
+    # Find all the files that match these criteria
+    files = glob.glob( dirname + filename )
+
+    # When we find then, sort and combine into one list
+    files = sorted( files )
+
+    # Split into directory and file names
+    dirnames  = [ os.path.dirname(f)+'/' for f in files ]
+    filenames = [ os.path.basename(f)    for f in files ]
+
+    # Return
+    return dirnames, filenames
+
+
 # Directory and file names for given meteorology and date
 def get_met_filename( metversion, time ):
 
@@ -227,26 +250,33 @@ def get_met_filename( metversion, time ):
         # Special treatment
         dirname, filename = get_gdas1_filename( time )
     elif (metversion == 'gdas0p5'):
-        dirname = metroot+'gdas0p5/'
+        dirname  = metroot+'gdas0p5/'
         filename = '{date:%Y%m%d}_gdas0p5'
+    elif (metversion == 'gfs0p25'):
+        dirname  = metroot+'gfs0p25/'
+        filename = '{date:%Y%m%d}_gfs0p25'
     elif (metversion == 'nam3' ):
-        dirname = metroot+'nam3/'
+        dirname  = metroot+'nam3/'
         filename = '{date:%Y%m%d}_hysplit.namsa.CONUS'
     elif (metversion == 'nam12' ):
-        dirname = metroot+'nam12/'
+        dirname  = metroot+'nam12/'
         filename = '{date:%Y%m%d}_hysplit.t00z.namsa'
+    elif (metversion == 'hrrr' ):
+        # Special treatment
+        dirname, filename = get_hrrr_filename( time )
+        return dirname, filename
     else:
         raise NotImplementedError(
             "get_met_filename: {metversion:s} unrecognized".format(metversion) )
 
     # Build the filename
-    filename = filename.format( time )
+    filename = filename.format( date=time )
 
     return dirname, filename
 
 # Get a list of met directories and files
 # When there are two met version provided, the first result will be used
-def get_met_filelist( metversion, time ):
+def get_met_filelist( metversion, time, useAll=True ):
 
     if isinstance( metversion, str ):
 
@@ -257,8 +287,8 @@ def get_met_filelist( metversion, time ):
 
         # If metversion is a list, then get files for each met version in list
 
-        dirname  = None
-        filename = None
+        dirname  = []
+        filename = []
 
         # Loop over all the metversions
         # Use the first one with a file present
@@ -267,21 +297,31 @@ def get_met_filelist( metversion, time ):
             # Find filename for this met version
             d, f = get_met_filename( met, time )
 
-            # If the file exists, use this and exit;
-            # otherwise keep looking
-            if isinstance( f, str ):
-                if ( os.path.isfile( d+f ) ):
-                    dirname  = d
-                    filename = f
-                    break
-            elif isinstance( f, list ):
-                if ( os.path.isfile( d[0]+f[0] ) ):
-                    dirname  = d
-                    filename = f
-                    break
+            if (useAll):
+                # Append to the list so that all can be used
+                dirname.append( d)
+                filename.append(f)
+
+            else:
+                # Use just the first met file that exists
+                dirname  = d
+                filename = f
+                break
+                # If the file exists, use this and exit;
+                # otherwise keep looking
+                #if isinstance( f, str ):
+                #    if ( os.path.isfile( d+f ) ):
+                #        dirname  = d
+                #        filename = f
+                #        break
+                #elif isinstance( f, list ):
+                #    if ( os.path.isfile( d[0]+f[0] ) ):
+                #        dirname  = d
+                #        filename = f
+                #        break
 
         # Raise an error if 
-        if (filename is None):
+        if (filename is []):
             raise FileNotFoundError(
                 "get_met_filename: no files found for " + ','.join(metversion) )
 
