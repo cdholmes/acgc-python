@@ -276,7 +276,7 @@ def get_met_filename( metversion, time ):
 
 # Get a list of met directories and files
 # When there are two met version provided, the first result will be used
-def get_met_filelist( metversion, time, useAll=True ):
+def get_archive_filelist( metversion, time, useAll=True ):
 
     if isinstance( metversion, str ):
 
@@ -323,12 +323,71 @@ def get_met_filelist( metversion, time, useAll=True ):
         # Raise an error if 
         if (filename is []):
             raise FileNotFoundError(
-                "get_met_filename: no files found for " + ','.join(metversion) )
+                "get_archive_filename: no files found for " + ','.join(metversion) )
 
     else:
-        raise TypeError( "get_met_filelist: metversion must be a string or list" )
+        raise TypeError( "get_archive_filelist: metversion must be a string or list" )
 
     return dirname, filename
+
+def get_hybrid_filelist( metversion, time ):
+
+    print( "Hybrid Archive/Forecast meteorology using NAM3 CONUS nest" )
+
+    archivemet = 'nam3'
+    forecastmet = 'namsfCONUS'
+    
+    # Starting at "time" get all of the available analysis files, then add forecast files
+
+    # List of met directories and met files that will be used
+    metdirs  = []
+    metfiles = []
+
+    # Loop over 10 days, because that's probably enough for FIREX-AQ
+    for d in range(-1,10):
+        
+        # date of met data
+        metdate = time.date() + pd.Timedelta( d, "D" )
+        
+        #dirname, filename = get_archive_filelist( metversion, metdate )
+        dirname, filename = get_met_filename( archivemet, metdate )
+
+        # Check if the file exists
+        if ( os.path.isfile( dirname+filename ) ):
+            
+            # Add the file, if it isn't already in the list
+            if ( filename not in metfiles ):
+                metdirs.append(  dirname  )
+                metfiles.append( filename )
+
+        else:
+
+            # We need to get forecast meteorology
+
+            # Loop over forecast cycles
+            for hr in [0,6,12,18]:
+
+                cy =  dt.datetime.combine( metdate, dt.time( hour=hr ) )
+                
+                try:
+                    # If this works, then the file exists
+                    d, f = get_forecast_filename( forecastmet, cy, partial=True )
+                    # Add the first 6-hr forecast period
+                    metdirs.append( d[0] )
+                    metfiles.append( f[0] )
+                    # If we have a full forecast cycle, save it
+                    if (len(f)==8):
+                        dlast = d
+                        flast = f
+                except FileNotFoundError:
+                    # We have run out of forecast meteorology,
+                    # So add the remainder of the prior forecast cycle and we're done
+                    metdirs.extend(  dlast[1:] )
+                    metfiles.extend( flast[1:] )
+
+                    return metdirs, metfiles
+                    
+    return metdirs, metfiles
 
 def get_forecast_template( metversion ):
     # Get filename template for forecast meteorology
@@ -343,7 +402,7 @@ def get_forecast_template( metversion ):
 
     return filetemplate, nexpected
     
-def get_forecast_filename( metversion, cycle ): 
+def get_forecast_filename( metversion, cycle, partial=False ): 
     # Find files for a particular met version and forecast cycle
     
     dirname  = metroot + 'forecast/{:%Y%m%d}/'.format(cycle)
@@ -356,7 +415,7 @@ def get_forecast_filename( metversion, cycle ):
     files = glob.glob( dirname + filename )
 
     # Check if we found the expected number of files
-    if ( len(files) == nexpected ):
+    if ( (len(files) == nexpected) or (partial and len(files) >=1) ):
 
         # When we find then, sort and combine into one list
         files = sorted( files )
@@ -437,7 +496,8 @@ def get_forecast_filelist( metversion=['namsfCONUS','namf'], cycle=None ):
 
 def write_control( time, lat, lon, alt, trajhours,
                    fname='CONTROL.000', metversion=['gdas0p5','gdas1'],
-                   forecast=False, forecastcycle=None ):
+                   forecast=False, forecastcycle=None,
+                   hybrid=False ):
 
     # Write a control file for trajectory starting at designated time and coordinates
 
@@ -451,7 +511,13 @@ def write_control( time, lat, lon, alt, trajhours,
         d0 = 0
         d1 = ndays
 
-    if (forecast is True):
+    if (hybrid is True):
+
+        if (trajhours < 0):
+            raise NotImplementedError( "Combined Analysis/Forecast meteorology not supported for back trajectories" )
+        metdirs,metfiles = get_hybrid_filelist( metversion, time )
+
+    elif (forecast is True):
         # Get the forecast meteorology
         metdirs, metfiles = get_forecast_filelist( metversion, forecastcycle )
         
@@ -465,7 +531,7 @@ def write_control( time, lat, lon, alt, trajhours,
             # date of met data
             metdate = time.date() + pd.Timedelta( d, "D" )
 
-            dirname, filename = get_met_filelist( metversion, metdate )
+            dirname, filename = get_archive_filelist( metversion, metdate )
 
             # Add the file, if it isn't already in the list
             if ( filename not in metfiles ):
@@ -491,7 +557,7 @@ def write_control( time, lat, lon, alt, trajhours,
     f.write( '{:<10.4f} {:<10.4f} {:<10.4f}\n'.format( lat, lon, alt ) )
     f.write( '{:d}\n'.format( trajhours ) )
     f.write( "0\n" )
-    f.write( "10000.0\n" )
+    f.write( "15000.0\n" )
     f.write( '{:d}\n'.format( nmet ) )
     for i in range( nmet ):
         f.write( metdirs[i]+'\n' )
