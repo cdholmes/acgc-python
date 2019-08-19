@@ -221,19 +221,13 @@ def get_hrrr_filename( time ):
     # Directory
     dirname = metroot+'hrrr/'
 
-    # Filename template
-    filename = '{date:%Y%m%d}_*_hrrr'.format( date=time )
+    # There are four files per day containing these hours
+    hourstrings = ['00-05','06-11','12-17','18-23']
 
-    # Find all the files that match these criteria
-    files = glob.glob( dirname + filename )
-
-    # When we find then, sort and combine into one list
-    files = sorted( files )
-
-    # Split into directory and file names
-    dirnames  = [ os.path.dirname(f)+'/' for f in files ]
-    filenames = [ os.path.basename(f)    for f in files ]
-
+    filenames = [ '{:%Y%m%d}_{:s}_hrrr'.format( time, hstr )
+                  for hstr in hourstrings ]
+    dirnames = [ dirname for i in range(4) ]
+    
     # Return
     return dirnames, filenames
 
@@ -246,6 +240,7 @@ def get_met_filename( metversion, time ):
         raise TypeError( "get_met_filename: time must be a datetime object" )
     
     # Directory and filename template
+    doFormat=True
     if (metversion == 'gdas1' ):
         # Special treatment
         dirname, filename = get_gdas1_filename( time )
@@ -264,13 +259,14 @@ def get_met_filename( metversion, time ):
     elif (metversion == 'hrrr' ):
         # Special treatment
         dirname, filename = get_hrrr_filename( time )
-        return dirname, filename
+        doFormat=False
     else:
         raise NotImplementedError(
             "get_met_filename: {metversion:s} unrecognized".format(metversion) )
 
     # Build the filename
-    filename = filename.format( date=time )
+    if doFormat:
+        filename = filename.format( date=time )
 
     return dirname, filename
 
@@ -282,6 +278,11 @@ def get_archive_filelist( metversion, time, useAll=True ):
 
         # If metversion is a single string, then get value from appropriate function
         dirname, filename = get_met_filename( metversion, time )
+
+        # Convert to list, if isn't already
+        if isinstance(dirname, str):
+            dirname  = [dirname]
+            filename = [filename]
         
     elif isinstance( metversion, list ):
 
@@ -496,11 +497,33 @@ def get_forecast_filelist( metversion=['namsfCONUS','namf'], cycle=None ):
 
 def write_control( time, lat, lon, alt, trajhours,
                    fname='CONTROL.000', metversion=['gdas0p5','gdas1'],
-                   forecast=False, forecastcycle=None,
-                   hybrid=False ):
+                   forecast=False, forecastcycle=None, hybrid=False,
+                   outdir='./', tfile='tdump' ):
 
     # Write a control file for trajectory starting at designated time and coordinates
 
+    # Ensure that lat, lon, and alt are lists
+    try:
+        nlat = len( lat )
+    except TypeError:
+        lat = [ lat ]
+        nlat = len( lat )
+    try:
+        nlon = len( lon )
+    except TypeError:
+        lon = [ lon ]
+        nlon = len( lon )
+    try:
+        nalt = len( alt )
+    except TypeError:
+        alt = [ alt ]
+        nalt = len( alt )
+
+    # Should add some type checking to ensure that lon, lat, alt
+    # have conformable lengths
+    if ( (nlat != nlon) or (nlat != nalt) ):
+        raise ValueError( "lon, lat, alt must be conformable" )
+        
     # Number of days of met data
     ndays = int( np.ceil( np.abs( trajhours ) / 24 ) + 1 )
 
@@ -535,11 +558,13 @@ def write_control( time, lat, lon, alt, trajhours,
 
             # Add the file, if it isn't already in the list
             if ( filename not in metfiles ):
-                metdirs.append(  dirname  )
-                metfiles.append( filename )
+                metdirs.extend(  dirname  )
+                metfiles.extend( filename )
 
     # Number of met files
     nmet = len( metfiles )
+    if (nmet <= 0):
+        raise ValueError( 'Meteorology not found for ' + str( metversion ) )
 
     # Runs will fail if the initial time is not bracketed by met data.
     # When met resolution changes on the first day, this condition may not be met.
@@ -553,17 +578,20 @@ def write_control( time, lat, lon, alt, trajhours,
     f = open( fname, 'w' )
 
     f.write( startdate+'\n' )
-    f.write( "1\n" )
-    f.write( '{:<10.4f} {:<10.4f} {:<10.4f}\n'.format( lat, lon, alt ) )
+    f.write( '{:d}\n'.format( nlat ) )
+    for i in range(nlat):
+        f.write( '{:<10.4f} {:<10.4f} {:<10.4f}\n'.format( lat[i], lon[i], alt[i] ) )
     f.write( '{:d}\n'.format( trajhours ) )
     f.write( "0\n" )
     f.write( "15000.0\n" )
+    f.write( '0\n' )
+    f.write( '10000.0\n' )
     f.write( '{:d}\n'.format( nmet ) )
     for i in range( nmet ):
         f.write( metdirs[i]+'\n' )
         f.write( metfiles[i]+'\n' )
-    f.write( "./\n" )
-    f.write( "tdump\n" )
+    f.write( '{:s}\n'.format(outdir) )
+    f.write( '{:s}\n'.format(tfile) )
 
     f.close()
 

@@ -9,6 +9,105 @@ Created on Wed Apr 12 10:14:12 2017
 import numpy as np
 from numba import jit
 
+@jit
+def regrid_plevels( array1, pedge1, pedge2, intensive=False, edgelump=True ):
+    ''' Mass-conserving regridding of data on pressure levels
+    Data from the input array will be remapped to the output pressure levels while conserving total mass.
+
+    Inputs:
+    array1: Array of data that will be remapped. Quantities should be extensive (e.g. mass, not mixing ratio) 
+        unless the intensive keyword is used.
+    pedge1: Pressure edges of the input array1. The length of pedge1 should be one greater than array1. 
+        The element array1[i] is bounded by edges pedge1[i], pedge1[i+1]
+    pedge2: Pressure edges of the desired output array.
+    intensive: (boolean) If true, then array1 will be treated as an intensive quantity (e.g mole fraction, 
+        mixing ratio) during regridding. Each element array1[i] will be multiplied by (pedge1[i]-pedge[i+1]), 
+        which is proportional to airmass if pedge1 is pressure, before regridding. The output array2, will 
+        similarly be dividied by (pedge2[i]-pedge[i+1]) so that the output is also intensive. 
+        By default, intensive=False is used and the input array is assumed to be extensive.
+    edgelump: (boolean) If the max or min of pedge1 extend beyond the max or min of pedge2, the mass will 
+        be placed in in the first or last grid level of the output array2, ensuring that the mass of array2 
+        is the same as array1. 
+        By default, edgelump=True. If edgelump=False, then the mass of array2 can be less than array1.
+
+    Outputs:
+    array2: Array of remapped data. The length of array2 will be one less than pedge2.
+    '''
+
+    assert (len(pedge1)==len(array1)+1), "array1 and pedge1 must have the same length"
+
+    reverse = False
+
+    # Check if the input pedge1 are inceasing
+    if np.all(np.diff(pedge1) > 0):
+        # All are increasing, do nothing
+        pass
+    elif np.all(np.diff(pedge1) < 0):
+        # All are decreasing, reverse
+        array1 = np.flip( array1 )
+        pedge1 = np.flip( pedge1 )
+    else:
+        raise ValueError( 'Input pedge1 must be sorted ')
+
+    # Check if the output edges are increasing 
+    if np.all(np.diff(pedge2) > 0):
+        # All are increasing, do nothing
+        pass
+    elif np.all(np.diff(pedge2) < 0):
+        # All are decreasing, reverse
+        pedge2 = np.flip( pedge2 )
+        reverse = True
+    else:
+        raise ValueError( 'Input pedge2 must be sorted ')
+
+    # If input is an intensive quantity, then multiply by the pressure grid spacing
+    if intensive:
+        array1 = array1 * ( pedge1[1:] - pedge1[:-1] )
+
+    # Interpolate pedge2 into pedge1
+    idx21 = np.interp( pedge2, pedge1, np.arange(len(pedge1)) )
+
+    # If the pedge1 max or min are outside pedge2, then make sure the 
+    # edges go into the end levels
+    if edgelump:
+        idx21[0]  = 0
+        idx21[-1] = len(pedge1)-1  
+
+    # Empty array for result
+    array2 = np.zeros( len(pedge2)-1 )
+
+    for i in range(len(array2)):
+        for j in range( np.floor(idx21[i]).astype(int), np.ceil(idx21[i+1]).astype(int) ):
+
+            # Concise version
+            array2[i] += array1[j] * ( np.minimum(idx21[i+1],j+1) - np.maximum(idx21[i],j) )
+
+            # Lengthy version
+            #if ( j >= idx21[i] and j+1 <= idx21[i+1] ):
+            #    array2[i] += array1[j]
+            #    #print( 'input level {:d} inside output level {:d}'.format(j,i))
+            #elif ( j < idx21[i] and j+1 > idx21[i+1] ):
+            #    array2[i] += array1[j] * (idx21[i+1] - idx21[i])
+            #    #print( 'output level inside input level')
+            #elif ( j < idx21[i] ):
+            #    array2[i] +=  array1[j] * (1 - np.mod(idx21[i],  1)) 
+            #    #print( 'input level {:d} at bottom of output level {:d}'.format(j,i))
+            #elif ( j+1 > idx21[i+1] ):
+            #    array2[i] += array1[j] * np.mod( idx21[i+1], 1)
+            #    #print( 'input level {:d} at top of output level {:d}'.format(j,i))
+            #else:
+            #    raise NotImplemented
+
+    # Convert back to an intensive quantity, if necessary
+    if intensive:
+        array2 = array2 / ( pedge2[1:] - pedge2[:-1] )
+
+    # Reverse the output array, if necessary
+    if reverse:
+        array2 = np.flip( array2 )
+
+    return array2
+
 def set_center_edge( center, edge, name ):
     # Resolve any conflict between center and edge requests
     if ( (center==False) and (edge==False) ):
