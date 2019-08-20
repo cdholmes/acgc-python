@@ -584,8 +584,6 @@ def write_control( time, lat, lon, alt, trajhours,
     f.write( '{:d}\n'.format( trajhours ) )
     f.write( "0\n" )
     f.write( "15000.0\n" )
-    f.write( '0\n' )
-    f.write( '10000.0\n' )
     f.write( '{:d}\n'.format( nmet ) )
     for i in range( nmet ):
         f.write( metdirs[i]+'\n' )
