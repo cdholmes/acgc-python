@@ -155,8 +155,8 @@ def create_geo_var( var, fid, dimIDs, compress=True, classic=True, time=False, v
         fid.close()
         raise SystemExit
 
-    # If this is a time variable, then convert
-    if (time):
+    # If this is a time variable and units are "<time units> since <date>", then convert
+    if (time and (' since ' in var['units']) ):
         if ('calendar' in var.keys()):
             calendar = var['calendar']
         else:
