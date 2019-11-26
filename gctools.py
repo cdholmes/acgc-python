@@ -9,6 +9,66 @@ Created on Wed Apr 12 10:14:12 2017
 import numpy as np
 from numba import jit
 
+def mapweight1d( edge1, edge2, edgelump=True ):
+    '''Calculate mapping weights from source grid with edge1 to destination grid with edge2
+    Returns weights, which can then be applied 
+    new = np.dot(W,old)
+    '''
+
+    reverse = False
+
+    # Check if the input pedge1 are inceasing
+    if np.all(np.diff(edge1) > 0):
+        # All are increasing, do nothing
+        pass
+    elif np.all(np.diff(edge1) < 0):
+        raise ValueError( 'decreasing edge1 values not implemented')
+        # All are decreasing, reverse
+        edge1 = np.flip( edge1 )
+    else:
+        raise ValueError( 'Input edge1 must be sorted ')
+
+    # Check if the output edges are increasing 
+    if np.all(np.diff(edge2) > 0):
+        # All are increasing, do nothing
+        pass
+    elif np.all(np.diff(edge2) < 0):
+        raise ValueError( 'decreasing edge2 values not implemented')
+        # All are decreasing, reverse
+        edge2 = np.flip( edge2 )
+        reverse = True
+    else:
+        raise ValueError( 'Input edge2 must be sorted ')
+
+    # Interpolate pedge2 into pedge1
+    idx21 = np.interp( edge2, edge1, np.arange(len(edge1)) )
+
+    # If the pedge1 max or min are outside pedge2, then make sure the 
+    # edges go into the end levels
+    if edgelump:
+        idx21[0]  = 0
+        idx21[-1] = len(edge1)-1  
+
+    # Empty array for result
+    weight = np.zeros( (len(edge2)-1, len(edge1)-1) )
+    
+    for iNew in range(len(edge2)-1):
+        for iOld in range( np.floor(idx21[iNew]).astype(int), np.ceil(idx21[iNew+1]).astype(int) ):
+
+            # Concise version
+            weight[iNew,iOld] = ( np.minimum(idx21[iNew+1],iOld+1) - np.maximum(idx21[iNew],iOld) )
+   
+    return weight
+
+def regrid2d( array1, xe1, ye1, xe2, ye2 ):
+
+
+
+    weightX = mapweight1(xe1, xe2)
+    a1b = np.empty(  )
+    a1b = np.dot( weightX, array1.flatten() )
+
+    return
 @jit
 def regrid_plevels( array1, pedge1, pedge2, intensive=False, edgelump=True ):
     ''' Mass-conserving regridding of data on pressure levels
@@ -34,7 +94,8 @@ def regrid_plevels( array1, pedge1, pedge2, intensive=False, edgelump=True ):
     array2: Array of remapped data. The length of array2 will be one less than pedge2.
     '''
 
-    assert (len(pedge1)==len(array1)+1), "array1 and pedge1 must have the same length"
+    if (len(pedge1) != len(array1)+1):
+        raise ValueError("pedge1 must have size len(array1)+1")
 
     reverse = False
 
@@ -109,23 +170,53 @@ def regrid_plevels( array1, pedge1, pedge2, intensive=False, edgelump=True ):
     return array2
 
 def set_center_edge( center, edge, name ):
+
     # Resolve any conflict between center and edge requests
-    if ( (center==False) and (edge==False) ):
-        # If neither center nor edge is specified, default to center
-        center=True
-    elif ( (center==True) and (edge==True)):
-        # If both center and edge are specified, then raise error
-        print(name+': Choose either edge=True or center=True')
-        raise SystemExit()
+    # Values must be None or bool
+
+    if ((center is None) and (edge is None) ):
+
+        # If both center and edge are None, default to center
+        center = True
+        edge   = False
+
+    elif (center is None):
+        
+        # Use edge, if that value is boolean
+        if (type(edge) is bool):
+            center = not edge
+        else:
+            raise TypeError( name + ': edge must be boolean or None')
+
+    elif (edge is None):
+        
+        # Use center, if that value is boolean
+        if (type(center) is bool):
+            edge = not center
+        else:
+            raise TypeError( name + ': center must be boolean or None')
+
+    elif((type(center) is bool) and (type(edge) is bool)):
+
+        # If both are True or both are False, then raise error
+        if ( ((center==True)  and (edge==True)) or 
+             ((center==False) and (edge==False)) ):
+            # If both center and edge are specified, then raise error
+            raise ValueError( name + ': Choose either edge=True or center=True' )
+
+        # At this point, either center=True or edge=True, but not both 
+    
     else:
-        # At this point, either center=True or edge=True, but not both
-        center = not edge
+
+        # Values aren't boolean
+        raise TypeError( name + ': center and edge must be boolean or None')
 
     return center, edge    
 
-def get_lon(res=4, center=False, edge=False):
+def get_lon(res=4, center=None, edge=None):
     # Return the longitude of grid centers or edges. 
     # GMAO grids assumed
+    # res = 0.5 for 0.5x0.625
     # res = 2 for 2x2.5
     # res = 4 for 4x5
     
@@ -134,12 +225,17 @@ def get_lon(res=4, center=False, edge=False):
 
     # Longitude edges
     if (res==2):
-        lonedge = np.arange(-181.25,180,2.5)
+        dx=2.5
     elif (res==4):
-        lonedge = np.arange(-182.5,180,5)
+        dx=5
+    elif(res==0.5):
+        dx=0.625
     else:
         raise NotImplementedError( 'Resolution '+str(res)+' is not defined' )
-        
+
+    # Longitude edges
+    lonedge = np.arange(-180 - dx/2, 180, dx)
+
     # Get grid centers, if needed
     if (center):
         lon = ( lonedge[0:-1] + lonedge[1:] ) / 2
@@ -148,7 +244,7 @@ def get_lon(res=4, center=False, edge=False):
     
     return lon
     
-def get_lat(res=4, center=False, edge=False):
+def get_lat(res=4, center=None, edge=None):
     # Return the latitude of grid centers or edges. 
     # GMAO grids assumed
     # res = 2 for 2x2.5
@@ -159,11 +255,16 @@ def get_lat(res=4, center=False, edge=False):
 
     # Latitude edges
     if (res==2):
-        latedge = np.hstack([-90, np.arange(-89,90,2),90])
+        dy=2
     elif (res==4):
-        latedge = np.hstack([-90, np.arange(-88,90,4),90])
+        dy=4
+    elif (res==0.5):
+        dy=0.5
     else:
         raise NotImplementedError( 'Resolution '+str(res)+' is not defined' )
+
+    # Latitude edges
+    latedge = np.hstack([-90, np.arange(-90+dy/2,90,dy), 90] )
 
     # Get grid centers, if needed
     if (center):
