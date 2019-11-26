@@ -61,14 +61,57 @@ def mapweight1d( edge1, edge2, edgelump=True ):
     return weight
 
 def regrid2d( array1, xe1, ye1, xe2, ye2 ):
+    ''' Regrid regular x-y or lat-lon array
 
+    inputs:
+    array1 : 2D array input to regrid
+    xe1    : x dimension edges of input
+    ye1    : y dimension edges of input
+    xe2    : x dimension edges for output
+    ye2    : y dimension edges for output
+    '''
 
+    # Sizes
+    insize = np.shape(array1)
+    nxe1 = np.size(xe1)
+    nye1 = np.size(ye1)
+    nxe2 = np.size(xe2)
+    nye2 = np.size(ye2)
 
-    weightX = mapweight1(xe1, xe2)
-    a1b = np.empty(  )
-    a1b = np.dot( weightX, array1.flatten() )
+    # Ensure arrays conform
+    if (len(insize) != 2 ):
+        raise TypeError( 'array1 must be 2D')
+    if (insize[1] != nxe1-1):
+        raise ValueError( 'xe1 must match size of array1' )
+    if (insize[0] != nye1-1):
+        raise ValueError( 'ye1 must match size of array1' )
 
-    return
+    # Regridding weight matrices
+    weightY = mapweight1d(ye1, ye2)
+    weightX = mapweight1d(xe1, xe2)
+
+    # Size of temporary and output arrays
+    tmpsize = [nye2-1,nxe1-1]
+    outsize = [nye2-1,nxe2-1]
+
+    # Temporary array
+    a1b = np.empty( tmpsize )
+    a1b[:] = np.nan
+
+    # Output array
+    outarray = np.empty(outsize)
+    outarray[:] = np.nan
+
+    # Regrid latitude
+    for i in range(np.size(xe1)-1):
+        a1b[:,i] = np.dot( weightY, array1[:,i].flatten() )
+
+    # Regrid longitude
+    for i in range(outsize[0]):
+        outarray[i,:] = np.dot( weightX, a1b[i,:].flatten() )
+
+    return outarray
+
 @jit
 def regrid_plevels( array1, pedge1, pedge2, intensive=False, edgelump=True ):
     ''' Mass-conserving regridding of data on pressure levels
