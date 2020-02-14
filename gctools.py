@@ -9,6 +9,7 @@ Created on Wed Apr 12 10:14:12 2017
 import numpy as np
 from numba import jit
 
+@jit
 def mapweight1d( edge1, edge2, edgelump=True ):
     '''Calculate mapping weights from source grid with edge1 to destination grid with edge2
     Returns weights, which can then be applied 

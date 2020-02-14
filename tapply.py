@@ -65,10 +65,11 @@
 # with subject "python routine tapply"
 #-----------------------------------------------------------------------
 
-    
-def tapply( array, group, f ):
+import numpy as np
+from numba import jit
 
-    import numpy as np
+@jit
+def tapply( array, group, f ):
 
     # Find the unique GROUP values
     groupvalues = np.unique( group )
