@@ -43,7 +43,10 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None ):
     p      = np.zeros( (ntraj, nttime), np.float32 )
     T      = np.zeros( (ntraj, nttime), np.float32 )
     Q      = np.zeros( (ntraj, nttime), np.float32 )
+    U      = np.zeros( (ntraj, nttime), np.float32 )
+    V      = np.zeros( (ntraj, nttime), np.float32 )
     precip = np.zeros( (ntraj, nttime), np.float32 )
+    zmix   = np.zeros( (ntraj, nttime), np.float32 )
     inBL   = np.zeros( (ntraj, nttime), np.int8 ) 
 
     # Check if optional variables are present
@@ -52,6 +55,8 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None ):
     doBL       = ('MIXDEPTH' in traj.columns)
     doT        = ('AIR_TEMP' in traj.columns)
     doQ        = ('SPCHUMID' in traj.columns)
+    doU        = ('UWIND'    in traj.columns)
+    doV        = ('VWIND'    in traj.columns)
     doPrecip   = ('RAINFALL' in traj.columns)
 
     for t in tnums:
@@ -76,7 +81,8 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None ):
             altMSL[t-1,:] = traj.alt[idx] + traj.TERR_MSL[idx]
         if (doBL):
             inBL[t-1,:]   = (traj.alt[idx] < traj.MIXDEPTH[idx])
-    
+            zmix[t-1,:]   = traj.MIXDEPTH[idx]
+
     # Put output variables into a list
     variables = [
         {'name':'lat',
@@ -117,6 +123,18 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None ):
            'long_name':'specific humidity of trajectory',
            'units':'g/kg',
            'value':np.expand_dims(Q,axis=0)} )
+    if (doU):
+        variables.append(
+            {'name':'U',
+           'long_name':'eastward wind speed on trajectory',
+           'units':'m/s',
+           'value':np.expand_dims(U,axis=0)} )
+    if (doV):
+        variables.append(
+            {'name':'V',
+           'long_name':'northward wind speed on trajectory',
+           'units':'m/s',
+           'value':np.expand_dims(V,axis=0)} )
     if (doPrecip):
         variables.append(
             {'name':'precipitation',
@@ -129,6 +147,11 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None ):
            'long_name':'trajectory in boundary layer flag',
            'units':'unitless',
            'value':np.expand_dims(inBL,axis=0)} )
+        variables.append(
+            {'name':'mixdepth',
+           'long_name':'boundary layer mixing depth',
+           'units':'m',
+           'value':np.expand_dims(zmix,axis=0)} )
 
     # Construct global attributes
     # Start with default and add any provided by user input
