@@ -330,9 +330,19 @@ def get_archive_filelist( metversion, time, useAll=True ):
             d, f = get_met_filename( met, time )
 
             if (useAll):
+
+                # Ensure that directory and file are lists so that we can use extend below
+                if (type(d) is str):
+                    d = [d]
+                    f = [f]
+                elif (type(d) is list):
+                    pass
+                else:
+                    raise NotImplementedError( 'Variable expected to be string or list but is actually ',type(d) )
+                
                 # Append to the list so that all can be used
-                dirname.append( d)
-                filename.append(f)
+                dirname.extend( d)
+                filename.extend(f)
 
             else:
                 # Use just the first met file that exists
