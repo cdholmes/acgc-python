@@ -75,6 +75,10 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None ):
             T[t-1,:]      = traj.AIR_TEMP[idx]
         if (doQ):
             Q[t-1,:]      = traj.SPCHUMID[idx]
+        if (doU):
+            U[t-1,:]      = traj.UWIND[idx]
+        if (doV):
+            V[t-1,:]      = traj.VWIND[idx]
         if (doPrecip):
             precip[t-1,:] = traj.RAINFALL[idx]
         if (doMSL):
@@ -94,7 +98,7 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None ):
            'units':'degrees_east',
            'value':np.expand_dims(lon, axis=0)},
         {'name':'altAGL',
-           'long_name':'altitude of trajectory above ground level',
+           'long_name':'altitude above ground level',
            'units':'m',
            'value':np.expand_dims(altAGL, axis=0)} ]
 
@@ -102,44 +106,44 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None ):
     if (doMSL):
         variables.append( 
            {'name':'altMSL',
-           'long_name':'altitude of trajectory above mean sea level',
+           'long_name':'altitude above mean sea level',
            'units':'m',
            'value':np.expand_dims(altMSL,axis=0)} )
     if (doP):
         variables.append(
             {'name':'p',
-           'long_name':'pressure of trajectory',
+           'long_name':'pressure',
            'units':'hPa',
            'value':np.expand_dims(p,axis=0)} )
     if (doT):
         variables.append(
             {'name':'T',
-           'long_name':'temperature of trajectory',
+           'long_name':'temperature',
            'units':'K',
            'value':np.expand_dims(T,axis=0)} )
     if (doQ):
         variables.append(
             {'name':'q',
-           'long_name':'specific humidity of trajectory',
+           'long_name':'specific humidity',
            'units':'g/kg',
            'value':np.expand_dims(Q,axis=0)} )
     if (doU):
         variables.append(
             {'name':'U',
-           'long_name':'eastward wind speed on trajectory',
+           'long_name':'eastward wind speed',
            'units':'m/s',
            'value':np.expand_dims(U,axis=0)} )
     if (doV):
         variables.append(
             {'name':'V',
-           'long_name':'northward wind speed on trajectory',
+           'long_name':'northward wind speed',
            'units':'m/s',
            'value':np.expand_dims(V,axis=0)} )
     if (doPrecip):
         variables.append(
             {'name':'precipitation',
-           'long_name':'precipitation on trajectory',
-           'units':'mm',
+           'long_name':'precipitation',
+           'units':'mm/hr',
            'value':np.expand_dims(precip,axis=0)} )
     if (doBL):
         variables.append(
@@ -152,6 +156,10 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None ):
            'long_name':'boundary layer mixing depth',
            'units':'m',
            'value':np.expand_dims(zmix,axis=0)} )
+
+    # Add dimension information to all variables
+    for v in range(len(variables)):
+        variables[v]['dim_names'] = ['time','trajnum','trajtime']
 
     # Construct global attributes
     # Start with default and add any provided by user input
@@ -550,17 +558,13 @@ def write_control( time, lat, lon, alt, trajhours,
     # Number of days of met data
     ndays = int( np.ceil( np.abs( trajhours ) / 24 ) + 1 )
 
-    if ( trajhours < 0 ):
-        d0 = -ndays+1
-        d1 = 1
-    else:
-        d0 = 0
-        d1 = ndays
-
+    # Find the meteorology files
     if (hybrid is True):
 
+        # "Hybrid" combines past (archived) and future (forecast) meteorology
         if (trajhours < 0):
-            raise NotImplementedError( "Combined Analysis/Forecast meteorology not supported for back trajectories" )
+            raise NotImplementedError( "Combined Analysis/Forecast meteorology "+
+                                       "not supported for back trajectories" )
         metdirs,metfiles = get_hybrid_filelist( metversion, time )
 
     elif (forecast is True):
@@ -569,14 +573,34 @@ def write_control( time, lat, lon, alt, trajhours,
         
         # Check if the forecast meteorology covers the entire trajectory duration
     else:
+        # Use archived (past) meteorology
+
+        # Relative to trajectory start day,
+        # we need meteorology for days d0 through d1
+        if ( trajhours < 0 ):
+            d0 = -ndays+1
+            d1 = 1
+            # For trajectories that start 23-0Z (nam) or 21-0Z (gfs0p25), 
+            # also need the next day to bracket first time step
+            if (time.hour==23):
+                d1 = 2 
+        else:
+            d0 = 0
+            d1 = ndays
+            # For trajectories that start 00-01Z (nam) or 00-03Z (gfs0p25), 
+            # also need the prior day to bracket first time step
+            if (time.hour==0):
+                d0 = -1
 
         # List of met directories and met files that will be used
         metdirs  = []
         metfiles = []
         for d in range(d0,d1):
+
             # date of met data
             metdate = time.date() + pd.Timedelta( d, "D" )
 
+            # Met data for a single day 
             dirname, filename = get_archive_filelist( metversion, metdate )
 
             # Add the file, if it isn't already in the list
@@ -598,8 +622,9 @@ def write_control( time, lat, lon, alt, trajhours,
     # Start date-time, formatted as YY MM DD HH {mm}
     startdate = time.strftime( "%y %m %d %H %M" )
 
+    # Write the CONTROL file
     f = open( fname, 'w' )
-
+    
     f.write( startdate+'\n' )
     f.write( '{:d}\n'.format( nlat ) )
     for i in range(nlat):
