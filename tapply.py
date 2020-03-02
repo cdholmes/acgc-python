@@ -68,7 +68,7 @@
 import numpy as np
 from numba import jit
 
-@jit
+#@jit
 def tapply( array, group, f ):
 
     # Find the unique GROUP values
