@@ -179,6 +179,7 @@ def create_geo_var( var, fid, dimIDs, compress=True, classic=True, time=False, v
     var.pop('name',None)
     var.pop('value',None)
     var.pop('unlimited',None)
+    var.pop('dim_names',None)
     
     # Save the remaining attributes
     ncVar.setncatts(var)
@@ -217,6 +218,7 @@ def write_geo_nc(filename, variables,
        
     ### Define dimensions
     
+    dimName = []
     dimList = []
     dimSize = []
     varList = []
@@ -229,7 +231,8 @@ def write_geo_nc(filename, variables,
                     'units': 'degrees_east'}    
         
         ncDim, ncVar = create_geo_dim( xDim, f, compress=compress, classic=classic, verbose=verbose )
- 
+
+        dimName.append( ncDim.name )
         dimList.append( ncDim )
         varList.append( ncVar )
         dimSize.append( len(varList[-1][:]) )
@@ -243,6 +246,7 @@ def write_geo_nc(filename, variables,
 
         ncDim, ncVar = create_geo_dim( yDim, f, compress=compress, classic=classic, verbose=verbose )
  
+        dimName.append( ncDim.name )
         dimList.append( ncDim )
         varList.append( ncVar )
         dimSize.append( len(varList[-1][:]) )
@@ -267,6 +271,7 @@ def write_geo_nc(filename, variables,
 
         ncDim, ncVar = create_geo_dim( zDim, f, compress=compress, classic=classic, verbose=verbose )
 
+        dimName.append( ncDim.name )
         dimList.append( ncDim )
         varList.append( ncVar )
         dimSize.append( len(varList[-1][:]) )
@@ -283,6 +288,7 @@ def write_geo_nc(filename, variables,
 
         ncDim, ncVar = create_geo_dim( tDim, f, compress=compress, classic=classic, time=True, verbose=verbose )
 
+        dimName.append( ncDim.name )
         dimList.append( ncDim )
         varList.append( ncVar )
         dimSize.append( len(varList[-1][:]) )
@@ -296,21 +302,45 @@ def write_geo_nc(filename, variables,
 
         # Shape of the variable
         vShape = var['value'].shape
-        
-        # Match dimensions of variable with defined dimensions
-        dID = []
-        for s in vShape:
 
-            # Find the dimensions that match the variable dimension
-            try:
-                i = dimSize.index(s)
-            except ValueError:
-                # No dimensions match
-                raise ValueError( 'Cannot match dimensions for variable {:s}'.format( var['name'] ) )
+        # If dim_names is provided, otherwise use inference
+        if ('dim_names' in var.keys() ):
 
-            # List of the dimension names
-            dID.append(dimList[i].name)
+            # Set dimensions based on provided names
+            dID = var['dim_names']
 
+            # Confirm that correct number of dimensions are provided
+            if (len(dID) != len(vShape)):
+                raise ValueError( 'Variable {:s} has dimenion {:d} and {:d} dim_names'.format( var['name'],
+                                                                                               len(vShape),
+                                                                                               len(dID) ) )
+            # Shape of each named dimension
+            dShape = tuple( dimSize[dimName.index(d)] for d in dID )
+
+            # Confirm that the named dimensions match the shape of the variable
+            if (dShape != vShape):
+                raise ValueError( 'Shape of the dimensions [{:s}]=[{:s}] must match '.format( ','.join(dID),
+                                                                                   ','.join([str(i) for i in dShape]) ) + 
+                                  'the shape of variable {:s} which is [{:s}]'.format( var['name'],
+                                                                                   ','.join([str(i) for i in vShape]) ) )
+                        
+        else:
+            
+            # Match dimensions of variable with defined dimensions based on shape
+            dID = []
+            for s in vShape:
+
+                # Find the dimensions that match the variable dimension
+                try:
+                    i = dimSize.index(s)
+                except ValueError:
+                    # No dimensions match
+                    raise ValueError( 'Cannot match dimensions for variable {:s}'.format( var['name'] ) )
+
+                # List of the dimension names
+                dID.append(dimName[i])
+
+                
         # Create the variable
         ncVar = create_geo_var( var, f, dID, compress=compress, classic=classic, verbose=verbose )
 
