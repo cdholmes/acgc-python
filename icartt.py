@@ -124,6 +124,6 @@ def read_icartt( files, usePickle=False, timeIndex=False ):
         obsall.append(obs)
     
     # Concatenate all files into one dataframe
-    obs = pd.concat( obsall )
+    obs = pd.concat( obsall, sort=True )
     
     return obs
