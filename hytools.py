@@ -9,6 +9,19 @@ import os
 import glob
 import netCDF4 as nc
 
+'''
+Assumed directory structure for meteorological data. 
+All directories are archived meteorology except for "forecast/" directory.
+metroot/
+  forecast/ - All forecasts organized by initialization date
+    YYYYMMDD/ 
+  gdas1/
+  gdas0p5/
+  gfs0p25/
+  hrrr/
+  nam12/ - what ARL calls nams
+  nam3/ - pieced forecast of NAM CONUS nest (3 km)
+'''
 metroot = '/data/MetData/ARL/'
 
 def tdump2nc( inFile, outFile, clobber=False, globalAtt=None ):
