@@ -11,7 +11,7 @@ import netCDF4 as nc
 
 metroot = '/data/MetData/ARL/'
 
-def tdump2nc( inFile, outFile, clobber=False, globalAtt=None ):
+def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False ):
     # Convert a HYSPLIT tdump file to netCDF
     # Works with single point or ensemble trajectories
 
@@ -38,8 +38,8 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None ):
     # Empty arrays
     lat    = np.zeros( (ntraj, nttime), np.float32 )
     lon    = np.zeros( (ntraj, nttime), np.float32 )
-    altMSL = np.zeros( (ntraj, nttime), np.float32 )
-    altAGL = np.zeros( (ntraj, nttime), np.float32 )
+    alt    = np.zeros( (ntraj, nttime), np.float32 )
+    altTerr= np.zeros( (ntraj, nttime), np.float32 )
     p      = np.zeros( (ntraj, nttime), np.float32 )
     T      = np.zeros( (ntraj, nttime), np.float32 )
     Q      = np.zeros( (ntraj, nttime), np.float32 )
@@ -51,7 +51,7 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None ):
 
     # Check if optional variables are present
     doP        = ('PRESSURE' in traj.columns)
-    doMSL      = ('TERR_MSL' in traj.columns)
+    doTerr     = ('TERR_MSL' in traj.columns)
     doBL       = ('MIXDEPTH' in traj.columns)
     doT        = ('AIR_TEMP' in traj.columns)
     doQ        = ('SPCHUMID' in traj.columns)
@@ -64,9 +64,9 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None ):
         idx = traj.tnum==t
 
         # Save the coordinates
-        lat[t-1,:]    = traj.lat[idx]
-        lon[t-1,:]    = traj.lon[idx]
-        altAGL[t-1,:] = traj.alt[idx]
+        lat[t-1,:] = traj.lat[idx]
+        lon[t-1,:] = traj.lon[idx]
+        alt[t-1,:] = traj.alt[idx]
 
         # Add optional variables
         if (doP):
@@ -81,11 +81,26 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None ):
             V[t-1,:]      = traj.VWIND[idx]
         if (doPrecip):
             precip[t-1,:] = traj.RAINFALL[idx]
-        if (doMSL):
-            altMSL[t-1,:] = traj.alt[idx] + traj.TERR_MSL[idx]
+        if (doTerr):
+            altTerr[t-1,:]= traj.TERR_MSL[idx]
         if (doBL):
             inBL[t-1,:]   = (traj.alt[idx] < traj.MIXDEPTH[idx])
             zmix[t-1,:]   = traj.MIXDEPTH[idx]
+
+    if altIsMSL:
+        altName=     'altMSL'
+        altLongName= 'altitude above mean sea level'
+        if doTerr:
+            alt2Name=     'altAGL'
+            alt2LongName= 'altitude above ground level'
+            alt2=         alt-altTerr
+    else:
+        altName=     'altAGL'
+        altLongName= 'altitude above ground level'
+        if doTerr:
+            alt2Name=     'altMSL'
+            alt2LongName= 'altitude above mean sea level'
+            alt2=         alt+altTerr
 
     # Put output variables into a list
     variables = [
@@ -97,18 +112,23 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None ):
            'long_name':'longitude of trajectory',
            'units':'degrees_east',
            'value':np.expand_dims(lon, axis=0)},
-        {'name':'altAGL',
-           'long_name':'altitude above ground level',
+        {'name':altName,
+           'long_name':altLongName,
            'units':'m',
-           'value':np.expand_dims(altAGL, axis=0)} ]
+           'value':np.expand_dims(alt, axis=0)} ]
 
     # Add optional variables to output list
-    if (doMSL):
+    if (doTerr):
         variables.append( 
-           {'name':'altMSL',
-           'long_name':'altitude above mean sea level',
+           {'name':'altTerr',
+           'long_name':'altitude of terrain',
            'units':'m',
-           'value':np.expand_dims(altMSL,axis=0)} )
+           'value':np.expand_dims(altTerr,axis=0)} )
+        variables.append( 
+           {'name':alt2Name,
+           'long_name':alt2LongName,
+           'units':'m',
+           'value':np.expand_dims(alt2,axis=0)} )
     if (doP):
         variables.append(
             {'name':'p',
@@ -215,7 +235,7 @@ def read_tdump(file):
         
         # Read the data
         df = pd.read_csv( fid, delim_whitespace=True,
-                          header=None, index_col=False,
+                          header=None, index_col=False, na_values=['NaN','********'],
                 names=['tnum','metnum',
                        'year','month','day','hour','minute','fcasthr',
                        'thour','lat','lon','alt']+vnames )
@@ -538,7 +558,7 @@ def get_forecast_filelist( metversion=['namsfCONUS','namf'], cycle=None ):
 
 def write_control( time, lat, lon, alt, trajhours,
                    fname='CONTROL.000', metversion=['gdas0p5','gdas1'],
-                   forecast=False, forecastcycle=None, hybrid=False,
+                   forecast=False, forecastcycle=None, hybrid=False, exacttime=False,
                    outdir='./', tfile='tdump' ):
 
     # Write a control file for trajectory starting at designated time and coordinates
@@ -592,7 +612,8 @@ def write_control( time, lat, lon, alt, trajhours,
             d1 = 1
             # For trajectories that start 23-0Z (nam) or 21-0Z (gfs0p25), 
             # also need the next day to bracket first time step
-            if (time.hour==23):
+            if ( (('nam3'    in metversion) and (time.hour==23)) or
+                 (('gfs0p25' in metversion) and (time.hour>=21)) ):
                 d1 = 2 
         else:
             d0 = 0
@@ -601,6 +622,10 @@ def write_control( time, lat, lon, alt, trajhours,
             # also need the prior day to bracket first time step
             if (time.hour==0):
                 d0 = -1
+
+        #print('Initial Date Range',d0,d1)
+        #datelist = np.unique( ( time + pd.TimedeltaIndex( np.sign(trajhours) * np.arange(0,np.abs(trajhours)+1),"H" ) ).date )
+        #print(datelist)
 
         # List of met directories and met files that will be used
         metdirs  = []
@@ -625,8 +650,9 @@ def write_control( time, lat, lon, alt, trajhours,
 
     # Runs will fail if the initial time is not bracketed by met data.
     # When met resolution changes on the first day, this condition may not be met.
-    # Starting the midnight trajectories at one 00:01 avoids this problem.
-    if (time.hour==0 and time.minute == 0):
+    # Unless exacttime==True, the starting time will be shifted 1 minute to 00:01
+    # to avoid reading in an entire extra day of met data.
+    if (time.hour==0 and time.minute == 0 and not exacttime):
         time = time + pd.Timedelta( 1, "m" )
 
     # Start date-time, formatted as YY MM DD HH {mm}
