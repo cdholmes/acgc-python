@@ -63,7 +63,7 @@ def read_icartt( files, usePickle=False, timeIndex=False ):
 
                 # Raise exception if the time unit is not seconds;
                 # may need to be handled differently below
-                if (tunit in ['s','seconds','seconds (from midnight UTC)']):
+                if (tunit in ['s','seconds','seconds (from midnight UTC)','seconds_past_midnight']):
                     # Use unit expected by pandas
                     tunit = 's'
                 else:
@@ -101,13 +101,9 @@ def read_icartt( files, usePickle=False, timeIndex=False ):
                 if (scale[i]!=1):
                     obs[varnames[i]] *= scale[i]
                 
-            # Rename selected variables
-            obs.rename(columns={tname:'time'}, inplace=True)
-        
-            # Convert time to a datetime
-            #obs.time = dt.datetime(year,month,day) + pd.TimedeltaIndex(obs.time,'s')
-            obs.time = pd.DatetimeIndex( pd.Timestamp(year=year,month=month,day=day) +
-                                         pd.TimedeltaIndex(obs.time,tunit) )
+            # Add a time variable in datetime format
+            obs['time'] = pd.DatetimeIndex( pd.Timestamp(year=year,month=month,day=day) +
+                                         pd.TimedeltaIndex(obs[tname],tunit) )
         
             # Add flight number
             obs['file'] = n+1
