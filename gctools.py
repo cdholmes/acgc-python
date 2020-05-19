@@ -8,6 +8,7 @@ Created on Wed Apr 12 10:14:12 2017
 
 import numpy as np
 from numba import jit
+from scipy.interpolate import interp1d 
 
 @jit
 def mapweight1d( edge1, edge2, edgelump=True ):
@@ -255,15 +256,58 @@ def set_center_edge( center, edge, name ):
         # Values aren't boolean
         raise TypeError( name + ': center and edge must be boolean or None')
 
-    return center, edge    
+    return center, edge
+
+def lon2i(lon,res=4):
+    '''Find I grid index for longitude
+    '''
+    # Put longitude in expected GC the range [-180,180]
+    alon = np.mod( np.asarray(lon) + 180, 360 ) - 180
+    longrid = get_lon(res=res,center=True)
+    nlon = len(longrid)
+    f = interp1d(np.append(longrid,longrid[0]+360),
+                np.append(np.arange(nlon),0),
+                kind='nearest',
+                fill_value='extrapolate')
+    return f(alon).astype(np.int)
+
+def lat2j(lat,res=4):
+    '''Find J grid index for latitude
+    '''
+    alat = np.asarray(lat)
+    latgrid = get_lat(res=res,center=True)
+    nlat = len(latgrid)
+    if (np.any(alat<-90) or np.any(alat>90)):
+        raise ValueError('lat must be in the range [-90,90]')    
+    f = interp1d(latgrid,
+                np.arange(nlat),
+                kind='nearest',
+                fill_value='extrapolate')
+    return f(alat).astype(np.int)
+
+def ll2ij(lon,lat,res=4):
+    '''Find (I,J) grid index for longitude, latitude
+    '''
+    alon = np.asarray(lon)
+    alat = np.asarray(lat)
+    nlon = alon.size
+    nlat = alat.size
+    if (nlon==1 and nlat>1):
+        alon = np.ones_like(alat) * alon
+    elif (nlat==1 and nlon>1):
+        alat = np.ones_like(alon) * alat
+    elif (nlon != nlat):
+        raise ValueError('lon and lat must have the same length or be conformable')
+    return lon2i(alon,res=res), lat2j(alat,res=res)
 
 def get_lon(res=4, center=None, edge=None):
-    # Return the longitude of grid centers or edges. 
-    # GMAO grids assumed
-    # res = 0.5 for 0.5x0.625
-    # res = 2 for 2x2.5
-    # res = 4 for 4x5
-    
+    '''Return the longitude of grid centers or edges. 
+    GMAO grids assumed
+    res = 0.5 for 0.5x0.625
+    res = 2 for 2x2.5
+    res = 4 for 4x5
+    '''
+
     # Resolve any conflict between center and edge
     center, edge = set_center_edge( center, edge, 'get_lon' )
 
