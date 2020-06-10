@@ -123,3 +123,105 @@ def read_icartt( files, usePickle=False, timeIndex=False ):
     obs = pd.concat( obsall, sort=True )
     
     return obs
+
+def write_icartt(filename, df, **kwargs):
+
+    normal_comments = ['PI_CONTACT_INFO',
+                'PLATFORM',
+                'LOCATION',
+                'ASSOCIATED_DATA',
+                'INSTRUMENT_INFO',
+                'DATA_INFO',
+                'UNCERTAINTY',
+                'ULOD_FLAG',
+                'ULOD_VALUE',
+                'LLOD_FLAG',
+                'LLOD_VALUE',
+                'DM_CONTACT_INFO',
+                'PROJECT_INFO',
+                'STIPULATIONS_ON_USE',
+                'OTHER_COMMENTS',
+                'REVISION',
+                'REVISION_COMMENTS']
+
+    required = ['PI_NAME',
+                'ORGANIZATION_NAME',
+                'SOURCE_DESCRIPTION',
+                'MISSION_NAME',
+                'VOLUME_INFO',
+                'DATE_LINE',
+                'TIME_INTERVAL',
+                'INDEPENDENT_VARIABLE_DEFINITION',
+                'NUMBER_DEPENDENT_VARIABLES',
+                'DEPENDENT_SCALE_LINE',
+                'DEPENDENT_MISSING_FLAGS',
+                'DEPENDENT_VARIABLE_DEFINITION',
+                'SPECIAL_COMMENTS',
+                'NORMAL_COMMENTS']
+    
+    # Variables that will be written to file
+    ictvars = list(df.INDEPENDENT_VARIABLE_DEFINITION.keys()) + \
+              list(df.DEPENDENT_VARIABLE_DEFINITION.keys())
+
+    # Form the header
+    header = []
+
+    for k in required:
+        # Special handling for some 
+        if k=='VOLUME_INFO':
+            header.append( '1, 1')
+        elif k=='DATE_LINE':
+            header.append( df.time.iloc[0].strftime('%Y, %m, %d, ') + 
+                           pd.Timestamp.today().strftime('%Y, %m, %d'))
+        elif k=='TIME_INTERVAL':
+            header.append( '1'  ) # ***UPDATE LATER: TIME INTERVAL IN SECONDS
+        elif k=='INDEPENDENT_VARIABLE_DEFINITION':
+            keydict = getattr( df, k )
+            header.append( list(keydict.keys())[0] + ', ' + list(keydict.values())[0] )            
+        elif k=='DEPENDENT_VARIABLE_DEFINITION':
+            keydict = getattr( df, k )
+            nvars = len(keydict)
+            header.append( str(nvars) )
+            header.append( ','.join(['1']*nvars) ) # Scale line
+            header.append( ','.join(['-9999']*nvars) ) # Missing flags
+            for kn in keydict.keys():
+                header.append( kn + ', ' + keydict[kn])
+        elif k in ['TIME_INTERVAL',
+                'NUMBER_DEPENDENT_VARIABLES', 
+                'DEPENDENT_SCALE_LINE',
+                'DEPENDENT_MISSING_FLAGS']:
+            #*** Handled elsewhere
+            pass
+        elif k=='SPECIAL_COMMENTS':
+            v = getattr( df, k )
+            if v:
+                # Expect a string or array of several lines
+                header.append( str(len(list(v))) )
+                header.extend( list(v) )
+            else:
+                header.append( '0' )
+        elif k=='NORMAL_COMMENTS':
+            nc= []
+            for kn in normal_comments:
+                v = getattr( df, kn )
+                if kn=='REVISION_COMMENTS':
+                    # Expect a string or array of several lines
+                    nc.extend( list(v) )
+                else:    
+                    nc.append( '{:s}: {:s}'.format(kn,v) )
+            nc.append( ','.join(ictvars)) # Also add list of variable names
+            header.append( str(len(nc)) )
+            header.extend( nc )
+        else:
+            v = getattr( df, k )
+            header.append( v )
+
+    with open(filename,'w') as f:
+        f.write('{:d}, 1001\n'.format(len(header)+1))  # +1 accounts for this line
+        for line in header:
+            f.write(line+'\n')
+        df[ictvars].to_csv( f,
+                            index=False,
+                            header=False, 
+                            na_rep='-9999',
+                            **kwargs ) 
