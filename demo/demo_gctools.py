@@ -157,13 +157,13 @@ file = '/Users/cdholmes/MERRA2.20150101.I3.4x5.nc4'
 f2   = '/Users/cdholmes/MERRA2.20150101.A3dyn.4x5.nc4'
 
 # Surface pressure, 3D temperature, 3D specific humidity
-PS2D = nct.get_ncdf_var( file, 'PS' ) # Pa
-T3D  = nct.get_ncdf_var( file, 'T'  ) # K
-Q3D  = nct.get_ncdf_var( file, 'QV' ) # kg/kg
-lat  = nct.get_ncdf_var( file, 'lat')
-lon  = nct.get_ncdf_var( file, 'lon')
-WS3D = np.sqrt( nct.get_ncdf_var( f2,   'U'  )**2 + # m/s
-                nct.get_ncdf_var( f2,   'V'  )**2 ) # m/s
+PS2D = nct.get_nc_var( file, 'PS' ) # Pa
+T3D  = nct.get_nc_var( file, 'T'  ) # K
+Q3D  = nct.get_nc_var( file, 'QV' ) # kg/kg
+lat  = nct.get_nc_var( file, 'lat')
+lon  = nct.get_nc_var( file, 'lon')
+WS3D = np.sqrt( nct.get_nc_var( f2,   'U'  )**2 + # m/s
+                nct.get_nc_var( f2,   'V'  )**2 ) # m/s
 
 # Coordinates of some location
 i=15
