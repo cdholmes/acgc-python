@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 ''' 
-Read ICARTT (ffi1001) format files
+Read and write ICARTT (ffi1001) format files
 
 Created on Mon Aug 13 16:59:25 2018
 @author: C.D. Holmes
@@ -125,6 +125,17 @@ def read_icartt( files, usePickle=False, timeIndex=False ):
     return obs
 
 def write_icartt(filename, df, **kwargs):
+    '''Write an ICARTT ffi1001 file
+
+    filename -- File to be created
+    df       -- Pandas dataframe containing data and metadata
+                df attributes must include all of the "required" and "normal_comments" names.
+                The INDEPENDENT_VARIABLE_DEFINITION and DEPENDENT_VARIABLE_DEFINITION should be dicts containing
+                {'VariableName':'units, standard name, description'}
+                Only variables listed in INDEPENDENT_VARIABLE_DEFINITION and DEPENDENT_VARIABLE_DEFINITION
+                will be written to the output file.
+    **kwags  -- passed to pandas.to_csv
+    '''
 
     normal_comments = ['PI_CONTACT_INFO',
                 'PLATFORM',
@@ -216,6 +227,7 @@ def write_icartt(filename, df, **kwargs):
             v = getattr( df, k )
             header.append( v )
 
+    # Write the file
     with open(filename,'w') as f:
         f.write('{:d}, 1001\n'.format(len(header)+1))  # +1 accounts for this line
         for line in header:
