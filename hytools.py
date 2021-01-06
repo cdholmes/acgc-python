@@ -24,7 +24,7 @@ metroot/
 '''
 metroot = '/data/MetData/ARL/'
 
-def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False ):
+def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False, dropOneTime=False ):
     # Convert a HYSPLIT tdump file to netCDF
     # Works with single point or ensemble trajectories
 
@@ -75,6 +75,15 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False ):
     for t in tnums:
         # Find entries for this trajectory 
         idx = traj.tnum==t
+
+        if dropOneTime:
+            # Kludge to address trajectories that start 1 minute after the hour, 
+            # due to CONTROL files created with write_control(... exacttime=False )
+            # Drop the second time element (at minute 0) to retain one point per hour
+            # Find entries and Drop the second element
+            tmpidx = np.where(traj.tnum==t)[0]
+            idx = [tmpidx[0]]
+            idx.extend(tmpidx[2:])
 
         # Save the coordinates
         lat[t-1,:] = traj.lat[idx]
@@ -275,9 +284,9 @@ def get_gdas1_filename( time ):
     wnum = ((time.day-1) // 7) + 1
 
     # GDAS 1 degree file
-    filename = filetmp.format( mon=time.strftime("%b").lower(), yy=time, week=wnum )
+    filename = dirname + filetmp.format( mon=time.strftime("%b").lower(), yy=time, week=wnum )
 
-    return dirname, filename
+    return filename
 
 # Directory and File names for hrrr meteorology, for given date
 def get_hrrr_filename( time ):
@@ -288,12 +297,12 @@ def get_hrrr_filename( time ):
     # There are four files per day containing these hours
     hourstrings = ['00-05','06-11','12-17','18-23']
 
-    filenames = [ '{:%Y%m%d}_{:s}_hrrr'.format( time, hstr )
+    filenames = [ '{:s}/{:%Y%m%d}_{:s}_hrrr'.format( dirname, time, hstr )
                   for hstr in hourstrings ]
     dirnames = [ dirname for i in range(4) ]
     
     # Return
-    return dirnames, filenames
+    return filenames
 
 
 # Directory and file names for given meteorology and date
@@ -307,22 +316,22 @@ def get_met_filename( metversion, time ):
     doFormat=True
     if (metversion == 'gdas1' ):
         # Special treatment
-        dirname, filename = get_gdas1_filename( time )
+        filename = get_gdas1_filename( time )
     elif (metversion == 'gdas0p5'):
         dirname  = metroot+'gdas0p5/'
-        filename = '{date:%Y%m%d}_gdas0p5'
+        filename = dirname+'{date:%Y%m%d}_gdas0p5'
     elif (metversion == 'gfs0p25'):
         dirname  = metroot+'gfs0p25/'
-        filename = '{date:%Y%m%d}_gfs0p25'
+        filename = dirname+'{date:%Y%m%d}_gfs0p25'
     elif (metversion == 'nam3' ):
         dirname  = metroot+'nam3/'
-        filename = '{date:%Y%m%d}_hysplit.namsa.CONUS'
+        filename = dirname+'{date:%Y%m%d}_hysplit.namsa.CONUS'
     elif (metversion == 'nam12' ):
         dirname  = metroot+'nam12/'
-        filename = '{date:%Y%m%d}_hysplit.t00z.namsa'
+        filename = dirname+'{date:%Y%m%d}_hysplit.t00z.namsa'
     elif (metversion == 'hrrr' ):
         # Special treatment
-        dirname, filename = get_hrrr_filename( time )
+        filename = get_hrrr_filename( time )
         doFormat=False
     else:
         raise NotImplementedError(
@@ -332,7 +341,7 @@ def get_met_filename( metversion, time ):
     if doFormat:
         filename = filename.format( date=time )
 
-    return dirname, filename
+    return filename
 
 # Get a list of met directories and files
 # When there are two met version provided, the first result will be used
@@ -341,18 +350,16 @@ def get_archive_filelist( metversion, time, useAll=True ):
     if isinstance( metversion, str ):
 
         # If metversion is a single string, then get value from appropriate function
-        dirname, filename = get_met_filename( metversion, time )
+        filename = get_met_filename( metversion, time )
 
         # Convert to list, if isn't already
-        if isinstance(dirname, str):
-            dirname  = [dirname]
+        if isinstance(filename, str):
             filename = [filename]
         
     elif isinstance( metversion, list ):
 
         # If metversion is a list, then get files for each met version in list
 
-        dirname  = []
         filename = []
 
         # Loop over all the metversions
@@ -360,26 +367,23 @@ def get_archive_filelist( metversion, time, useAll=True ):
         for met in metversion:
 
             # Find filename for this met version
-            d, f = get_met_filename( met, time )
+            f = get_met_filename( met, time )
 
             if (useAll):
 
                 # Ensure that directory and file are lists so that we can use extend below
-                if (type(d) is str):
-                    d = [d]
+                if (type(f) is str):
                     f = [f]
-                elif (type(d) is list):
+                elif (type(f) is list):
                     pass
                 else:
-                    raise NotImplementedError( 'Variable expected to be string or list but is actually ',type(d) )
+                    raise NotImplementedError( 'Variable expected to be string or list but is actually ',type(f) )
                 
                 # Append to the list so that all can be used
-                dirname.extend( d)
                 filename.extend(f)
 
             else:
                 # Use just the first met file that exists
-                dirname  = d
                 filename = f
                 break
                 # If the file exists, use this and exit;
@@ -403,7 +407,7 @@ def get_archive_filelist( metversion, time, useAll=True ):
     else:
         raise TypeError( "get_archive_filelist: metversion must be a string or list" )
 
-    return dirname, filename
+    return filename
 
 def get_hybrid_filelist( metversion, time ):
 
@@ -415,7 +419,6 @@ def get_hybrid_filelist( metversion, time ):
     # Starting at "time" get all of the available analysis files, then add forecast files
 
     # List of met directories and met files that will be used
-    metdirs  = []
     metfiles = []
 
     # Loop over 10 days, because that's probably enough for FIREX-AQ
@@ -425,14 +428,13 @@ def get_hybrid_filelist( metversion, time ):
         metdate = time.date() + pd.Timedelta( d, "D" )
         
         #dirname, filename = get_archive_filelist( metversion, metdate )
-        dirname, filename = get_met_filename( archivemet, metdate )
+        filename = get_met_filename( archivemet, metdate )
 
         # Check if the file exists
-        if ( os.path.isfile( dirname+filename ) ):
+        if ( os.path.isfile( filename ) ):
             
             # Add the file, if it isn't already in the list
             if ( filename not in metfiles ):
-                metdirs.append(  dirname  )
                 metfiles.append( filename )
 
         else:
@@ -446,23 +448,20 @@ def get_hybrid_filelist( metversion, time ):
                 
                 try:
                     # If this works, then the file exists
-                    d, f = get_forecast_filename( forecastmet, cy, partial=True )
+                    f = get_forecast_filename( forecastmet, cy, partial=True )
                     # Add the first 6-hr forecast period
-                    metdirs.append( d[0] )
                     metfiles.append( f[0] )
                     # If we have a full forecast cycle, save it
                     if (len(f)==8):
-                        dlast = d
                         flast = f
                 except FileNotFoundError:
                     # We have run out of forecast meteorology,
                     # So add the remainder of the prior forecast cycle and we're done
-                    metdirs.extend(  dlast[1:] )
                     metfiles.extend( flast[1:] )
 
-                    return metdirs, metfiles
+                    return metfiles
                     
-    return metdirs, metfiles
+    return metfiles
 
 def get_forecast_template( metversion ):
     # Get filename template for forecast meteorology
@@ -493,14 +492,10 @@ def get_forecast_filename( metversion, cycle, partial=False ):
     if ( (len(files) == nexpected) or (partial and len(files) >=1) ):
 
         # When we find then, sort and combine into one list
-        files = sorted( files )
-        
-        # Split into directory and file names
-        dirnames  = [ os.path.dirname(f)+'/' for f in files ]
-        filenames = [ os.path.basename(f)    for f in files ]
-        
+        filenames = sorted( files )
+              
         # Return
-        return dirnames, filenames
+        return filenames
         
     # Raise an error if no forecasts are found
     raise FileNotFoundError('ARL forecast meteorology found' )
@@ -529,14 +524,10 @@ def get_forecast_filename_latest( metversion ):
             if ( len(files) == nexpected ):
 
                 # When we find then, sort and combine into one list
-                files = sorted( files )
-                
-                # Split into directory and file names
-                dirnames  = [ os.path.dirname(f)+'/' for f in files ]
-                filenames = [ os.path.basename(f)    for f in files ]
-                
+                filenames = sorted( files )
+                               
                 # Return
-                return dirnames, filenames
+                return filenames
 
     # Raise an error if no forecasts are found
     raise FileNotFoundError('No ARL forecast meteorology found' )
@@ -547,31 +538,29 @@ def get_forecast_filelist( metversion=['namsfCONUS','namf'], cycle=None ):
     if isinstance( metversion, str ):
 
         if (cycle is None):
-            dirnames, filenames = get_forecast_filename_latest( metversion )
+            filenames = get_forecast_filename_latest( metversion )
         else:
-            dirnames, filenames = get_forecast_filename( metversion, cycle )
+            filenames = get_forecast_filename( metversion, cycle )
             
     else:
 
-        dirnames  = []
         filenames = []
         
         # Loop over the list of met types, combine them all
         for met in metversion:
 
             # Get directory and file names for one version
-            d, f = get_forecast_filelist( met, cycle )
+            f = get_forecast_filelist( met, cycle )
 
             # Combine them into one list
-            dirnames  = dirnames  + d
             filenames = filenames + f            
             
-    return dirnames, filenames
+    return filenames
 
 
 def write_control( time, lat, lon, alt, trajhours,
                    fname='CONTROL.000', metversion=['gdas0p5','gdas1'],
-                   forecast=False, forecastcycle=None, hybrid=False, exacttime=False,
+                   forecast=False, forecastcycle=None, hybrid=False, exacttime=True,
                    outdir='./', tfile='tdump' ):
 
     # Write a control file for trajectory starting at designated time and coordinates
@@ -608,11 +597,11 @@ def write_control( time, lat, lon, alt, trajhours,
         if (trajhours < 0):
             raise NotImplementedError( "Combined Analysis/Forecast meteorology "+
                                        "not supported for back trajectories" )
-        metdirs,metfiles = get_hybrid_filelist( metversion, time )
+        metfiles = get_hybrid_filelist( metversion, time )
 
     elif (forecast is True):
         # Get the forecast meteorology
-        metdirs, metfiles = get_forecast_filelist( metversion, forecastcycle )
+        metfiles = get_forecast_filelist( metversion, forecastcycle )
         
         # Check if the forecast meteorology covers the entire trajectory duration
     else:
@@ -641,7 +630,6 @@ def write_control( time, lat, lon, alt, trajhours,
         #print(datelist)
 
         # List of met directories and met files that will be used
-        metdirs  = []
         metfiles = []
         for d in range(d0,d1):
 
@@ -649,12 +637,13 @@ def write_control( time, lat, lon, alt, trajhours,
             metdate = time.date() + pd.Timedelta( d, "D" )
 
             # Met data for a single day 
-            dirname, filename = get_archive_filelist( metversion, metdate )
+            filename = get_archive_filelist( metversion, metdate )
 
-            # Add the file, if it isn't already in the list
-            if ( filename not in metfiles ):
-                metdirs.extend(  dirname  )
-                metfiles.extend( filename )
+            # Add the files to the list
+            metfiles.extend( filename )
+        # Keep only the unique files
+        metfiles = np.unique(metfiles)
+
 
     # Number of met files
     nmet = len( metfiles )
@@ -683,8 +672,8 @@ def write_control( time, lat, lon, alt, trajhours,
     f.write( "15000.0\n" )
     f.write( '{:d}\n'.format( nmet ) )
     for i in range( nmet ):
-        f.write( metdirs[i]+'\n' )
-        f.write( metfiles[i]+'\n' )
+        f.write( os.path.dirname(  metfiles[i] ) + '/\n' )
+        f.write( os.path.basename( metfiles[i] ) + '\n'  )
     f.write( '{:s}\n'.format(outdir) )
     f.write( '{:s}\n'.format(tfile) )
 
