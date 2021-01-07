@@ -143,7 +143,8 @@ def get_nc_type( value, name='', classic=True ):
 
     return vartype
 
-def create_geo_var( var, fid, dimIDs, compress=True, classic=True, time=False, verbose=False ):
+def create_geo_var( var, fid, dimIDs, compress=True, classic=True, time=False, 
+                    fill_value=None, verbose=False ):
     
     try:
         assert ('name' in var), \
@@ -166,11 +167,17 @@ def create_geo_var( var, fid, dimIDs, compress=True, classic=True, time=False, v
     # Variable type
     vartype = get_nc_type( var['value'], var['name'], classic )
   
+    # Fill value, if any
+    try:
+        fill_value = var['fill_value']
+    except:
+        pass
+
     #*** Check whether the data type is allowed in classic data type
     
     # Create the variable
     ncVar = fid.createVariable( var['name'], vartype, dimIDs, 
-                             zlib=compress, complevel=2 )
+                             zlib=compress, complevel=2, fill_value=fill_value )
 
     # Write variable values 
     ncVar[:] = var['value'][:]
@@ -180,6 +187,7 @@ def create_geo_var( var, fid, dimIDs, compress=True, classic=True, time=False, v
     var.pop('value',None)
     var.pop('unlimited',None)
     var.pop('dim_names',None)
+    var.pop('fill_value',None)
     
     # Save the remaining attributes
     ncVar.setncatts(var)
