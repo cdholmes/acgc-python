@@ -28,6 +28,10 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False, dr
     # Convert a HYSPLIT tdump file to netCDF
     # Works with single point or ensemble trajectories
 
+    # Return if the file already exists and not set to clobber
+    if os.path.exists(outFile) and clobber==False:
+        return 
+
     import nctools as nct
 
     # Trajectory points
@@ -49,18 +53,18 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False, dr
     nttime = len( ttime )
 
     # Empty arrays
-    lat    = np.zeros( (ntraj, nttime), np.float32 )
-    lon    = np.zeros( (ntraj, nttime), np.float32 )
-    alt    = np.zeros( (ntraj, nttime), np.float32 )
-    altTerr= np.zeros( (ntraj, nttime), np.float32 )
-    p      = np.zeros( (ntraj, nttime), np.float32 )
-    T      = np.zeros( (ntraj, nttime), np.float32 )
-    Q      = np.zeros( (ntraj, nttime), np.float32 )
-    U      = np.zeros( (ntraj, nttime), np.float32 )
-    V      = np.zeros( (ntraj, nttime), np.float32 )
-    precip = np.zeros( (ntraj, nttime), np.float32 )
-    zmix   = np.zeros( (ntraj, nttime), np.float32 )
-    inBL   = np.zeros( (ntraj, nttime), np.int8 ) 
+    lat    = np.zeros( (ntraj, nttime), np.float32 ) * np.nan
+    lon    = np.zeros( (ntraj, nttime), np.float32 ) * np.nan
+    alt    = np.zeros( (ntraj, nttime), np.float32 ) * np.nan
+    altTerr= np.zeros( (ntraj, nttime), np.float32 ) * np.nan
+    p      = np.zeros( (ntraj, nttime), np.float32 ) * np.nan
+    T      = np.zeros( (ntraj, nttime), np.float32 ) * np.nan
+    Q      = np.zeros( (ntraj, nttime), np.float32 ) * np.nan
+    U      = np.zeros( (ntraj, nttime), np.float32 ) * np.nan
+    V      = np.zeros( (ntraj, nttime), np.float32 ) * np.nan
+    precip = np.zeros( (ntraj, nttime), np.float32 ) * np.nan
+    zmix   = np.zeros( (ntraj, nttime), np.float32 ) * np.nan
+    inBL   = np.zeros( (ntraj, nttime), np.int8 )    * -9
 
     # Check if optional variables are present
     doP        = ('PRESSURE' in traj.columns)
@@ -73,8 +77,12 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False, dr
     doPrecip   = ('RAINFALL' in traj.columns)
 
     for t in tnums:
+
         # Find entries for this trajectory 
-        idx = traj.tnum==t
+        idx = traj.tnum==t 
+
+        # Number of times in this trajectory
+        nt = np.sum(idx)
 
         if dropOneTime:
             # Kludge to address trajectories that start 1 minute after the hour, 
@@ -86,28 +94,28 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False, dr
             idx.extend(tmpidx[2:])
 
         # Save the coordinates
-        lat[t-1,:] = traj.lat[idx]
-        lon[t-1,:] = traj.lon[idx]
-        alt[t-1,:] = traj.alt[idx]
+        lat[t-1,:nt] = traj.lat[idx]
+        lon[t-1,:nt] = traj.lon[idx]
+        alt[t-1,:nt] = traj.alt[idx]
 
         # Add optional variables
         if (doP):
-            p[t-1,:] = traj.PRESSURE[idx]
+            p[t-1,:nt] = traj.PRESSURE[idx]
         if (doT):
-            T[t-1,:]      = traj.AIR_TEMP[idx]
+            T[t-1,:nt]      = traj.AIR_TEMP[idx]
         if (doQ):
-            Q[t-1,:]      = traj.SPCHUMID[idx]
+            Q[t-1,:nt]      = traj.SPCHUMID[idx]
         if (doU):
-            U[t-1,:]      = traj.UWIND[idx]
+            U[t-1,:nt]      = traj.UWIND[idx]
         if (doV):
-            V[t-1,:]      = traj.VWIND[idx]
+            V[t-1,:nt]      = traj.VWIND[idx]
         if (doPrecip):
-            precip[t-1,:] = traj.RAINFALL[idx]
+            precip[t-1,:nt] = traj.RAINFALL[idx]
         if (doTerr):
-            altTerr[t-1,:]= traj.TERR_MSL[idx]
+            altTerr[t-1,:nt]= traj.TERR_MSL[idx]
         if (doBL):
-            inBL[t-1,:]   = (traj.alt[idx] < traj.MIXDEPTH[idx])
-            zmix[t-1,:]   = traj.MIXDEPTH[idx]
+            inBL[t-1,:nt]   = (traj.alt[idx] < traj.MIXDEPTH[idx])
+            zmix[t-1,:nt]   = traj.MIXDEPTH[idx]
 
     if altIsMSL:
         altName=     'altMSL'
@@ -129,15 +137,18 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False, dr
         {'name':'lat',
             'long_name':'latitude of trajectory',
             'units':'degrees_north',
-            'value':np.expand_dims(lat,axis=0)},
+            'value':np.expand_dims(lat,axis=0),
+            'fill_value':np.float32(np.nan)},
         {'name':'lon',
            'long_name':'longitude of trajectory',
            'units':'degrees_east',
-           'value':np.expand_dims(lon, axis=0)},
+           'value':np.expand_dims(lon, axis=0),
+           'fill_value':np.float32(np.nan)},
         {'name':altName,
            'long_name':altLongName,
            'units':'m',
-           'value':np.expand_dims(alt, axis=0)} ]
+           'value':np.expand_dims(alt, axis=0),
+           'fill_value':np.float32(np.nan)} ]
 
     # Add optional variables to output list
     if (doTerr):
@@ -145,59 +156,69 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False, dr
            {'name':'altTerr',
            'long_name':'altitude of terrain',
            'units':'m',
-           'value':np.expand_dims(altTerr,axis=0)} )
+           'value':np.expand_dims(altTerr,axis=0),
+           'fill_value':np.float32(np.nan)} )
         variables.append( 
            {'name':alt2Name,
            'long_name':alt2LongName,
            'units':'m',
-           'value':np.expand_dims(alt2,axis=0)} )
+           'value':np.expand_dims(alt2,axis=0),
+           'fill_value':np.float32(np.nan)} )
     if (doP):
         variables.append(
             {'name':'p',
            'long_name':'pressure',
            'units':'hPa',
-           'value':np.expand_dims(p,axis=0)} )
+           'value':np.expand_dims(p,axis=0),
+           'fill_value':np.float32(np.nan)} )
     if (doT):
         variables.append(
             {'name':'T',
            'long_name':'temperature',
            'units':'K',
-           'value':np.expand_dims(T,axis=0)} )
+           'value':np.expand_dims(T,axis=0),
+           'fill_value':np.float32(np.nan)} )
     if (doQ):
         variables.append(
             {'name':'q',
            'long_name':'specific humidity',
            'units':'g/kg',
-           'value':np.expand_dims(Q,axis=0)} )
+           'value':np.expand_dims(Q,axis=0),
+           'fill_value':np.float32(np.nan)} )
     if (doU):
         variables.append(
             {'name':'U',
            'long_name':'eastward wind speed',
            'units':'m/s',
-           'value':np.expand_dims(U,axis=0)} )
+           'value':np.expand_dims(U,axis=0),
+           'fill_value':np.float32(np.nan)} )
     if (doV):
         variables.append(
             {'name':'V',
            'long_name':'northward wind speed',
            'units':'m/s',
-           'value':np.expand_dims(V,axis=0)} )
+           'value':np.expand_dims(V,axis=0),
+           'fill_value':np.float32(np.nan)} )
     if (doPrecip):
         variables.append(
             {'name':'precipitation',
            'long_name':'precipitation',
            'units':'mm/hr',
-           'value':np.expand_dims(precip,axis=0)} )
+           'value':np.expand_dims(precip,axis=0),
+           'fill_value':np.float32(np.nan)} )
     if (doBL):
         variables.append(
             {'name':'inBL',
            'long_name':'trajectory in boundary layer flag',
            'units':'unitless',
-           'value':np.expand_dims(inBL,axis=0)} )
+           'value':np.expand_dims(inBL,axis=0),
+           'fill_value':-9} )
         variables.append(
             {'name':'mixdepth',
            'long_name':'boundary layer mixing depth',
            'units':'m',
-           'value':np.expand_dims(zmix,axis=0)} )
+           'value':np.expand_dims(zmix,axis=0),
+           'fill_value':np.float32(np.nan)} )
 
     # Add dimension information to all variables
     for v in range(len(variables)):
