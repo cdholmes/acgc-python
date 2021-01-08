@@ -212,6 +212,7 @@ def write_icartt(filename, df, **kwargs):
             else:
                 header.append( '0' )
         elif k=='NORMAL_COMMENTS':
+            # Form the comment block
             nc= []
             for kn in normal_comments:
                 v = getattr( df, kn )
@@ -220,7 +221,9 @@ def write_icartt(filename, df, **kwargs):
                     nc.extend( list(v) )
                 else:    
                     nc.append( '{:s}: {:s}'.format(kn,v) )
-            nc.append( ','.join(ictvars)) # Also add list of variable names
+            nc.append( ', '.join(ictvars)) # Also add list of variable names
+            
+            # Add normal comments to the header
             header.append( str(len(nc)) )
             header.extend( nc )
         else:
