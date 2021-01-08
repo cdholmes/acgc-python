@@ -50,6 +50,7 @@ plt.clf()
 
 # data coordinates: Use Geodetic (or PlateCarree) for data in lat-lon coordinates
 datacoord = ccrs.Geodetic()
+datacoord = ccrs.PlateCarree()
 
 # Map projection for Global 
 ax = plt.axes(projection=ccrs.PlateCarree())
