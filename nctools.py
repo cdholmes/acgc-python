@@ -6,6 +6,7 @@ Created on Mon Jun 29 15:49:33 2015
 """
 
 import netCDF4 as nc
+import numpy   as np
 
 def get_nc_var(filename,varname):
     """ Read a variable from a netCDF file"""
@@ -97,9 +98,6 @@ def put_nc_att(filename,varname,attname,value,glob=False):
     # Close the file
     ncfile.close()
 
-###############################################
-### EVERYTHING AFTER HERE IN DEVELOPMENT
- 
 def create_geo_dim( var, fid, **kwargs ):
     
     try:
@@ -121,7 +119,7 @@ def create_geo_dim( var, fid, **kwargs ):
 
     ncDim = fid.createDimension( var['name'], size )
     
-    ncVar = create_geo_var( var, fid, (var['name']), **kwargs )
+    ncVar = create_geo_var( var, fid, (var['name']), isDim=True, **kwargs )
 
     return ncDim, ncVar    
 
@@ -144,7 +142,7 @@ def get_nc_type( value, name='', classic=True ):
     return vartype
 
 def create_geo_var( var, fid, dimIDs, compress=True, classic=True, time=False, 
-                    fill_value=None, verbose=False ):
+                    fill_value=None, verbose=False, isDim=False ):
     
     try:
         assert ('name' in var), \
@@ -163,21 +161,85 @@ def create_geo_var( var, fid, dimIDs, compress=True, classic=True, time=False,
         else:
             calendar = 'standard'
         var['value'] = nc.date2num( var['value'], units=var['units'], calendar=calendar)    
-    
+
     # Variable type
     vartype = get_nc_type( var['value'], var['name'], classic )
-  
-    # Fill value, if any
-    try:
-        fill_value = var['fill_value']
-    except:
-        pass
 
+    # Fill value, if any
+    if 'fill_value' in var.keys():
+        fill_value = var['fill_value']
+    else:
+        pass
+    
+    ### Progress towards packing variables as integers; 
+    ### Appears to be working, but only minimal testing so far
+    # Check if packing keywords are set
+    if 'pack' in var.keys():
+        pack = var['pack']
+    else:
+        pack = False
+    if 'packtype' in var.keys():
+        packtype = var['packtype']
+    else:
+        packtype = 'i2'
+        
+    # Pack to integer data, if requested
+    # Dimension variables should not be packed
+    if pack and not isDim:
+ 
+        # Number of bits in the packed data type
+        if packtype=='i2':
+            n = 16
+        elif packtype=='i1':
+            n = 8
+        else:
+            raise ValueError('Packing to type {:s} has not been implemented'.format(packtype) )
+
+        # Compute scale and offset
+        # Follows Unidata recommendations: https://www.unidata.ucar.edu/software/netcdf/documentation/NUG/_best_practices.html
+        min = np.nanmin( var['value'][:] )
+        max = np.nanmax( var['value'][:] )
+        scale_factor = ( max - min ) / (2**n - 2)
+        add_offset   = ( max + min ) / 2
+
+        # Use a fill value within the packed range
+        pack_fill_value   = -2**(n-1)  
+  
+        vartype = packtype
+    
+        # Packed values
+        pack_value = ( var['value'][:] - add_offset ) / scale_factor
+    
+        # Set missing value
+        if np.ma.is_masked( var['value'] ):
+            pack_value[ var['value'].mask ] = pack_fill_value
+        if fill_value is not None:
+            pack_value[ var['value']==fill_value ] = pack_fill_value
+        if np.any( np.isnan(var['value']) ):
+            pack_value[ np.isnan( var['value'] ) ] = pack_fill_value
+        if np.any( np.isinf(var['value']) ):
+            pack_value[ np.isinf( var['value'] ) ] = pack_fill_value
+
+        var['scale_factor'] = scale_factor
+        var['add_offset']   = add_offset
+
+        # Rename 
+        fill_value = pack_fill_value
+        var['value'] = pack_value
+
+    else:
+         scale_factor = None
+         add_offset   = None
+    var.pop('pack',None)
+    var.pop('packtype',None)
+    ###
+        
     #*** Check whether the data type is allowed in classic data type
     
     # Create the variable
     ncVar = fid.createVariable( var['name'], vartype, dimIDs, 
-                             zlib=compress, complevel=2, fill_value=fill_value )
+                             zlib=compress, complevel=2,
+                             fill_value=fill_value )
 
     # Write variable values 
     ncVar[:] = var['value'][:]
@@ -188,6 +250,7 @@ def create_geo_var( var, fid, dimIDs, compress=True, classic=True, time=False,
     var.pop('unlimited',None)
     var.pop('dim_names',None)
     var.pop('fill_value',None)
+
     
     # Save the remaining attributes
     ncVar.setncatts(var)

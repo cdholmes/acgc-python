@@ -24,7 +24,7 @@ metroot/
 '''
 metroot = '/data/MetData/ARL/'
 
-def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False, dropOneTime=False ):
+def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False, dropOneTime=False, pack=False ):
     # Convert a HYSPLIT tdump file to netCDF
     # Works with single point or ensemble trajectories
 
