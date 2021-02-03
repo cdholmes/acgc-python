@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-""" Weighted variance, covariance, and correlation
+""" Weighted variance, covariance, correlation, median, and quantiles
 
 The weighted correlation coefficient here may be usedful to construct a 
 a "weighted R2" or "weighted coefficient of determination" from a 
@@ -196,4 +196,108 @@ def wscale(w):
     '''
     return w / np.max( w )
 
+def wmedian(x,w,**kwargs):
+    '''Weighted median
+
+    See documentation for wquantile
+    '''
+    return wquantile(x,0.5,w,**kwargs)
+
+def wquantile(x,q,w,interpolation='midpoint'):
+    '''Weighted quantile 
     
+    Calculate the quantile q of array x using weights w. 
+    When weights are equal to number of replicate samples, wquantile gives similar result
+    to numpy.quantile operating on an array with replicates included.
+    This naive algorithm is O(n) and may be slow for large samples (x).
+    Consider using Robustats or another optimized package.
+        
+    Args:
+        x      : array of values to compute quantiles
+        q      : quantile or list of quantiles to calculate, in range 0-1
+        w      : array of weights for each element of x; can be ommitted if robust=True
+        interpolation : {'midpoint','nearest', 'lower', 'upper', None}
+            This parameter specifies the interpolation method to use when the desired quantile 
+            lies bewteen elements i < j. The quantile is guaranteed to be an element of the input
+            array when using methods 'nearest', 'lower', and 'upper'.
+            'lower'   : i, the largest element <= the q quantile
+            'upper'   : j, the smallest element >= the q quantile
+            'nearest' : i or j element that most closely divides data at the q quantile
+            None      : same as 'nearest'
+            'midpoint': average of the i, j 
+        
+    Returns:
+        scalar or array : weighted quantile
+    '''
+
+    # Ensure arguments are arrays
+    x = np.asarray( x )
+    w = np.asarray( w )
+
+    # To calculate multiple quantiles, call function iteratively for each quantile requested
+    if isinstance(q, (list, tuple, np.ndarray)):
+        return [wquantile(x,qi,w) for qi in q]
+
+    # Number of elements
+    n = len(x)
+
+    # Ensure weights are same length as x
+    if (len(w) != n ):
+        raise ValueError( 'weights w must be the same length as array x')
+
+    # Ensure inputs are all finite, no NaN or Inf
+    if np.any( ~np.isfinite(x) ):
+        raise ValueError( 'Array x contains non-finite elements')
+    if np.any( ~np.isfinite(w) ):
+        raise ValueError( 'Weights w contains non-finite elements')
+    
+    # Sort x from smallest to largest
+    idx = np.argsort( x )
+
+    # Cumulative sum of weights, divided by sum
+    wsum = np.cumsum( w[idx] ) / np.sum( w )
+    # Reverse cumulative sum
+    wsumr = np.cumsum( w[idx][::-1] )[::-1] / np.sum( w )
+
+    # Lower bound for quantile; il is an index into the sorted array
+    if q <= wsum[0]:
+        il = 0
+    else:
+        il = np.where( wsum < q )[0][-1] + 1
+    
+    # Upper bound for quantile; iu is an index into the sorted array
+    if (1-q) <= wsumr[-1]:
+        iu = n-1
+    else:
+        iu = np.where( wsumr < (1-q) )[0][0] - 1
+    
+    if il == iu:
+    
+        # Upper and lower bounds are the same; we're done
+        xq = x[idx[il]]
+
+    else:
+        # Several methods for reconciling different upper and lower bounds
+
+        # Average the upper and lower bounds
+        if interpolation == 'midpoint':
+            xq = np.mean( x[idx[[il,iu]]] )
+
+        # Choose the element with the smaller weight
+        elif interpolation in ['nearest',None]:
+            if w[idx[il]] < w[idx[iu]]:
+                iq = il
+            else:
+                iq = iu
+            xq = x[idx[iq]]
+        
+        # Use upper or lower estimates
+        elif interpolation == 'lower':
+            xq = x[idx[il]]
+        elif interpolation == 'upper':
+            xq = x[idx[iu]]
+
+        else:
+            raise ValueError('Unrecognized value for interpolation: ' + interpolation)
+
+    return xq
