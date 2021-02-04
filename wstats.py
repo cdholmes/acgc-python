@@ -46,6 +46,7 @@ Created on Mon Apr 24 17:39:51 2017
 
 import numpy as np
 from sklearn.covariance import MinCovDet
+from scipy.interpolate import interp1d
 
 def wmean(x,w=None,robust=False):
     '''Weighted mean 
@@ -203,29 +204,43 @@ def wmedian(x,w,**kwargs):
     '''
     return wquantile(x,0.5,w,**kwargs)
 
-def wquantile(x,q,w,interpolation='midpoint'):
+def wquantile(x,q,w,interpolation='partition'):
     '''Weighted quantile 
     
-    Calculate the quantile q of array x using weights w. 
-    When weights are equal to number of replicate samples, wquantile gives similar result
-    to numpy.quantile operating on an array with replicates included.
+    Calculate the quantile q from data array x using data weights w.
+    If weights reflect the relative frequency of the elements of x in a large population,
+    then the weighted quantile result is equivalent to numpy.quantile or numpy.percentile 
+    operating on an array of that larger population (containing many repeated elements).
+
+    For uniform weights and interpolation=partition or partition0, this function 
+    differs from numpy.percentile. This behavior is expected and desirable.
+    The numpy.percentile behaviro can be reproduced here by using 
+    interpolation = linear, lower, higher, or nearest.
+    Note that numpy.quantile is equivalent to numpy.percentile(interpolation='linear')
+    
     This naive algorithm is O(n) and may be slow for large samples (x).
-    Consider using Robustats or another optimized package.
-        
+    Consider using Robustats or another optimized package.       
+    
     Args:
         x      : array of values to compute quantiles
         q      : quantile or list of quantiles to calculate, in range 0-1
-        w      : array of weights for each element of x; can be ommitted if robust=True
-        interpolation : {'midpoint','nearest', 'lower', 'upper', None}
+        w      : array of weights for each element of x (e.g. representing the frequency of elements x in a large population)
+        interpolation : {'partition' [default], 'partition0', 'linear', 'nearest', 'lower', 'upper'}
             This parameter specifies the interpolation method to use when the desired quantile 
-            lies bewteen elements i < j. The quantile is guaranteed to be an element of the input
-            array when using methods 'nearest', 'lower', and 'upper'.
-            'lower'   : i, the largest element <= the q quantile
-            'upper'   : j, the smallest element >= the q quantile
+            lies bewteen elements i < j in x.
+            'partition': [default] choose the element of x that partitions the 
+                         sum of weights on either side to q and (1-q)
+                         When two elements both satisfy partition, then average them.
+                         This is the Edgeworth method (https://en.wikipedia.org/wiki/Weighted_median)
+            'partition0': Same as partition, but result is always an element of x (no averaging). 
+                         Instead return the element of x that partitions weights most closely to q and (1-q) 
+                         or, if there is still a tie, then the smaller element.
+            'linear'  : i + (j-1) * fraction. replicates behavior of numpy.quantile when all 
+                        weights are equal
             'nearest' : i or j element that most closely divides data at the q quantile
-            None      : same as 'nearest'
-            'midpoint': average of the i, j 
-        
+            'lower'   : i, the largest element <= the q quantile
+            'higher'  : j, the smallest element >= the q quantile
+                         
     Returns:
         scalar or array : weighted quantile
     '''
@@ -233,10 +248,6 @@ def wquantile(x,q,w,interpolation='midpoint'):
     # Ensure arguments are arrays
     x = np.asarray( x )
     w = np.asarray( w )
-
-    # To calculate multiple quantiles, call function iteratively for each quantile requested
-    if isinstance(q, (list, tuple, np.ndarray)):
-        return [wquantile(x,qi,w) for qi in q]
 
     # Number of elements
     n = len(x)
@@ -254,50 +265,79 @@ def wquantile(x,q,w,interpolation='midpoint'):
     # Sort x from smallest to largest
     idx = np.argsort( x )
 
-    # Cumulative sum of weights, divided by sum
-    wsum = np.cumsum( w[idx] ) / np.sum( w )
-    # Reverse cumulative sum
-    wsumr = np.cumsum( w[idx][::-1] )[::-1] / np.sum( w )
 
-    # Lower bound for quantile; il is an index into the sorted array
-    if q <= wsum[0]:
-        il = 0
-    else:
-        il = np.where( wsum < q )[0][-1] + 1
+    if interpolation in ['partition','partition2']:
+
+        # To calculate multiple quantiles, call function iteratively for each quantile requested
+        if isinstance(q, (list, tuple, np.ndarray)):
+            return [wquantile(x,qi,w,interpolation) for qi in q]
     
-    # Upper bound for quantile; iu is an index into the sorted array
-    if (1-q) <= wsumr[-1]:
-        iu = n-1
-    else:
-        iu = np.where( wsumr < (1-q) )[0][0] - 1
+        # Cumulative sum of weights, divided by sum
+        wsum = np.cumsum( w[idx] ) / np.sum( w )
+        # Reverse cumulative sum (cumulative sum of elements in reverse order)
+        wsumr = np.cumsum( w[idx][::-1] )[::-1] / np.sum( w )
     
-    if il == iu:
-    
-        # Upper and lower bounds are the same; we're done
-        xq = x[idx[il]]
-
-    else:
-        # Several methods for reconciling different upper and lower bounds
-
-        # Average the upper and lower bounds
-        if interpolation == 'midpoint':
-            xq = np.mean( x[idx[[il,iu]]] )
-
-        # Choose the element with the smaller weight
-        elif interpolation in ['nearest',None]:
-            if w[idx[il]] < w[idx[iu]]:
-                iq = il
-            else:
-                iq = iu
-            xq = x[idx[iq]]
+        # Lower bound for quantile; il is an index into the sorted array
+        if q <= wsum[0]:
+            il = 0
+        else:
+            il   = np.flatnonzero( wsum < q )[-1] + 1
         
-        # Use upper or lower estimates
-        elif interpolation == 'lower':
+        # Upper bound for quantile; iu is an index into the sorted array
+        if (1-q) <= wsumr[-1]:
+            iu = n-1
+        else:
+            iu   = np.flatnonzero( wsumr < (1-q) )[0] - 1
+            
+        if il == iu:
+            # Upper and lower bounds are the same; we're done
             xq = x[idx[il]]
-        elif interpolation == 'upper':
-            xq = x[idx[iu]]
+    
+        else:
+            # Several methods for reconciling different upper and lower bounds
+    
+            if interpolation == 'partition':
+                # Average the upper and lower bounds
+                # This creates an element not found in the input array, which may be inappropriate in some cases 
+                xq = np.mean( x[idx[[il,iu]]] )
 
+            else:
+                # Choose the element with the smaller weight
+                # This guarantees that the value is an element of the input array
+                if w[idx[il]] <= w[idx[iu]]:
+                    iq = il
+                else:
+                    iq = iu
+                xq = x[idx[iq]]
+
+    else:
+
+        # These methods give the same results as numpy.percentile when using 
+        # the same interpolation method and uniform weights.
+
+                        
+        # Define the quantile for each element in x
+        w         = w.astype(np.float32)
+        qx        = w[idx] / 2 - w[idx][0] / 2
+        qx[1:]   += np.cumsum( w[idx] )[:-1] 
+        qx       /= qx[-1]
+
+        # Interpolate to get quantile value
+        if interpolation == 'linear':
+            f = interp1d(qx,x[idx],kind='linear')
+        elif interpolation == 'nearest':
+            f = interp1d(qx,x[idx],kind='nearest')
+        elif interpolation == 'lower':
+            f = interp1d(qx,x[idx],kind='previous')
+        elif interpolation == 'higher':
+            f = interp1d(qx,x[idx],kind='next')
+        elif interpolation == 'midpoint':
+            # Average the lower and higher values
+            f = lambda q: ( interp1d(qx,x[idx],kind='previous')(q) +
+                            interp1d(qx,x[idx],kind='next')(q)     ) / 2
         else:
             raise ValueError('Unrecognized value for interpolation: ' + interpolation)
-
+            
+        xq = f(q)
+    
     return xq
