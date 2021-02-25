@@ -580,11 +580,16 @@ def get_forecast_filelist( metversion=['namsfCONUS','namf'], cycle=None ):
 
 
 def write_control( time, lat, lon, alt, trajhours,
-                   fname='CONTROL.000', metversion=['gdas0p5','gdas1'],
+                   fname='CONTROL.000', clobber=False,
+                   metversion=['gdas0p5','gdas1'],
                    forecast=False, forecastcycle=None, hybrid=False, exacttime=True,
-                   outdir='./', tfile='tdump' ):
+                   maxheight=15000., outdir='./', tfile='tdump' ):
 
     # Write a control file for trajectory starting at designated time and coordinates
+
+    if os.path.isfile( fname ) and (clobber is False):
+        raise OSError( 'File exists. Set clobber=True to overwrite: {:s}'.format(fname) )
+        return
 
     # Ensure that lat, lon, and alt are lists
     try:
@@ -682,21 +687,20 @@ def write_control( time, lat, lon, alt, trajhours,
     startdate = time.strftime( "%y %m %d %H %M" )
 
     # Write the CONTROL file
-    f = open( fname, 'w' )
+    with open( fname, 'w' ) as f:
     
-    f.write( startdate+'\n' )
-    f.write( '{:d}\n'.format( nlat ) )
-    for i in range(nlat):
-        f.write( '{:<10.4f} {:<10.4f} {:<10.4f}\n'.format( lat[i], lon[i], alt[i] ) )
-    f.write( '{:d}\n'.format( trajhours ) )
-    f.write( "0\n" )
-    f.write( "15000.0\n" )
-    f.write( '{:d}\n'.format( nmet ) )
-    for i in range( nmet ):
-        f.write( os.path.dirname(  metfiles[i] ) + '/\n' )
-        f.write( os.path.basename( metfiles[i] ) + '\n'  )
-    f.write( '{:s}\n'.format(outdir) )
-    f.write( '{:s}\n'.format(tfile) )
+        f.write( startdate+'\n' )
+        f.write( '{:d}\n'.format( nlat ) )
+        for i in range(nlat):
+            f.write( '{:<10.4f} {:<10.4f} {:<10.4f}\n'.format( lat[i], lon[i], alt[i] ) )
+        f.write( '{:d}\n'.format( trajhours ) )
+        f.write( "0\n" )
+        f.write( "{:<10.1f}\n".format( maxheight ) )
+        f.write( '{:d}\n'.format( nmet ) )
+        for i in range( nmet ):
+            f.write( os.path.dirname(  metfiles[i] ) + '/\n' )
+            f.write( os.path.basename( metfiles[i] ) + '\n'  )
+        f.write( '{:s}\n'.format(outdir) )
+        f.write( '{:s}\n'.format(tfile) )
 
-    f.close()
 
