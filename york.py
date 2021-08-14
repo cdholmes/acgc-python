@@ -17,11 +17,17 @@ def york( x, y, sigx=1, sigy=1, rxy=0 ):
     Arguments
     x, y       : arrays of points for fitting
     sigx, sigy : errors or uncertainty in x and y
-    rxy        : correlation coefficient for errors in x and y 
+    rxy        : correlation coefficient for errors in x and y, default to rxy=0 meaning that the errors in x are unrelated to errors in y
         sigx, sigy, and rxy can be constants or arrays of the same length as x and y
     
     Returns
     result  : Dict containing
+        b      = slope estimate
+        a      = intercept estimate
+        sigs   = standard error of slope estimate
+        sigi   = standard error of intercept estimate
+        params = [b,a] as array 
+        sigma  = [sigs,sigi] as array 
     """
     
     # relative error tolerance required for convergence
@@ -43,36 +49,41 @@ def york( x, y, sigx=1, sigy=1, rxy=0 ):
 
         # Weight for point i
         W = wx * wy / ( wx + b**2 * wy - 2 * b * rxy * alpha )
+        Wsum = np.sum( W )
 
         # Weighted means        
-        Xbar = np.sum( W * x ) / np.sum( W )
-        Ybar = np.sum( W * y ) / np.sum( W )
+        Xbar = np.sum( W * x ) / Wsum
+        Ybar = np.sum( W * y ) / Wsum
         
         # Deviation from weighted means
         U = x - Xbar
         V = y - Ybar
         
-        # 
-        beta = W * ( U / wx + b*V / wx - (b*U + V) * rxy / alpha )
+        # parameter needed for slope
+        beta = W * ( U / wy + b*V / wx - (b*U + V) * rxy / alpha )
         
         # Update slope estimate
         bnew = np.sum( W * beta * V ) / np.sum( W * beta * U )
     
-        # Break from loop if new value is  
+        # Break from loop if new value is very close to old value
         if (np.abs( (bnew-b)/b ) < rtol ):
             break
         else:
             b = bnew
     
+    if i==49:
+        raise ValueError( 'York regression failed to converge in 50 iterations' )
+    
     # Intercept
     a = Ybar - b * Xbar
     
-    # least-squares adjusted points, expectaion values of X and Y
+    # least-squares adjusted points, expectation values of X and Y
     xa = Xbar + beta 
     ya = Ybar + b*beta
     
     # Mean of adjusted points
-    xabar = np.sum( W * xa ) / np.sum( W )
+    xabar = np.sum( W * xa ) / Wsum
+    yabar = np.sum( W * ya ) / Wsum
     
     # Devaiation of adjusted points from their means
     u = xa - xabar
@@ -80,14 +91,14 @@ def york( x, y, sigx=1, sigy=1, rxy=0 ):
     
     # Variance of slope and intercept estimates
     varb = 1 / np.sum( W * u**2 )
-    vara = 1 / np.sum( W ) + xabar**2 * varb 
+    vara = 1 / Wsum + xabar**2 * varb 
     
     # Standard error of slope and intercept
     siga = np.sqrt( vara )
     sigb = np.sqrt( varb )
     
     # Define a named tuple type that will contain the results
-    result = namedtuple( 'result', 'slope intercept sigs sigi params sigma params sigma' )
+    result = namedtuple( 'result', 'slope intercept sigs sigi params sigma' )
     
     # Return results as a named tuple, User can access as a regular tuple too
     return result( b, a, sigb, siga, [b,a], [sigb, siga] )
