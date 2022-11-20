@@ -171,7 +171,7 @@ def wcorr(x,y,w=None,robust=False):
     assert len(y) == n, 'y must be the same length as x'
 
     # Use FastMCD to calculate weights; Another method could be used here
-    if (w==None):
+    if (w==None or robust==True):
         w = MinCovDet().fit( np.array([x,y]).T ).support_
     
     if (len(w) == 0): raise SystemExit('must specify weights w or select robust=True')
