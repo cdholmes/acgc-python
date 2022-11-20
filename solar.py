@@ -65,7 +65,35 @@ def equationOfTime( date ):
 
     return eot
 
-def sza( lat, lon, datetimeUTC ):
+def refraction_angle( true_elevation_angle, pressure=101325., temperature_celsius=10. ):
+    '''Atmospheric refraction angle
+    Equation from Saemundsson/Bennett
+
+    Inputs:
+    true_elevation_angle : degrees above horizon
+    pressure            : surface atmospheric pressure (Pa)
+    temperature_celsius : surface atmospheric temperature (C)
+
+    Output
+    '''
+    # Refraction angle, arcminutes
+    R = 1.02 / np.tan( ( true_elevation_angle + 10.3 / (true_elevation_angle + 5.11) ) * pi180 )
+    # Account for temperature and pressure, arcminutes
+    R = R * pressure / 101325 * 283 / ( 273 + temperature_celsius )
+    # Convert arcminutes -> degrees
+    R /= 60
+
+    # Result must be positive
+    R = np.maximum(R,0)
+
+    # Refraction defined only when the apparent elevation angle is positive
+    # Set refraction to zero when the apparent elevation is below horizon
+    refraction_angle = np.where( true_elevation_angle + R <= 0, 0, R)
+
+    return refraction_angle
+
+
+def sza( lat, lon, datetimeUTC, refraction=False, temperature=10., pressure=101325. ):
     # Calculate solar zenith angle for a given latitude, longitude, date and time.
     # Accounts for equation of time, but not for elevation or atmospheric refraction,
     # which are important when the sun is near the horizon.
@@ -75,6 +103,10 @@ def sza( lat, lon, datetimeUTC ):
     # lat  : scalar or array of latitudes, degrees
     # lon  : scalar or array of longitudes, degrees
     # datetimeUTC : date and time in UTC, can be a pandas.Timestamp or datetime object
+    # refraction  : boolean specifying whether to account for atmospheric refraction
+    # temperature : surface atmospheric temperature (Celsius), only used for refraction calculation
+    # pressure    : surface atmospheric pressure (Pa), only used for refraction calculation
+    #  
     #
     # C.D. Holmes - 9 Nov 2018 - Initial version
     
@@ -93,11 +125,16 @@ def sza( lat, lon, datetimeUTC ):
     # Add equation of time to the hour angle
     Ha += eot
 
-    # Solar zenith angle, radians
-    sza = np.arccos( np.sin(lat*pi180) * np.sin(dec*pi180) + np.cos(lat*pi180) * np.cos(dec*pi180) * np.cos(Ha*pi180) )
+    # True solar zenith angle, radians
+    sza = np.arccos( np.sin(lat*pi180) * np.sin(dec*pi180) + \
+          np.cos(lat*pi180) * np.cos(dec*pi180) * np.cos(Ha*pi180) )
 
     # Convert radians -> degrees
     sza /= pi180
+
+    if refraction: 
+        # Subtract refraction angle (degrees) from zenith angle (SZA is always smaller due to refraction)
+        sza -= refraction_angle( 90-sza, pressure, temperature ) 
 
     return sza 
 
