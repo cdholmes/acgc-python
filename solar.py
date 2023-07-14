@@ -31,7 +31,7 @@ def solarDeclination( date ):
     gm = 357.528 + 0.9856003 * NJD
     lm = 280.460 + 0.9856474 * NJD
 
-    # Ecliptic longitude of sun
+    # Ecliptic longitude of sun, degrees
     ec = lm + 1.915 * np.sin( gm * pi180 ) + 0.020 * np.sin( 2 * gm * pi180 )
 
     #Solar declination, degrees
@@ -65,6 +65,20 @@ def equationOfTime( date ):
 
     return eot
 
+def hour_angle( lon, datetimeUTC ):
+    # Compute hour angle, degrees
+    #
+    # Hour angle is the angular displacement of the sun from the local meridian.
+    # It is zero at local noon, negative in the morning, and positive is afternoon.
+
+    # This is for mean solar time. Actual solar position has a small offset given by the equation of time (below)
+    Ha = ( ( datetimeUTC.hour + datetimeUTC.minute / 60 - 12 ) * 15 + lon ) 
+
+    # Add equation of time to the hour angle, degrees
+    Ha += equationOfTime( datetimeUTC )
+
+    return Ha
+    
 def refraction_angle( true_elevation_angle, pressure=101325., temperature_celsius=10. ):
     '''Atmospheric refraction angle
     Equation from Saemundsson/Bennett
@@ -114,16 +128,11 @@ def sza( lat, lon, datetimeUTC, refraction=False, temperature=10., pressure=1013
     if (type(datetimeUTC) is datetime.datetime ):
         datetimeUTC = pd.Timestamp( datetimeUTC )
 
-    # Calculate declination and equation of time, degrees 
+    # Solar declination, degrees 
     dec = solarDeclination( datetimeUTC )    
-    eot = equationOfTime(   datetimeUTC )
 
     # Hour angle, degrees
-    # This is for mean solar time. Actual solar position has a small offset given by the equation of time (below)
-    Ha = ( ( datetimeUTC.hour + datetimeUTC.minute / 60 - 12 ) * 15 + lon ) 
-
-    # Add equation of time to the hour angle
-    Ha += eot
+    Ha = hour_angle( lon, datetimeUTC )
 
     # True solar zenith angle, radians
     sza = np.arccos( np.sin(lat*pi180) * np.sin(dec*pi180) + \
@@ -136,8 +145,35 @@ def sza( lat, lon, datetimeUTC, refraction=False, temperature=10., pressure=1013
         # Subtract refraction angle (degrees) from zenith angle (SZA is always smaller due to refraction)
         sza -= refraction_angle( 90-sza, pressure, temperature ) 
 
-    return sza 
+    return sza
 
+def saa( lat, lon, datetimeUTC ):
+    '''Solar azimuth angle (degrees) for a latitude, longitude, date and time
+    
+    SAA is degrees clockwise from north.
+    Inputs:
+    lat  : scalar or array of latitudes, degrees
+    lon  : scalar or array of longitudes, degrees
+    datetimeUTC : date and time in UTC, can be a pandas.Timestamp or datetime object
 
+    C.D. Holmes - 13 Jan 2023 - Initial version
+    '''
+
+    # Solar declination, degrees 
+    dec = solarDeclination( datetimeUTC )   
+
+    # Hour angle, degrees
+    Ha = hour_angle( lon, datetimeUTC )
+
+    # Solar zenith angle, degrees
+    # Use true sza, without refraction
+    zen = sza( lat, lon, datetimeUTC, refraction=False )
+
+    # Solar azimuth angle, degrees
+    saa = np.arcsin( -np.sin( Ha*pi180 ) * np.cos( dec*pi180 ) / 
+            np.sin( zen*pi180 ) ) / pi180
+
+    # Change range [-180,180] to [0,360]
+    return np.mod( saa+360, 360 )
 
 
