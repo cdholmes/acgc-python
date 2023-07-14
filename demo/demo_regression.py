@@ -31,31 +31,51 @@ y[0] = y[0] + 400
 # Convert to data fram
 data = pandas.DataFrame({'t':t,'y':y})
 
+print('***OLS LINEAR REGRESSION***')
+# Create regression model
+model_linear = smf.ols('y ~ 1 + t',data)
+
+# Do the regression fit
+result_linear = model_linear.fit()
+
+print('\nBest fit parameter values')
+print(result_linear.params)
+
+
+print('***OLS LINEAR REGRESSION, forcing zero intercept***')
+# Create regression model
+model_linear0 = smf.ols('y ~ 0 + t',data)
+
+# Do the regression fit
+result_linear0 = model_linear0.fit()
+
+print('\nBest fit parameter values')
+print(result_linear0.params)
 
 print('***OLS REGRESSION***')
 # Create regression model
-model = smf.ols('y ~ 1 + t + np.square(t)',data)
+model_ols = smf.ols('y ~ 1 + t + np.square(t)',data)
 
 # Do the regression fit
-result = model.fit()
+result_ols = model_ols.fit()
 
 print('\nBest fit parameter values')
-print(result.params)
+print(result_ols.params)
 
 print('\n68% Confidence interval (1-sigma) for fit parameters')
-print(result.conf_int(0.68))
+print(result_ols.conf_int(0.68))
 
 # Covariance of fit parameters
-pcov = result.cov_params()
+pcov = result_ols.cov_params()
 
 # inverse standard deviation of fit parameters
 pcor = np.diag(1/np.sqrt(np.diag(pcov)))
 
 print('\n*Covariance* of fit parameters')
-print(result.cov_params())
+print(result_ols.cov_params())
 
 print('\n*Cross correlation* of fit parameters')
-print(result.cov_params(pcor))
+print(result_ols.cov_params(pcor))
 
 print('***QUANTILE REGRESSION***')
 # Create the model
@@ -92,7 +112,10 @@ result_rlm = model_rlm.fit()
 # Display data and best fit
 plt.clf()
 plt.plot(t,y,'o',label='data')
-plt.plot(t,model.predict(result.params), label='OLS')
+plt.plot(t,model_linear.predict(result_linear.params), label='Linear')
+plt.plot(t,model_linear0.predict(result_linear0.params), label='Linear, zero intercept')
+plt.plot(t,model_ols.predict(result_ols.params), label='OLS')
 plt.plot(t,model_qr.predict(result_qr.params),label='QuantReg')
 plt.plot(t,model_rlm.predict(result_rlm.params), label='RLM')
 plt.legend(loc='lower left')
+plt.show()
