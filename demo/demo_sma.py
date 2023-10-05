@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Jun  1 11:37:46 2016
+"""Demonstrate standard major axis (SMA) fitting
 
 @author: cdholmes
 """
-
+#%%
 import numpy as np
 import matplotlib.pyplot as plt
 from smafit import smafit
 import statsmodels.formula.api as smf
 
+#%%
 # Create 100 normally distributed points with slope 2, intercept 1
 n = 1000
 x0 = np.random.randn(n)
@@ -27,7 +27,7 @@ ypure = np.copy(y)
 y[idxout] = [400,300,450,420]
 
 # SMA fit, use robust methods to minimize effect of outliers
-s,i,stds,stdi,cis,cii = smafit(x,y,cl=0.95,robust=True)
+result = smafit(x,y,cl=0.95,robust=True)
 # SMA fit on the "pure" data without outliers
 #sp,ip,stdsp,stdip,cisp,ciip = smafit(x,ypure,cl=0.95)
 
@@ -36,14 +36,14 @@ res = smf.ols('y ~ x + 1',{'x':x, 'y':y}).fit()
 
 fmt = '{:15s}{:8.4f}+/-{:8.4f}'
 
-print(fmt.format('slope',s,stds))
-print(fmt.format('intercept',i,stdi))
+print(fmt.format('slope',result['slope'],result['slope_ste']))
+print(fmt.format('intercept',result['intercept'],result['intercept_ste']))
 
 plt.clf()
 #plt.style.use('bmh')
 plt.scatter(x,y,label='data') 
 plt.plot(x,x,label='1:1')
-plt.plot(x,s*x+i,label='SMA')
+plt.plot(x,result['slope']*x+result['intercept'],label='SMA')
 #plt.plot(x,sp*x+ip,label='SMA (pure)')
 plt.plot(x,res.fittedvalues,label='OLS')
 plt.legend()

@@ -6,7 +6,11 @@ Created on Fri May 20 19:13:26 2016
 @author: cdholmes
 """
 
-def smafit(X0,Y0,W0=None,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
+def smafit(X0,Y0,W0=None,
+           data=None,
+           cl=0.95,
+           intercept=True,
+           robust=False,robust_method='FastMCD'):
     """Standard Major-Axis (SMA) line fitting
     
     Calculate standard major axis, aka reduced major axis, fit to 
@@ -32,9 +36,12 @@ def smafit(X0,Y0,W0=None,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
 
     Parameters
     ----------
-    X, Y : array_like
+    X, Y : array_like, str
         Input values, Must have same length.
-    W    : optional array of weights for each X-Y point, typically W_i = 1/(var(X_i)+var(Y_i)) 
+    W    : array_like, str, optional
+        array of weights for each X-Y point, typically W_i = 1/(var(X_i)+var(Y_i)) 
+    data : dict_like, optional
+        data structure containing variables. Used when X, Y, or W are str.
     cl   : float (default = 0.95)
         Desired confidence level for output. 
     intercept : boolean (default=True)
@@ -42,7 +49,7 @@ def smafit(X0,Y0,W0=None,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
         The model will be forced through the origin (0,0) if intercept=False.
     robust : boolean (default=False)
         Use statistical methods that are robust to the presence of outliers
-    rmethod: string (default='FastMCD')
+    robust_method: string (default='FastMCD')
         Method for calculating robust variance and covariance. Options:
         'MCD' or 'FastMCD' for Fast MCD
         'Huber' for Huber's T: reduce, not eliminate, influence of outliers
@@ -51,18 +58,25 @@ def smafit(X0,Y0,W0=None,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
         
     Returns
     -------
-    Slope     : float
-        Slope or Gradient of Y vs. X
-    Intercept : float
-        Y intercept.
-    ste_grad : float
-        Standard error of gradient estimate
-    ste_int : float
-        standard error of intercept estimate
-    ci_grad : [float, float]
-        confidence interval for gradient at confidence level cl
-    ci_int : [float, float]
-        confidence interval for intercept at confidence level cl
+    resut : dict containing the following fields
+        slope     : float
+            Slope or Gradient of Y vs. X
+        intercept : float
+            Y intercept.
+        slope_ste : float
+            Standard error of slope estimate
+        intercept_ste : float
+            standard error of intercept estimate
+        slope_interval : [float, float]
+            confidence interval for gradient at confidence level cl
+        intercept_interval : [float, float]
+            confidence interval for intercept at confidence level cl
+        df_model : float
+            degrees of freedom for model
+        df_resid : float
+            degrees of freedom for residuals
+        params : [float,float]
+            array of fitted parameters
     """
 
     import numpy as np
@@ -70,7 +84,22 @@ def smafit(X0,Y0,W0=None,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
     from sklearn.covariance import MinCovDet
     import statsmodels.formula.api as smf
     import statsmodels.robust.norms as norms
-        
+
+    def str2var( v ):
+        '''Extract variable named v from data'''
+        try:
+            return data[v]
+        except Exception as exc:
+            raise ValueError( 'Argument data must be provided with a key named '+v ) from exc
+
+    # If variables are provided as strings, get values from the data structure
+    if isinstance( X0, str ):
+        X0 = str2var( X0 )
+    if isinstance( Y0, str ):
+        Y0 = str2var( Y0 )
+    if isinstance( W0, str ):
+        W0 = str2var( W0 )
+
     # Make sure arrays have the same length
     assert ( len(X0) == len(Y0) ), 'Arrays X and Y must have the same length'
     if (W0 != None ):
@@ -83,10 +112,11 @@ def smafit(X0,Y0,W0=None,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
     if (W0==None):
         W0 = np.zeros_like(X0) + 1
     
-    # Drop any NaN elements of X or Y    
+    # Drop any NaN elements of X, Y, or W    
     # Infinite values are allowed but will make the result undefined
-    idx = ~np.logical_or( np.isnan(X0), np.isnan(Y0) ) 
-    
+    # idx = ~np.logical_or( np.isnan(X0), np.isnan(Y0) ) 
+    idx = ~np.isnan(X0) * ~np.isnan(Y0) * ~np.isnan(W0)
+
     X = X0[idx]
     Y = Y0[idx]
     W = W0[idx]
@@ -105,7 +135,7 @@ def smafit(X0,Y0,W0=None,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
     if (robust):
         
         # Choose the robust method
-        if ((rmethod.lower() =='mcd') or (rmethod.lower() == 'fastmcd') ):
+        if ((robust_method.lower() =='mcd') or (robust_method.lower() == 'fastmcd') ):
             # FAST MCD    
         
             if (not intercept):
@@ -131,10 +161,10 @@ def smafit(X0,Y0,W0=None,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
             # excludes observations marked as outliers
             N = mcd.support_.sum()
 
-        elif ((rmethod.lower() =='biweight') or (rmethod.lower() == 'huber') ):
+        elif ((robust_method.lower() =='biweight') or (robust_method.lower() == 'huber') ):
 
             # Tukey's Biweight and Huber's T
-            if ( rmethod.lower() =='biweight'):
+            if ( robust_method.lower() =='biweight'):
                 norm = norms.TukeyBiweight()
             else:
                 norm = norms.HuberT()
@@ -168,7 +198,7 @@ def smafit(X0,Y0,W0=None,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
 
         else:
 
-            raise NotImplementedError("smafit.py hasn't implemented rmethod={:%s}".format(rmethod))
+            raise NotImplementedError("smafit.py hasn't implemented robust_method={:%s}".format(robust_method))
     else:
     
         if (intercept):
@@ -252,5 +282,18 @@ def smafit(X0,Y0,W0=None,cl=0.95,intercept=True,robust=False,rmethod='FastMCD'):
         ste_int   = 0
         ci_int    = np.array([0,0])
         
+    result = dict( slope            = Slope,
+                   intercept        = Intercept,
+                   slope_ste        = ste_slope,
+                   intercept_ste    = ste_int,
+                   slope_interval   = ci_grad,
+                   intercept_interval = ci_int,
+                   df_model         = dfmod,
+                   df_resid         = N-dfmod,
+                   params           = np.array([Slope,Intercept]),
+                   nobs             = len(X),
+                   fittedvalues     = Intercept + Slope * X,
+                   resid            = Intercept + Slope * X - Y )
     
-    return Slope, Intercept, ste_slope, ste_int, ci_grad, ci_int
+    # return Slope, Intercept, ste_slope, ste_int, ci_grad, ci_int
+    return result
