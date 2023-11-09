@@ -6,7 +6,7 @@ Created on Fri May 20 19:13:26 2016
 @author: cdholmes
 """
 
-def smafit(X0,Y0,W0=None,
+def smafit(X,Y,W=None,
            data=None,
            cl=0.95,
            intercept=True,
@@ -93,36 +93,35 @@ def smafit(X0,Y0,W0=None,
             raise ValueError( 'Argument data must be provided with a key named '+v ) from exc
 
     # If variables are provided as strings, get values from the data structure
-    if isinstance( X0, str ):
-        X0 = str2var( X0 )
-    if isinstance( Y0, str ):
-        Y0 = str2var( Y0 )
-    if isinstance( W0, str ):
-        W0 = str2var( W0 )
+    if isinstance( X, str ):
+        X = str2var( X )
+    if isinstance( Y, str ):
+        Y = str2var( Y )
+    if isinstance( W, str ):
+        W = str2var( W )
 
     # Make sure arrays have the same length
-    assert ( len(X0) == len(Y0) ), 'Arrays X and Y must have the same length'
-    if (W0 != None ):
-        assert ( len(W0) == len(X0) ), 'Array W must have the same length as X and Y'
+    assert ( len(X) == len(Y) ), 'Arrays X and Y must have the same length'
+    if (W is None):
+         W = np.zeros_like(X) + 1
+    else:
+        assert ( len(W) == len(X) ), 'Array W must have the same length as X and Y'
 
     # Make sure cl is within the range 0-1
     assert (cl < 1), 'cl must be less than 1'
     assert (cl > 0), 'cl must be greater than 0'    
     
-    if (W0==None):
-        W0 = np.zeros_like(X0) + 1
-    
     # Drop any NaN elements of X, Y, or W    
     # Infinite values are allowed but will make the result undefined
     # idx = ~np.logical_or( np.isnan(X0), np.isnan(Y0) ) 
-    idx = ~np.isnan(X0) * ~np.isnan(Y0) * ~np.isnan(W0)
+    idx = ~np.isnan(X) * ~np.isnan(Y) * ~np.isnan(W)
 
-    X = X0[idx]
-    Y = Y0[idx]
-    W = W0[idx]
+    X0 = X[idx]
+    Y0 = Y[idx]
+    W0 = W[idx]
     
     # Number of observations
-    N = len(X)
+    N = len(X0)
     
     # Degrees of freedom for the model
     if (intercept):
@@ -144,7 +143,7 @@ def smafit(X0,Y0,W0=None,
                 raise NotImplementedError('FastMCD method only supports SMA with intercept')
             
             # Fit robust model of mean and covariance
-            mcd = MinCovDet().fit( np.array([X,Y]).T )
+            mcd = MinCovDet().fit( np.array([X0,Y0]).T )
         
             # Robust mean
             Xmean = mcd.location_[0]
@@ -173,15 +172,15 @@ def smafit(X0,Y0,W0=None,
             # Fitting a linear model the easiest way to get these             
             # Options include "TukeyBiweight" (totally removes large deviates) 
             # "HuberT" (linear, not squared weighting of large deviates)
-            rweights = smf.rlm('y~x+1',{'x':X,'y':Y},M=norm).fit().weights
+            rweights = smf.rlm('y~x+1',{'x':X0,'y':Y0},M=norm).fit().weights
 
             # Sum of weight and weights squared, for convienience
             rsum  = np.sum( rweights ) 
             rsum2 = np.sum( rweights**2 ) 
         
             # Mean
-            Xmean = np.sum( X * rweights ) / rsum
-            Ymean = np.sum( Y * rweights ) / rsum
+            Xmean = np.sum( X0 * rweights ) / rsum
+            Ymean = np.sum( Y0 * rweights ) / rsum
         
             # Force intercept through zero, if requested
             if (not intercept):
@@ -189,9 +188,9 @@ def smafit(X0,Y0,W0=None,
                 Ymean = 0
         
             # Variance & Covariance
-            Vx    = np.sum( (X-Xmean)**2 * rweights**2 ) / rsum2
-            Vy    = np.sum( (Y-Ymean)**2 * rweights**2 ) / rsum2
-            Vxy   = np.sum( (X-Xmean) * (Y-Ymean) * rweights**2 ) / rsum2   
+            Vx    = np.sum( (X0-Xmean)**2 * rweights**2 ) / rsum2
+            Vy    = np.sum( (Y0-Ymean)**2 * rweights**2 ) / rsum2
+            Vxy   = np.sum( (X0-Xmean) * (Y0-Ymean) * rweights**2 ) / rsum2   
 
             # Effective number of observations
             N = rsum  
@@ -206,11 +205,11 @@ def smafit(X0,Y0,W0=None,
             wsum = np.sum(W)
             
             # Average values
-            Xmean = np.sum(X * W) / wsum
-            Ymean = np.sum(Y * W) / wsum
+            Xmean = np.sum(X0 * W0) / wsum
+            Ymean = np.sum(Y0 * W0) / wsum
   
             # Covariance matrix
-            cov = np.cov( X, Y, ddof=1, aweights=W**2 )
+            cov = np.cov( X0, Y0, ddof=1, aweights=W0**2 )
     
             # Variance
             Vx = cov[0,0]
@@ -225,12 +224,12 @@ def smafit(X0,Y0,W0=None,
             Xmean = 0
             Ymean = 0
             
-            wsum = np.sum(W)
+            wsum = np.sum(W0)
             
             # Sum of squares in place of variance and covariance
-            Vx = np.sum( X**2 * W ) / wsum
-            Vy = np.sum( Y**2 * W ) / wsum
-            Vxy= np.sum( X*Y  * W ) / wsum
+            Vx = np.sum( X0**2 * W0 ) / wsum
+            Vy = np.sum( Y0**2 * W0 ) / wsum
+            Vxy= np.sum( X0*Y0 * W0 ) / wsum
         
     # Standard deviation
     Sx = np.sqrt( Vx )
@@ -248,7 +247,7 @@ def smafit(X0,Y0,W0=None,
     ste_slope = np.sqrt( 1/(N-dfmod) * Sy**2 / Sx**2 * (1-R**2) )
     
     # Confidence interval for Slope
-    B = (1-R**2)/(N-dfmod) * stats.f.isf(1-cl,1,N-dfmod)
+    B = (1-R**2)/(N-dfmod) * stats.f.isf(1-cl, 1, N-dfmod)
     ci_grad = Slope * ( np.sqrt( B+1 ) + np.sqrt(B)*np.array([-1,+1]) )
 
     #############
@@ -264,7 +263,7 @@ def smafit(X0,Y0,W0=None,
 
         # OLD METHOD
         # Standard deviation of residuals
-        #resid = Y - (Intercept + Slope * X )    
+        #resid = Y0 - (Intercept + Slope * X0 )    
         # Population standard deviation of the residuals
         #Sr = np.std( resid, ddof=0 )      
     
@@ -291,9 +290,9 @@ def smafit(X0,Y0,W0=None,
                    df_model         = dfmod,
                    df_resid         = N-dfmod,
                    params           = np.array([Slope,Intercept]),
-                   nobs             = len(X),
-                   fittedvalues     = Intercept + Slope * X,
-                   resid            = Intercept + Slope * X - Y )
+                   nobs             = len(X0),
+                   fittedvalues     = Intercept + Slope * X0,
+                   resid            = Intercept + Slope * X0 - Y0 )
     
     # return Slope, Intercept, ste_slope, ste_int, ci_grad, ci_int
     return result
