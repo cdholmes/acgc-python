@@ -1,0 +1,68 @@
+### Style inspired by the Proplot package
+
+## Font
+font.size       : 10.0
+font.family     : sans-serif
+font.serif      : TeX Gyre Pagella, TeX Gyre Termes, TeX Gyre Schola, TeX Gyre Bonum, DejaVu Serif, Bitstream Vera Serif, Computer Modern Roman, New Century Schoolbook, Century Schoolbook L, Utopia, ITC Bookman, Bookman, Nimbus Roman No9 L, Times New Roman, Times, Palatino, Charter, serif
+font.sans-serif : TeX Gyre Heros, Arial, Helvetica, DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid, Avant Garde, sans-serif
+font.cursive    : TeX Gyre Chorus, Apple Chancery, Textile, Zapf Chancery, Sand, Script MT, Felipa, Comic Neue, Comic Sans MS, cursive
+font.fantasy    : TeX Gyre Adventor, Chicago, Charcoal, Impact, Western, Humor Sans, xkcd, fantasy
+font.monospace  : TeX Gyre Cursor, DejaVu Sans Mono, Bitstream Vera Sans Mono, Computer Modern Typewriter, Andale Mono, Nimbus Mono L, Courier New, Courier, Fixed, Terminal, monospace
+
+
+## Figure display
+figure.figsize      : 4.0, 3.3
+figure.titlesize    : 10
+figure.titleweight  : bold
+figure.dpi          : 100
+figure.constrained_layout.use   : True
+axes.titlepad       : 5.0       # more compact
+
+## Figure saving
+savefig.dpi         : 400 # recommended by many journals
+savefig.facecolor   : white
+savefig.format      : pdf
+
+## Show grid lines
+axes.grid       : True
+axes.grid.which : major
+grid.color      : black
+grid.alpha      : 0.1
+grid.linewidth  : 0.6
+
+## Width of border lines
+axes.linewidth  : 0.6
+patch.linewidth : 0.6
+
+## Legend
+legend.edgecolor        : 0
+legend.borderaxespad    : 0.2   # closer to edges
+legend.columnspacing    : 1.5   # more compact
+legend.handleheight     : 1.0   # taller lines
+legend.handlelength     : 2.0   # longer lines   
+legend.handletextpad    : 0.5   # more compact
+
+## Ticks
+xtick.color         : black
+xtick.direction     : out
+xtick.labelsize     : medium
+xtick.major.pad     : 2.0
+xtick.major.size    : 4.0
+xtick.major.width   : 0.6
+xtick.minor.pad     : 2.0
+xtick.minor.size    : 2.0
+xtick.minor.width   : 0.5
+xtick.minor.visible : True
+
+ytick.color         : black
+ytick.direction     : out
+ytick.labelsize     : medium
+ytick.major.pad     : 2.0
+ytick.major.size    : 4.0
+ytick.major.width   : 0.6
+ytick.minor.pad     : 2.0
+ytick.minor.size    : 2.0
+ytick.minor.width   : 0.5
+ytick.minor.visible : True
+
+# See https://matplotlib.org/stable/users/explain/customizing.html#customizing-with-matplotlibrc-files for more documentation

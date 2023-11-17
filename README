@@ -9,27 +9,29 @@ CONTACT: cdholmes@fsu.edu
 *******************************************
 
 CONTENTS:
-demo/            - Directory of simple scripts demonstrating common data analysis and visualization tasks
+demo/               Directory of simple scripts demonstrating common data analysis and visualization tasks
 
-boxcar.py        - Boxcar (running mean) filters
-boxcarpoly.py	 - Boxcar (running mean) polynomial fit
-bstats.py	 - Bias statistics
-erroranalysis.py - Automatic error propagation through complex models
-execfile.py	 - Reproduces Python 2 "execfile" command in Python 3
-gctools.py       - Tools for handling GEOS-Chem model output
-hytools.py	 - Tools for running HYSPLIT and reading HYSPLIT output
-icartt.py	 - Tools for reading data in ICARTT format
-igra.py		 - Tools for reading IGRA radiosonde data
-loess.py	 - LOESS locally weighted least squares fitting
-mettools.py	 - Miscelaneous functions for PBL properties
-modetools.py	 - Visualization of eigenmode systems
-nctools.py       - High-level functions for reading and writing netCDF files
-partial_corr.py	 - Partial correlation
-scalebar.py	 - Add a length scale bar on a map
-sen_slope.py	 - Compute Sen's (robust) slope estimator
-smafit.py        - Standard Major Axis (SMA) line fitting, including robust methods and error analysis
-solar.py	 - Solar zenith angle, declination, equation of time
-tapply.py	 - tapply function from R implemented in Python (Use groupby methods in pandas or xarray when possible.)
-time_tools.py    - Functions for calculating with dates. e.g. converting dates to fractional years
-wstats.py        - Weighted statistics. e.g. weighted mean, weighted R2, etc.
-york.py		 - York regression
+acgc.mplstyle       Matplotlib stylesheet for publication-quality figures
+acgcstyle.py        Convenience module for using acgc.mplstyle
+boxcar.py           Boxcar (running mean) filters
+boxcarpoly.py	    Boxcar (running mean) polynomial fit
+bstats.py	        Bivariate statistics
+erroranalysis.py    Automatic error propagation through complex models
+execfile.py	        Reproduces Python 2 "execfile" command in Python 3
+gctools.py          Tools for handling GEOS-Chem model output
+hytools.py	        Tools for running HYSPLIT and reading HYSPLIT output
+icartt.py	        Tools for reading data in ICARTT format
+igra.py		        Tools for reading IGRA radiosonde data
+loess.py	        LOESS locally weighted least squares fitting
+mettools.py	        Miscelaneous functions for PBL properties
+modetools.py	    Visualization of eigenmode systems
+nctools.py          High-level functions for reading and writing netCDF files
+partial_corr.py	    Partial correlation
+scalebar.py	        Add a length scale bar on a map
+sen_slope.py	    Compute Sen's (robust) slope estimator
+smafit.py           Standard Major Axis (SMA) line fitting, including robust methods and error analysis
+solar.py	        Solar zenith angle, declination, equation of time
+tapply.py	        tapply function from R implemented in Python (Use groupby methods in pandas or xarray when possible.)
+time_tools.py       Functions for calculating with dates. e.g. converting dates to fractional years
+wstats.py           Weighted statistics. e.g. weighted mean, weighted R2, etc.
+york.py		        York regression
