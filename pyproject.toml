@@ -5,3 +5,23 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 include = ["acgc*"]
 exclude = ["demo*"]
+
+[project]
+name = "acgc"
+version = "0.1_a3"
+authors = [
+  { name="Christopher D. Holmes", email="cdholmes@fsu.edu" },
+]
+description = "A collection of data analysis routines used by the Atmospheric Chemistry and Global Change research group"
+readme = "README"
+requires-python = ">=3.4"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: LGPL 3.0",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/cdholmes/pylib"
+Issues = "https://github.com/cdholmes/pylib/issues"
+
