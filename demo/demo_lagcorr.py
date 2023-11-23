@@ -8,9 +8,9 @@ Created on Thu May 14 17:47:41 2015
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as stats
-from boxcar import boxcar
-from tapply import tapply
-from boxcarpoly import boxcarpoly
+from acgc.boxcar import boxcar
+from acgc.tapply import tapply
+from acgc.boxcarpoly import boxcarpoly
 
 # Create a AR(1) time series
 N = 365

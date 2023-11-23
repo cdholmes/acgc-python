@@ -6,7 +6,7 @@ Created on Thu Jun 11 16:40:56 2015
 @author: cdholmes
 """
 import numpy as np
-from loess import loess
+from acgc.loess import loess
 import matplotlib.pyplot as plt
 
 # Create a synthetic dataset -- sinusoid with noise

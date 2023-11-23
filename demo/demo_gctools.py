@@ -6,8 +6,8 @@ Created on Wed Apr 12 15:00:41 2017
 @author: cdholmes
 """
 
-import gctools as gc
-import nctools as nct
+import acgc.gctools as gc
+import acgc.nctools as nct
 import matplotlib.pyplot as plt
 import numpy as np
 

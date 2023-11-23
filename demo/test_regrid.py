@@ -1,8 +1,8 @@
 #!/usr/bin/env ipython3
 
-import gctools as gct
+import acgc.gctools as gct
 import numpy as np 
-import nctools as nct
+import acgc.nctools as nct
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 

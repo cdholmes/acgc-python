@@ -6,7 +6,7 @@ Created on Thu Sep 17 16:08:47 2015
 """
 
 import numpy as np
-from boxcar import boxcar
+from acgc.boxcar import boxcar
 
 # Create a synthetic dataset consisting of a sine wave with noise
 x = np.arange(0,4*np.pi,0.1)
@@ -20,3 +20,4 @@ plt.clf()
 plt.plot(x,y,label='noisy')
 plt.plot(x,z,label='smoothed')
 plt.legend()
+plt.show()

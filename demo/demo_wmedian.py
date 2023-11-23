@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import wstats as ws
+import acgc.wstats as ws
 import numpy as np
 
 n = 10

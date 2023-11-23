@@ -8,7 +8,7 @@ Created on Fri May 22 16:12:41 2015
 import numpy as np
 import pandas
 import matplotlib.pyplot as plt
-from tapply import tapply
+from acgc.tapply import tapply
 import datetime as dt
 
 file = 'c2h6_brw_surface-flask_1_arl_event.txt'

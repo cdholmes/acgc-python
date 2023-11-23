@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import gctools as gct
+import acgc.gctools as gct
 import numpy as np
 
 n1 = 5

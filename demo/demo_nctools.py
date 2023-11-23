@@ -7,7 +7,7 @@ Created on Mon Jul 31 17:58:41 2017
 """
 
 import numpy as np
-import nctools as nct
+import acgc.nctools as nct
 
 
 nct.write_geo_ncdf('test.nc',globalAtt={'Author':'Me'},

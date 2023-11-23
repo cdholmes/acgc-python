@@ -9,7 +9,7 @@ Created on Thu Apr 23 11:57:32 2015
 
 import numpy as np
 import scipy.stats
-from sen_slope import sen_slope 
+from acgc.sen_slope import sen_slope 
 import matplotlib.pyplot as plt
 
 
