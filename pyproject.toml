@@ -1,17 +1,23 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = [
+  "setuptools>=61.0",
+  "setuptools-scm>=8.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
 
 [tool.setuptools.packages.find]
 include = ["acgc"]
 exclude = ["demo"]
 
 [tool.setuptools.package-data]
-acgc = ["*.mplstyle","fonts/*.otf"]
+acgc = [
+  "*.mplstyle",
+  "fonts/*.otf"]
 
 [project]
 name = "acgc"
-dynamic = ["version"]
+dynamic = ["version"] # Version number will be discovered from git tags by setuptools_scm
 authors = [
   { name="Christopher Holmes", email="cdholmes@fsu.edu" },
 ]
