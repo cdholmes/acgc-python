@@ -2,9 +2,6 @@
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-include-package-data = true
-
 [tool.setuptools.packages.find]
 include = ["acgc"]
 exclude = ["demo"]
@@ -14,20 +11,41 @@ acgc = ["*.mplstyle","fonts/*.otf"]
 
 [project]
 name = "acgc"
-version = "0.1_a3"
+dynamic = ["version"]
 authors = [
-  { name="Christopher D. Holmes", email="cdholmes@fsu.edu" },
+  { name="Christopher Holmes", email="cdholmes@fsu.edu" },
 ]
-description = "A collection of data analysis routines used by the Atmospheric Chemistry and Global Change research group"
+maintainers = [
+  { name="Christopher Holmes", email="cdholmes@fsu.edu" },
+]
+description = "A collection of data analysis programs used by the Atmospheric Chemistry and Global Change research group"
 readme = "README"
+license = { file = "LICENSE" }
 requires-python = ">=3.4"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: LGPL 3.0",
     "Operating System :: OS Independent",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Atmospheric Science"
+]
+dependencies = [
+    "matplotlib",
+    "matplotlib_inline",
+    "cartopy",
+    "numpy",
+    "scipy",
+    "numba",
+    "pandas",
+    "netCDF4",
+    "scikit-learn",
+    "statsmodels"
+    #"rpy2",
 ]
 
 [project.urls]
 Homepage = "https://github.com/cdholmes/pylib"
+Repository = "https://github.com/cdholmes/pylib"
 Issues = "https://github.com/cdholmes/pylib/issues"
 
