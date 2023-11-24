@@ -25,7 +25,7 @@ maintainers = [
   { name="Christopher Holmes", email="cdholmes@fsu.edu" },
 ]
 description = "A collection of data analysis programs used by the Atmospheric Chemistry and Global Change research group"
-readme = "README"
+readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.4"
 classifiers = [
