@@ -7,13 +7,13 @@ The acgc package is a collection of data analysis functions used by the Atmosphe
 
 `pip install git+https://github.com/cdholmes/acgc-pylib`
 
-You can then use the package via `import acgc`.
+You can then use the package via `from acgc import <submodule>`.
 
 ## Contents
 
 The acgc package includes the following sub-modules. Import these via `from acgc import <submodule>` or `import acgc.<submodule> as <alias>`. Example: `import acgc.gctools as gct` 
 
-- acgcstyle.py        
+- figstyle.py        
 Changes Matplotlib style to make figures closer to publication ready. 
 - bstats.py	        
 Bivariate statistics
@@ -27,14 +27,14 @@ Tools for running HYSPLIT and reading HYSPLIT output
 Tools for reading data in ICARTT format
 - igra.py		        
 Tools for reading IGRA radiosonde data
+- map_scalebar.py	        
+Add a length scale bar on a map
 - mettools.py	        
 Miscelaneous functions for PBL properties
 - modetools.py	    
 Visualization of eigenmode systems
 - partial_corr.py	    
 Partial correlation
-- scalebar.py	        
-Add a length scale bar on a map
 - sen_slope.py	    
 Compute Sen's (robust) slope estimator
 - smafit.py           
