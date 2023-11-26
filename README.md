@@ -5,7 +5,7 @@ The acgc package is a collection of data analysis functions used by the Atmosphe
 
 ## Installation
 
-`pip install git+https://github.com/cdholmes/acgc-pylib`
+`pip install git+https://github.com/cdholmes/acgc-python`
 
 You can then use the package via `from acgc import <submodule>`.
 
