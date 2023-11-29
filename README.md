@@ -7,18 +7,26 @@ The acgc package is a collection of data analysis functions used by the Atmosphe
 
 `pip install git+https://github.com/cdholmes/acgc-python`
 
-You can then use the package via `from acgc import <submodule>`.
+The package can then be imported and used via `from acgc import <submodule>`.
+
+#### Editable installation
+If you plan to edit, update, and improve the python source code within this package, an editable installation may be better:
+`pip install -e git+https://github.com/cdholmes/acgc-python`
+The local files can then be managed with git, including keeping up-to-date with the github source repository via `git pull`.
+
+#### Classic version
+The old version of this package, which is a regular file directory, not an importable python module is accessible as the "classic" branch of this repository.
 
 ## Contents
 
 The acgc package includes the following sub-modules. Import these via `from acgc import <submodule>` or `import acgc.<submodule> as <alias>`. Example: `import acgc.gctools as gct`. 
 See `help(acgc.<submodule>)` for complete list of features.
 
-- **figstyle**  
+- figstyle  
 Changes Matplotlib style to make figures closer to publication ready. 
-- **stats**  
+- stats  
 Collection of statistical methods. Useful functions include BivariateStatistics, line fitting methods (sma, sen, york), weighted statistics (wmean, wmedian, wcov, wcorr, etc.), partial_corr, among others. See help(acgc.stats) for complete list of methods.
-- erroranalysis    
+- erroranalysis   
 Automatic error propagation through complex models
 - gctools       
 Tools for handling GEOS-Chem model output
