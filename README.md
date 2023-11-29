@@ -12,11 +12,12 @@ You can then use the package via `from acgc import <submodule>`.
 ## Contents
 
 The acgc package includes the following sub-modules. Import these via `from acgc import <submodule>` or `import acgc.<submodule> as <alias>`. Example: `import acgc.gctools as gct`. 
+See help(acgc.<submodule>) for complete list of features.
 
-- **figstyle**
+- **figstyle**  
 Changes Matplotlib style to make figures closer to publication ready. 
-- **stats**
-Collection of statistical methods. Useful functions include BivariateStatistics, line fitting methods (sma, sen, york), weighted statistics (wmean, wmedian, wcov, wcorr, etc.), partial_corr.
+- **stats**  
+Collection of statistical methods. Useful functions include BivariateStatistics, line fitting methods (sma, sen, york), weighted statistics (wmean, wmedian, wcov, wcorr, etc.), partial_corr, among others. See help(acgc.stats) for complete list of methods.
 - erroranalysis    
 Automatic error propagation through complex models
 - gctools       
@@ -34,11 +35,11 @@ Miscelaneous functions for PBL properties
 - modetools	    
 Visualization of eigenmode systems
 - nctools.py          
-High-level functions for reading and writing netCDF files
+High-level functions for reading and writing netCDF files. Legacy code. write_geo_nc is still useful for concisely creating netCDF files, but xarray is better for reading netCDF.
 - solar        
 Solar zenith angle, declination, equation of time
 - time_tools       
-Functions for calculating with dates. e.g. converting dates to fractional years
+Functions for calculating with dates. e.g. converting dates to fractional years. Legacy code. Use pandas.Timestamps or similar for new projects.
 
 ## Demos
 The [`demo`](./demo/) folder contains examples of how to accomplish common data analysis and visualization tasks, including using many of the functions within the `acgc` library.
