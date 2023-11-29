@@ -14,7 +14,7 @@ Functions:
     wvar
 '''
 import warnings
-from .stats.wstats import wcorr, wcorrcoef, wcov, wmean, wmedian, wquantile, _wscale, wstd, wvar
+from .stats.weighted import wcorr, wcorrcoef, wcov, wmean, wmedian, wquantile, _wscale, wstd, wvar
 
 with warnings.catch_warnings():
     warnings.simplefilter('always', DeprecationWarning)

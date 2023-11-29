@@ -10,6 +10,8 @@ import scipy.stats as stats
     
 from numba import jit
 
+__all__ = ['sma_warton_fit']
+
 def sma_warton_fit(X0,Y0,alpha=0.05,intercept=True,robust=False,wartonrobust=False):
 
     '''

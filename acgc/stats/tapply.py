@@ -3,6 +3,8 @@
 
 import numpy as np
 
+__all__ = ['tapply']
+
 def tapply( array, group, f ):
     '''Apply user-specified function to array elements within each group
 

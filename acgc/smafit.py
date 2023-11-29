@@ -6,7 +6,7 @@ Functions:
     smafit
 '''
 import warnings
-from .stats.smafit import smafit
+from .stats.bivariate_lines import smafit
 
 with warnings.catch_warnings():
     warnings.simplefilter('always', DeprecationWarning)

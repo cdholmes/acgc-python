@@ -7,7 +7,7 @@ Functions:
     sen_slope
 '''
 import warnings
-from .stats.sen import sen, sen_slope
+from .stats.bivariate_lines import sen, sen_slope
 
 with warnings.catch_warnings():
     warnings.simplefilter('always', DeprecationWarning)

@@ -9,6 +9,8 @@ Testing: Valentina Borghesani, valentinaborghesani@gmail.com
 import numpy as np
 from scipy import stats, linalg
 
+__all__ = ['partial_corr']
+
 def partial_corr(C):
     """Returns the sample linear partial correlation coefficients between pairs of variables in C, 
     controlling for the remaining variables in C.

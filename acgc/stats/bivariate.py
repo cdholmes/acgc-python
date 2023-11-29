@@ -2,13 +2,8 @@
 # -*- coding: utf-8 -*-
 """ Bivariate statistics
 
-Statistical measures of bias between two populations
-Includes: 
-Normalized Mean Bias Factor (NMBF) and Normalized Mean Absolute Error Factor (NMAEF)
+Statistical measures of relationships between two populations
 
-Yu, S., Eder, B., Dennis, R., Chu, S.-H., & Schwartz, S. E. (2006). 
-    New unbiased symmetric metrics for evaluation of air quality models.
-    Atmospheric Science Letters, 7(1), 26–34. https://doi.org/10.1002/asl.125
 
 Created on June 4 2019
 
@@ -17,8 +12,16 @@ Created on June 4 2019
 
 import numpy as np
 from scipy import stats
-from .smafit import smafit
+from .bivariate_lines import sma
 # import xarray as xr
+
+__all__ = [
+    "BivariateStatistics",
+    "nmb",
+    "nmae",
+    "nmbf",
+    "nmaef"
+]
 
 def nmb( ref_values, exp_values ):
     '''Compute Normalized Mean Bias (NMB)
@@ -62,7 +65,7 @@ def nmae( ref_values, exp_values ):
 
 def nmbf( ref_values, exp_values ):
     '''Compute Normalized Mean Bias Factor (NMBF)
-    Definition from Yu et al. (2006, Atmos. Sci. Lett.)
+    Definition from Yu et al. (2006) https://doi.org/10.1002/asl.125
 
     Parameters
     ----------
@@ -91,13 +94,17 @@ def nmbf( ref_values, exp_values ):
 
 def nmaef( ref_values, exp_values ):
     '''Compute Normalized Mean Absolute Error Factor (NMAEF)
-    Definition from Yu et al. (2006, Atmos. Sci. Lett.)
+    Definition from Yu et al. (2006) https://doi.org/10.1002/asl.125
     
     Parameters
     ----------
     ref_values : reference values
     exp_values : experiment values
     '''
+
+    # Ensure that arguments have the same length
+    assert (len(exp_values) == len(ref_values)), \
+        "exp_values must have the same length as ref_values"
 
     # Mean values
     ref_mean = np.mean(ref_values)
@@ -116,7 +123,6 @@ def nmaef( ref_values, exp_values ):
     #result = abs_diff / ( oMean**((1+S)/2) * mMean**((1-S)/2) )
 
     return result
-
 
 class BivariateStatistics:
     '''A suite of common statistics to quantify bivariate relationships
@@ -172,7 +178,7 @@ class BivariateStatistics:
         if len(x) != len(y):
             raise ValueError( 'Arguments x and y must have the same length' )
         if (w is not None) and (len(w) != len(x)):
-            raise ValueError( 'Argument w (if present) must have the same length as x' )                
+            raise ValueError( 'Argument w (if present) must have the same length as x' )
 
         diff = y - x
         absdiff = np.abs( y - x )
@@ -237,7 +243,7 @@ class BivariateStatistics:
             line fitting method: sma (default), ols, wls, York
         intercept : bool
             defines whether non-zero intercept should be fitted
-        **kwargs passed to smafit (e.g. robust=True)
+        **kwargs passed to sma (e.g. robust=True)
 
         Returns
         -------
@@ -249,7 +255,7 @@ class BivariateStatistics:
         '''
 
         if method.lower()=='sma':
-            sma = smafit(self._x,
+            sma = sma(  self._x,
                         self._y,
                         self._w,
                         intercept=intercept,

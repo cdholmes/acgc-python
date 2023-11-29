@@ -2,43 +2,6 @@
 # -*- coding: utf-8 -*-
 """ Weighted variance, covariance, correlation, median, and quantiles
 
-The weighted correlation coefficient here may be usedful to construct a 
-a "weighted R2" or "weighted coefficient of determination" from a 
-Weighted Least Squares regression: R2w = wcorr(x,y,w)**2. The resulting R2w is
-equivalent to equation 4 from Willett and Singer (1988, American Statistician) 
-and their caveats apply. 
-
-Craig Milligan provides the following advice in an online forum:
-"What is the meaning of this (corrected) weighted r-squared? 
-Willett and Singer interpret it as: "the coefficient of determination in the 
-transformed [weighted] dataset. It is a measure of the proportion of the 
-variation in weighted Y that can be accounted for by weighted X, and is the 
-quantity that is output as R2 by the major statistical computer packages when a 
-WLS regression is performed".
-
-Is it meaningful as a measure of goodness of fit? 
-This depends on how it is presented and interpreted. Willett and Singer caution 
-that it is typically quite a bit higher than the r-squared obtained in ordinary 
-least squares regression, and the high value encourages prominent display... 
-but this display may be deceptive IF it is interpreted in the conventional 
-sense of r-squared (as the proportion of unweighted variation explained by a 
-model). Willett and Singer propose that a less 'deceptive' alternative is 
-their equation 7 [usual unweighted R2, called pseudor2wls by Willett and Singer]. 
-In general, Willett and Singer also caution that it is 
-not good to rely on any r2 (even their pseudor2wls) as a sole measure of 
-goodness of fit. Despite these cautions, the whole premise of robust regression 
-is that some cases are judged 'not as good' and don't count as much in the model 
-fitting, and it may be good to reflect this in part of the model assessment 
-process. The weighted r-squared described, can be one good measure of goodness 
-of fit - as long as the correct interpretation is clearly given in the 
-presentation and it is not relied on as the sole assessment of goodness of fit."
-
-
-
-Willett, J. B. and Singer, J. D.: Another Cautionary Note About R2: 
-    Its Use in Weighted Least-Squares Regression-Analysis, American Statistician, 
-    42(3), 236–238, 1988.
-
 Created on Mon Apr 24 17:39:51 2017
 
 @author: cdholmes
@@ -47,6 +10,17 @@ Created on Mon Apr 24 17:39:51 2017
 import numpy as np
 from sklearn.covariance import MinCovDet
 from scipy.interpolate import interp1d
+
+__all__ = [
+    'wcorr',
+    'wcorrcoef',
+    'wcov',
+    'wmean',
+    'wmedian',
+    'wquantile',
+    'wstd',
+    'wvar'
+]
 
 def wmean(x,w=None,robust=False):
     '''Weighted mean 
@@ -174,7 +148,7 @@ def wcov(x,y,w=None,ddof=1,robust=False):
         raise ValueError('must specify weights w or select robust=True')
     assert len(w) == n, 'w must be the same length as x and y'
 
-    w = wscale(w)
+    w = _wscale(w)
     nw = np.count_nonzero(w)
 
     return np.sum( ( x - wmean(x,w) ) * ( y - wmean(y,w) ) * w ) / \
@@ -185,6 +159,8 @@ def wcorr(x,y,w=None,robust=False):
     
     Calculate the Pearson linear correlation coefficient of x and y using weights w. 
     This is derived from the weighted covariance and weighted variance.
+    Equivalent to R2w in Eq. 4 from Willett and Singer (1988).
+    See notes below on interpretation.
     
     Parameters
     ----------
@@ -202,6 +178,43 @@ def wcorr(x,y,w=None,robust=False):
     -------
     result : float
         weighted correlation coefficient of x and y
+
+    Notes
+    -----
+    The weighted correlation coefficient here may be usedful to construct a 
+    a "weighted R2" or "weighted coefficient of determination" from a 
+    Weighted Least Squares regression: R2w = wcorr(x,y,w)**2. The resulting R2w is
+    equivalent to equation 4 from Willett and Singer (1988, American Statistician) 
+    and their caveats apply. 
+
+    Craig Milligan provides the following advice in an online forum:
+    "What is the meaning of this (corrected) weighted r-squared? 
+    Willett and Singer interpret it as: "the coefficient of determination in the 
+    transformed [weighted] dataset. It is a measure of the proportion of the 
+    variation in weighted Y that can be accounted for by weighted X, and is the 
+    quantity that is output as R2 by the major statistical computer packages when a 
+    WLS regression is performed".
+
+    Is it meaningful as a measure of goodness of fit? 
+    This depends on how it is presented and interpreted. Willett and Singer caution 
+    that it is typically quite a bit higher than the r-squared obtained in ordinary 
+    least squares regression, and the high value encourages prominent display... 
+    but this display may be deceptive IF it is interpreted in the conventional 
+    sense of r-squared (as the proportion of unweighted variation explained by a 
+    model). Willett and Singer propose that a less 'deceptive' alternative is 
+    their equation 7 [usual unweighted R2, called pseudor2wls by Willett and Singer]. 
+    In general, Willett and Singer also caution that it is 
+    not good to rely on any r2 (even their pseudor2wls) as a sole measure of 
+    goodness of fit. Despite these cautions, the whole premise of robust regression 
+    is that some cases are judged 'not as good' and don't count as much in the model 
+    fitting, and it may be good to reflect this in part of the model assessment 
+    process. The weighted r-squared described, can be one good measure of goodness 
+    of fit - as long as the correct interpretation is clearly given in the 
+    presentation and it is not relied on as the sole assessment of goodness of fit."
+
+    Willett, J. B. and Singer, J. D.: Another Cautionary Note About R2: 
+        Its Use in Weighted Least-Squares Regression-Analysis, American Statistician, 
+        42(3), 236–238, 1988.
     '''
 
     n = len(x)
@@ -214,13 +227,13 @@ def wcorr(x,y,w=None,robust=False):
     if len(w) == 0:
         raise ValueError('must specify weights w or select robust=True')
     assert len(w) == n, 'w must be the same length as x and y'
-    w = wscale(w)
+    w = _wscale(w)
     return wcov(x,y,w) / np.sqrt( wvar(x,w) * wvar(y,w) )
 
 # Alias for wcorr
 wcorrcoef = wcorr
 
-def wscale(w):
+def _wscale(w):
     '''Scale array to a maximum value of 1
 
     Rescale array to a maximum value of 1. 

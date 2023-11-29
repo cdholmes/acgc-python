@@ -2,10 +2,16 @@
 
 import numpy as np
 
+__all__ = [
+    "boxcar",
+    "boxcarpoly"
+]
+
 def boxcarpoly( array, width, order=2, align='center'):
     '''Calculate a boxcar polynomial (i.e. running polynomial fit) of an array. 
     
-    See boxcar for argument definitions'''
+    See boxcar for parameter definitions
+    '''
     return boxcar( array, width, order=order, align=align, method='polynomial')
 
 def boxcar( array, width, align='center', method='mean', order=2 ):

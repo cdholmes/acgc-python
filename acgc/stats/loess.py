@@ -13,10 +13,13 @@ import numpy as np
 os.environ['R_HOME'] = '/Users/cdholmes/anaconda/bin'
 import rpy2.robjects as robjects
 
+__all__ = ['loess']
 
 def loess(x,y,span=0.5,degree=2,family="symmetric"):
-    '''Compute loess smoothing fit 
+    '''Compute loess smoothing fit using the loess function in R
 
+    Requires installation of rpy2 and R.
+    
     Arguments
     ---------
     x, y : float, array
