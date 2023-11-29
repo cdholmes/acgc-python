@@ -6,7 +6,7 @@
 #%%
 import numpy as np
 import matplotlib.pyplot as plt
-from acgc.smafit import smafit
+from acgc.stats import sma
 import statsmodels.formula.api as smf
 
 #%%
@@ -27,7 +27,7 @@ ypure = np.copy(y)
 y[idxout] = [400,300,450,420]
 
 # SMA fit, use robust methods to minimize effect of outliers
-result = smafit(x,y,cl=0.95,robust=True)
+result = sma(x,y,cl=0.95,robust=True)
 # SMA fit on the "pure" data without outliers
 #sp,ip,stdsp,stdip,cisp,ciip = smafit(x,ypure,cl=0.95)
 

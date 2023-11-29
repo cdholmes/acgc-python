@@ -5,11 +5,12 @@ Created on Fri May 22 16:12:41 2015
 @author: cdholmes
 """
 
+import datetime as dt
 import numpy as np
 import pandas
 import matplotlib.pyplot as plt
-from acgc.tapply import tapply
-import datetime as dt
+from acgc.stats import tapply
+
 
 file = 'c2h6_brw_surface-flask_1_arl_event.txt'
 
@@ -27,6 +28,7 @@ timeid = np.int64(timeid.values)
 
 # calculate the mean and standard deviation of replicate samples, 
 # which have the same timeid
+# This should be rewritten to use pandas.groupby
 valuemean, timeiduniq = tapply(data['value'].values,timeid,np.nanmean)
 valuestd, _ = tapply(data['value'].values,timeid,np.nanstd)
 

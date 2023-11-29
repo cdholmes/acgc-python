@@ -14,7 +14,6 @@ import statsmodels.robust.norms as norms
 from numba import jit
 
 __all__ = [
-    "__version__",
     "sma",
     "smafit",
     "sen",
