@@ -12,7 +12,7 @@ You can then use the package via `from acgc import <submodule>`.
 ## Contents
 
 The acgc package includes the following sub-modules. Import these via `from acgc import <submodule>` or `import acgc.<submodule> as <alias>`. Example: `import acgc.gctools as gct`. 
-See help(acgc.<submodule>) for complete list of features.
+See `help(acgc.<submodule>)` for complete list of features.
 
 - **figstyle**  
 Changes Matplotlib style to make figures closer to publication ready. 
