@@ -53,23 +53,30 @@ def wmean(x,w=None,robust=False):
     
     Calculate the mean of x using weights w.
     
-    Args:
-        x : array of values to be averaged
-        w      : array of weights for each element of x; can be ommitted if robust=True
-        robust : (boolean) robust weights will be internally calculated using FastMCD;
-                 only used if robust=True and w is empty
+    Parameters
+    ----------
+    x : ndarray 
+        values to be averaged
+    w : ndarray (default=None)
+        weights for each element of x; can be ommitted if robust=True
+    robust : bool (default=False) 
+        if robust=True, weights will be internally calculated using FastMCD;
+        ignored if w is used
         
-    Returns:
-        scalar : weighted mean    
+    Returns
+    -------
+    result : float
+        weighted mean of x 
     '''
-    if (w!=None):
+    if w is not None:
         assert len(w) == len(x), 'w must be the same length as x'
 
     # Use FastMCD to calculate weights; Another method could be used here
-    if (robust and w==None):
+    if robust and (w is None):
         w = MinCovDet().fit( np.array([x,x]).T ).support_
-    
-    if (len(w) == 0): raise SystemExit('must specify weights w or select robust=True')
+
+    if len(w) == 0: 
+        raise ValueError('must specify weights w or select robust=True')
     assert len(w) == len(x), 'w must be the same length as x'
 
     return np.sum( x * w ) / np.sum(w)
@@ -80,19 +87,26 @@ def wstd(x,w=None,ddof=1,robust=False):
     Calculate the standard deviation of x using weights w. If ddof=1 (default),
     then the result is the unbiased (sample) standard deviation when w=1.
     
-    Args:
-        x    : array of values 
-        w      : array of weights for each element of x; can be ommitted if robust=True
-        ddof   : scalar differential degrees of freedom (Default ddof=1)
-        robust : (boolean) robust weights will be internally calculated using FastMCD;
-                 only used if robust=True and w is empty
+    Parameters
+    ----------
+    x : ndarray 
+        values to be analyzed
+    w : ndarray (default=None)
+        weights for each element of x; can be ommitted if robust=True
+    ddof : int (default=1)
+        differential degrees of freedom. See note above.
+    robust : bool (default=False) 
+        if robust=True, weights will be internally calculated using FastMCD;
+        ignored if w is used
         
-    Returns:
-        scalar : weighted variance   
+    Returns
+    -------
+    result : float
+        weighted standard deviation of x 
     '''
-    if (w!=None):
+    if w is not None:
         assert len(w) == len(x), 'w must be the same length as x'
-        
+
     return np.sqrt( wcov(x,x,w,ddof,robust) )
 
 def wvar(x,w=None,ddof=1,robust=False):
@@ -101,21 +115,27 @@ def wvar(x,w=None,ddof=1,robust=False):
     Calculate the variance of x using weights w. If ddof=1 (default),
     then the result is the unbiased (sample) variance when w=1.
     
-    Args:
-        x    : array of values 
-        w      : array of weights for each element of x; can be ommitted if robust=True
-        ddof   : scalar differential degrees of freedom (Default ddof=1)
-        robust : (boolean) robust weights will be internally calculated using FastMCD;
-                 only used if robust=True and w is empty
+    Parameters
+    ----------
+    x : ndarray 
+        values to be analyzed
+    w : ndarray (default=None)
+        weights for each element of x; can be ommitted if robust=True
+    ddof : int (default=1)
+        differential degrees of freedom. See note above.
+    robust : bool (default=False) 
+        if robust=True, weights will be internally calculated using FastMCD;
+        ignored if w is used
         
-    Returns:
-        scalar : weighted variance   
+    Returns
+    -------
+    result : float
+        weighted variance of x 
     '''
-    if (w!=None):
+    if w is not None:
         assert len(w) == len(x), 'w must be the same length as x'
-        
-    return wcov(x,x,w,ddof,robust)
 
+    return wcov(x,x,w,ddof,robust)
 
 def wcov(x,y,w=None,ddof=1,robust=False):
     '''Weighted covariance 
@@ -123,26 +143,35 @@ def wcov(x,y,w=None,ddof=1,robust=False):
     Calculate the covariance of x and y using weights w. If ddof=1 (default),
     then the result is the unbiased (sample) covariance when w=1.
     
-    Implements weighted covariance as defined by NIST Dataplot (https://www.itl.nist.gov/div898/software/dataplot/refman2/ch2/weighvar.pdf)
+    Implements weighted covariance as defined by NIST Dataplot 
+    https://www.itl.nist.gov/div898/software/dataplot/refman2/ch2/weighvar.pdf
     
-    Args:
-        x,y    : array of values 
-        w      : array of weights for each element of x; can be ommitted if robust=True
-        ddof   : scalar differential degrees of freedom (Default ddof=1)
-        robust : (boolean) robust weights will be internally calculated using FastMCD;
-                 only used if robust=True and w is empty
+    Parameters
+    ----------
+    x, y : ndarray 
+        values to be analyzed
+    w : ndarray (default=None)
+        weights for each element of x; can be ommitted if robust=True
+    ddof : int (default=1)
+        differential degrees of freedom. See note above.
+    robust : bool (default=False) 
+        if robust=True, weights will be internally calculated using FastMCD;
+        ignored if w is used
         
-    Returns:
-        scalar : weighted covariance   
+    Returns
+    -------
+    result : float
+        weighted covariance of x and y
     '''
-    n = len(x)   
+    n = len(x)
     assert len(y) == n, 'y must be the same length as x'
 
     # Use FastMCD to calculate weights; Another method could be used here
-    if (robust and w==None):
+    if robust and (w is None):
         w = MinCovDet().fit( np.array([x,y]).T ).support_
-    
-    if (len(w) == 0): raise SystemExit('must specify weights w or select robust=True')
+
+    if len(w) == 0:
+        raise ValueError('must specify weights w or select robust=True')
     assert len(w) == n, 'w must be the same length as x and y'
 
     w = wscale(w)
@@ -150,31 +179,40 @@ def wcov(x,y,w=None,ddof=1,robust=False):
 
     return np.sum( ( x - wmean(x,w) ) * ( y - wmean(y,w) ) * w ) / \
         ( np.sum(w) / nw * (nw - ddof) )
-    
+
 def wcorr(x,y,w=None,robust=False):
     '''Weighted correlation coeffient
     
     Calculate the Pearson linear correlation coefficient of x and y using weights w. 
     This is derived from the weighted covariance and weighted variance.
     
-    Args:
-        x,y    : array of values 
-        w      : array of weights for each element of x
-        robust : (boolean) robust weights will be internally calculated using FastMCD;
-                 only used if robust=True and w is empty
+    Parameters
+    ----------
+    x, y : ndarray 
+        values to be analyzed
+    w : ndarray (default=None)
+        weights for each element of x; can be ommitted if robust=True
+    ddof : int (default=1)
+        differential degrees of freedom. See note above.
+    robust : bool (default=False) 
+        if robust=True, weights will be internally calculated using FastMCD;
+        ignored if w is used
         
-    Returns:
-        scalar : weighted covariance   
+    Returns
+    -------
+    result : float
+        weighted correlation coefficient of x and y
     '''
 
-    n = len(x)   
+    n = len(x)
     assert len(y) == n, 'y must be the same length as x'
 
     # Use FastMCD to calculate weights; Another method could be used here
-    if (w==None or robust==True):
+    if robust and (w is None):
         w = MinCovDet().fit( np.array([x,y]).T ).support_
-    
-    if (len(w) == 0): raise SystemExit('must specify weights w or select robust=True')
+
+    if len(w) == 0:
+        raise ValueError('must specify weights w or select robust=True')
     assert len(w) == n, 'w must be the same length as x and y'
     w = wscale(w)
     return wcov(x,y,w) / np.sqrt( wvar(x,w) * wvar(y,w) )
@@ -189,11 +227,15 @@ def wscale(w):
     In weighted averaging, we will assume that a weight of 1 means 1 degree of 
     freedom in the observations.
     
-    Args:
-        w : array 
+    Parameters
+    ----------
+    w : ndarray
+        weights 
         
-    Returns:
-        array : input array rescaled to a maximum value of 1
+    Returns
+    -------
+    result : float
+        input array rescaled so the largest element is 1
     '''
     return w / np.max( w )
 
@@ -201,6 +243,20 @@ def wmedian(x,w,**kwargs):
     '''Weighted median
 
     See documentation for wquantile
+
+    Parameters
+    ----------
+    x : ndarray 
+        values to be analyzed
+    w : ndarray
+        weights for each element of x
+    **kwargs passed to wquantile
+
+    Returns
+    -------
+    result : float
+        weighted median of x 
+
     '''
     return wquantile(x,0.5,w,**kwargs)
 
@@ -221,28 +277,35 @@ def wquantile(x,q,w,interpolation='partition'):
     This naive algorithm is O(n) and may be slow for large samples (x).
     Consider using Robustats or another optimized package.       
     
-    Args:
-        x      : array of values to compute quantiles
-        q      : quantile or list of quantiles to calculate, in range 0-1
-        w      : array of weights for each element of x (e.g. representing the frequency of elements x in a large population)
-        interpolation : {'partition' [default], 'partition0', 'linear', 'nearest', 'lower', 'upper'}
-            This parameter specifies the interpolation method to use when the desired quantile 
-            lies bewteen elements i < j in x.
-            'partition': [default] choose the element of x that partitions the 
-                         sum of weights on either side to q and (1-q)
-                         When two elements both satisfy partition, then average them.
-                         This is the Edgeworth method (https://en.wikipedia.org/wiki/Weighted_median)
-            'partition0': Same as partition, but result is always an element of x (no averaging). 
-                         Instead return the element of x that partitions weights most closely to q and (1-q) 
-                         or, if there is still a tie, then the smaller element.
-            'linear'  : i + (j-1) * fraction. replicates behavior of numpy.quantile when all 
-                        weights are equal
-            'nearest' : i or j element that most closely divides data at the q quantile
-            'lower'   : i, the largest element <= the q quantile
-            'higher'  : j, the smallest element >= the q quantile
+    Parameters
+    ----------
+    x : ndarray 
+        values to be analyzed
+    q : list
+        quantiles that will be calculated, in range 0-1
+    w : ndarray
+        weights for each element of x. 
+        These represent the frequency of elements x in a large population
+    interpolation : str (default='partition')
+        This parameter specifies the interpolation method to use when the desired quantile 
+        lies bewteen elements i < j in x. Allowed values:
+        'partition': [default] choose the element of x that partitions the 
+                        sum of weights on either side to q and (1-q)
+                        When two elements both satisfy partition, then average them.
+                        This is the Edgeworth method (https://en.wikipedia.org/wiki/Weighted_median)
+        'partition0': Same as partition, but result is always an element of x (no averaging). 
+                        Instead return the element of x that partitions weights most closely to q and (1-q) 
+                        or, if there is still a tie, then the smaller element.
+        'linear'  : i + (j-1) * fraction. replicates behavior of numpy.quantile when all 
+                    weights are equal
+        'nearest' : i or j element that most closely divides data at the q quantile
+        'lower'   : i, the largest element <= the q quantile
+        'higher'  : j, the smallest element >= the q quantile
                          
-    Returns:
-        scalar or array : weighted quantile
+    Result
+    ------
+    xq : ndarray
+        weighted quantiles of x. Length is the same as input q
     '''
 
     # Ensure arguments are arrays
@@ -253,7 +316,7 @@ def wquantile(x,q,w,interpolation='partition'):
     n = len(x)
 
     # Ensure weights are same length as x
-    if (len(w) != n ):
+    if len(w) != n:
         raise ValueError( 'weights w must be the same length as array x')
 
     # Ensure inputs are all finite, no NaN or Inf
@@ -261,44 +324,44 @@ def wquantile(x,q,w,interpolation='partition'):
         raise ValueError( 'Array x contains non-finite elements')
     if np.any( ~np.isfinite(w) ):
         raise ValueError( 'Weights w contains non-finite elements')
-    
+
     # Sort x from smallest to largest
     idx = np.argsort( x )
-
 
     if interpolation in ['partition','partition2']:
 
         # To calculate multiple quantiles, call function iteratively for each quantile requested
         if isinstance(q, (list, tuple, np.ndarray)):
             return [wquantile(x,qi,w,interpolation) for qi in q]
-    
+
         # Cumulative sum of weights, divided by sum
         wsum = np.cumsum( w[idx] ) / np.sum( w )
         # Reverse cumulative sum (cumulative sum of elements in reverse order)
         wsumr = np.cumsum( w[idx][::-1] )[::-1] / np.sum( w )
-    
+
         # Lower bound for quantile; il is an index into the sorted array
         if q <= wsum[0]:
             il = 0
         else:
             il   = np.flatnonzero( wsum < q )[-1] + 1
-        
+
         # Upper bound for quantile; iu is an index into the sorted array
         if (1-q) <= wsumr[-1]:
             iu = n-1
         else:
             iu   = np.flatnonzero( wsumr < (1-q) )[0] - 1
-            
+
         if il == iu:
             # Upper and lower bounds are the same; we're done
             xq = x[idx[il]]
-    
+
         else:
             # Several methods for reconciling different upper and lower bounds
-    
+
             if interpolation == 'partition':
                 # Average the upper and lower bounds
-                # This creates an element not found in the input array, which may be inappropriate in some cases 
+                # This creates an element not found in the input array,
+                # which may be inappropriate in some cases
                 xq = np.mean( x[idx[[il,iu]]] )
 
             else:
@@ -312,14 +375,13 @@ def wquantile(x,q,w,interpolation='partition'):
 
     else:
 
-        # These methods give the same results as numpy.percentile when using 
+        # These methods give the same results as numpy.percentile when using
         # the same interpolation method and uniform weights.
 
-                        
         # Define the quantile for each element in x
         w         = w.astype(np.float32)
         qx        = w[idx] / 2 - w[idx][0] / 2
-        qx[1:]   += np.cumsum( w[idx] )[:-1] 
+        qx[1:]   += np.cumsum( w[idx] )[:-1]
         qx       /= qx[-1]
 
         # Interpolate to get quantile value
@@ -333,11 +395,12 @@ def wquantile(x,q,w,interpolation='partition'):
             f = interp1d(qx,x[idx],kind='next')
         elif interpolation == 'midpoint':
             # Average the lower and higher values
-            f = lambda q: ( interp1d(qx,x[idx],kind='previous')(q) +
-                            interp1d(qx,x[idx],kind='next')(q)     ) / 2
+            def f(q):
+                return ( interp1d(qx,x[idx],kind='previous')(q) +
+                         interp1d(qx,x[idx],kind='next')(q)     ) / 2
         else:
             raise ValueError('Unrecognized value for interpolation: ' + interpolation)
-            
+
         xq = f(q)
-    
+
     return xq

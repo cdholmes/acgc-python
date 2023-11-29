@@ -85,8 +85,8 @@ def smafit(X,Y,W=None,
     import statsmodels.formula.api as smf
     import statsmodels.robust.norms as norms
 
-    def str2var( v ):
-        '''Extract variable named v from data'''
+    def str2var( v, data ):
+        '''Extract variable named v from Dataframe named data'''
         try:
             return data[v]
         except Exception as exc:
@@ -94,57 +94,57 @@ def smafit(X,Y,W=None,
 
     # If variables are provided as strings, get values from the data structure
     if isinstance( X, str ):
-        X = str2var( X )
+        X = str2var( X, data )
     if isinstance( Y, str ):
-        Y = str2var( Y )
+        Y = str2var( Y, data )
     if isinstance( W, str ):
-        W = str2var( W )
+        W = str2var( W, data )
 
     # Make sure arrays have the same length
     assert ( len(X) == len(Y) ), 'Arrays X and Y must have the same length'
-    if (W is None):
-         W = np.zeros_like(X) + 1
+    if W is None:
+        W = np.zeros_like(X) + 1
     else:
         assert ( len(W) == len(X) ), 'Array W must have the same length as X and Y'
 
     # Make sure cl is within the range 0-1
     assert (cl < 1), 'cl must be less than 1'
-    assert (cl > 0), 'cl must be greater than 0'    
-    
-    # Drop any NaN elements of X, Y, or W    
+    assert (cl > 0), 'cl must be greater than 0'  
+
+    # Drop any NaN elements of X, Y, or W
     # Infinite values are allowed but will make the result undefined
-    # idx = ~np.logical_or( np.isnan(X0), np.isnan(Y0) ) 
+    # idx = ~np.logical_or( np.isnan(X0), np.isnan(Y0) )
     idx = ~np.isnan(X) * ~np.isnan(Y) * ~np.isnan(W)
 
     X0 = X[idx]
     Y0 = Y[idx]
     W0 = W[idx]
-    
+
     # Number of observations
     N = len(X0)
-    
+
     # Degrees of freedom for the model
-    if (intercept):
+    if intercept:
         dfmod = 2
     else:
         dfmod = 1
-    
-   
+
+
     # Choose whether to use methods robust to outliers
-    if (robust):
-        
+    if robust:
+
         # Choose the robust method
         if ((robust_method.lower() =='mcd') or (robust_method.lower() == 'fastmcd') ):
-            # FAST MCD    
-        
-            if (not intercept):
+            # FAST MCD
+
+            if not intercept:
                 # intercept=False could possibly be supported by calculating
                 # using mcd.support_ as weights in an explicit variance/covariance calculation
                 raise NotImplementedError('FastMCD method only supports SMA with intercept')
-            
+
             # Fit robust model of mean and covariance
             mcd = MinCovDet().fit( np.array([X0,Y0]).T )
-        
+
             # Robust mean
             Xmean = mcd.location_[0]
             Ymean = mcd.location_[1]
@@ -163,89 +163,90 @@ def smafit(X,Y,W=None,
         elif ((robust_method.lower() =='biweight') or (robust_method.lower() == 'huber') ):
 
             # Tukey's Biweight and Huber's T
-            if ( robust_method.lower() =='biweight'):
+            if robust_method.lower()=='biweight':
                 norm = norms.TukeyBiweight()
             else:
                 norm = norms.HuberT()
-        
+
             # Get weights for downweighting outliers
-            # Fitting a linear model the easiest way to get these             
-            # Options include "TukeyBiweight" (totally removes large deviates) 
+            # Fitting a linear model the easiest way to get these
+            # Options include "TukeyBiweight" (totally removes large deviates)
             # "HuberT" (linear, not squared weighting of large deviates)
             rweights = smf.rlm('y~x+1',{'x':X0,'y':Y0},M=norm).fit().weights
 
             # Sum of weight and weights squared, for convienience
-            rsum  = np.sum( rweights ) 
-            rsum2 = np.sum( rweights**2 ) 
-        
+            rsum  = np.sum( rweights )
+            rsum2 = np.sum( rweights**2 )
+
             # Mean
             Xmean = np.sum( X0 * rweights ) / rsum
             Ymean = np.sum( Y0 * rweights ) / rsum
-        
+
             # Force intercept through zero, if requested
-            if (not intercept):
+            if not intercept:
                 Xmean = 0
                 Ymean = 0
-        
+
             # Variance & Covariance
             Vx    = np.sum( (X0-Xmean)**2 * rweights**2 ) / rsum2
             Vy    = np.sum( (Y0-Ymean)**2 * rweights**2 ) / rsum2
-            Vxy   = np.sum( (X0-Xmean) * (Y0-Ymean) * rweights**2 ) / rsum2   
+            Vxy   = np.sum( (X0-Xmean) * (Y0-Ymean) * rweights**2 ) / rsum2
 
             # Effective number of observations
-            N = rsum  
+            N = rsum
 
         else:
 
-            raise NotImplementedError("smafit.py hasn't implemented robust_method={:%s}".format(robust_method))
+            raise NotImplementedError("smafit.py hasn't implemented robust_method={:%s}".\
+                                      format(robust_method))
     else:
-    
-        if (intercept):
-            
+
+        if intercept:
+
             wsum = np.sum(W)
-            
+
             # Average values
             Xmean = np.sum(X0 * W0) / wsum
             Ymean = np.sum(Y0 * W0) / wsum
-  
+
             # Covariance matrix
             cov = np.cov( X0, Y0, ddof=1, aweights=W0**2 )
-    
+
             # Variance
             Vx = cov[0,0]
             Vy = cov[1,1]
-        
+
             # Covariance
             Vxy = cov[0,1]
 
         else:
-            
+
             # Force the line to pass through origin by setting means to zero
             Xmean = 0
             Ymean = 0
-            
+
             wsum = np.sum(W0)
-            
+
             # Sum of squares in place of variance and covariance
             Vx = np.sum( X0**2 * W0 ) / wsum
             Vy = np.sum( Y0**2 * W0 ) / wsum
             Vxy= np.sum( X0*Y0 * W0 ) / wsum
-        
+
     # Standard deviation
     Sx = np.sqrt( Vx )
     Sy = np.sqrt( Vy )
 
     # Correlation coefficient (equivalent to np.corrcoef()[1,0] for non-robust cases)
     R = Vxy / np.sqrt( Vx * Vy )
- 
+
     #############
-    # SLOPE 
-    
+    # SLOPE
+
     Slope  = np.sign(R) * Sy / Sx
-    
+
     # Standard error of slope estimate
     ste_slope = np.sqrt( 1/(N-dfmod) * Sy**2 / Sx**2 * (1-R**2) )
-    
+
     # Confidence interval for Slope
     B = (1-R**2)/(N-dfmod) * stats.f.isf(1-cl, 1, N-dfmod)
     ci_grad = Slope * ( np.sqrt( B+1 ) + np.sqrt(B)*np.array([-1,+1]) )
@@ -253,9 +254,9 @@ def smafit(X,Y,W=None,
     #############
     # INTERCEPT
 
-    if (intercept):
+    if intercept:
         Intercept = Ymean - Slope * Xmean
-       
+
         # Standard deviation of residuals
         # New Method: Formula from smatr R package (Warton)
         # This formula avoids large residuals of outliers when using robust=True
@@ -266,21 +267,21 @@ def smafit(X,Y,W=None,
         #resid = Y0 - (Intercept + Slope * X0 )    
         # Population standard deviation of the residuals
         #Sr = np.std( resid, ddof=0 )      
-    
+
         # Standard error of the intercept estimate
         ste_int = np.sqrt( Sr**2/N + Xmean**2 * ste_slope**2  )
-        
+
         # Confidence interval for Intercept
         tcrit = stats.t.isf((1-cl)/2,N-dfmod)
         ci_int = Intercept + ste_int * np.array([-tcrit,tcrit])
-    
-    else:     
-        
+
+    else:
+
         # Set Intercept quantities to zero
         Intercept = 0
         ste_int   = 0
         ci_int    = np.array([0,0])
-        
+
     result = dict( slope            = Slope,
                    intercept        = Intercept,
                    slope_ste        = ste_slope,
@@ -293,6 +294,6 @@ def smafit(X,Y,W=None,
                    nobs             = len(X0),
                    fittedvalues     = Intercept + Slope * X0,
                    resid            = Intercept + Slope * X0 - Y0 )
-    
+
     # return Slope, Intercept, ste_slope, ste_int, ci_grad, ci_int
     return result

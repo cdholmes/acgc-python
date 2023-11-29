@@ -1,17 +1,36 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-''' 
-Read and write ICARTT (ffi1001) format files
+'''Read and write ICARTT (ffi1001) format files
 
 Created on Mon Aug 13 16:59:25 2018
 @author: C.D. Holmes
 '''
 
-import numpy  as np 
-import pandas as pd
 import os
+import pandas as pd
+
 
 def read_icartt( files, usePickle=False, timeIndex=False ):
+    '''Read ICARTT file or files into a pandas DataFrame
+    
+    Parameters
+    ----------
+    files : list or str
+        path to ICARTT file or files that will be read. 
+        Data within these files will be concatenated, so files should all contain the same variables
+    usePickle : bool (default=False)
+        if usePickle=True, the data will be written to a pkl file with ".pkl" appended to path
+        On subsequent read_icartt calls, data will be read from the .pkl file, if it exists
+    timeIndex : bool (default=False)
+        sets DataFrame index to the time variable from the ICARTT file, rather than a row counter
+        
+    Returns
+    -------
+    obs : pandas.DataFrame
+        ICARTT file contents. In addition to column names for the ICARTT variables, 
+        the DataFrame columns also include 'time' in pandas.DatetimeIndex format and 
+        'file' that is the ordinal number of the input file that each row was read from
+    '''
 
     # Files input must be string or list of strings
     if isinstance( files, str ):
@@ -25,36 +44,36 @@ def read_icartt( files, usePickle=False, timeIndex=False ):
 
     obsall = []
     for n,file in enumerate(files):
-    
+
         # Read from Pickle file, if it exists and is requested
         pklfile = file+'.pkl'
         if (usePickle and os.path.isfile(pklfile)):
             obs = pd.read_pickle(pklfile)
-        
+
         else:
 
             # Ensure file exists
-            if (not os.path.isfile( file )):
+            if not os.path.isfile( file ):
                 raise FileNotFoundError( file+" doesn't exist" )
 
             # Read the ICARTT file
-            with open( file, 'r' ) as f:
-            
+            with open( file, 'r', encoding='ascii' ) as f:
+
                 # Read the number of header lines
                 nheader, fmt = f.readline().split(',')
                 nheader = int(nheader)
 
                 # Ensure this is a 
-                if (int(fmt) != 1001 ):
+                if int(fmt) != 1001:
                     raise Exception( 'read_icartt: '+file+' is not an ICARTT (ffi1001) file' )
-                    
+
                 # Skip 5 lines
                 for junk in range(5):
                     next(f)
-                
+
                 # Read date
                 year, month, day = map( int, f.readline().split(',')[0:3] )
-            
+
                 # Skip line
                 next(f)
 
@@ -85,11 +104,11 @@ def read_icartt( files, usePickle=False, timeIndex=False ):
 
                 # Missing flags for each variable as a dict
                 nadict = { varnames[i]: naflag[i] for i in range(nvar) }
-            
+
             # Read data
             obs = pd.read_csv(file, skiprows=nheader-1,
                               na_values=nadict, skipinitialspace=True)
-            
+
             # Catch missing data that are not reported as integers
             #obs[obs==-99999] = np.nan
 
@@ -97,44 +116,49 @@ def read_icartt( files, usePickle=False, timeIndex=False ):
             #obs.columns = obs.columns.str.strip()
 
             # Apply scale factors
-            for i in range(len(scale)):
-                if (scale[i]!=1):
-                    obs[varnames[i]] *= scale[i]
-                
+            for i, s in enumerate(scale):
+                if s != 1:
+                    obs[varnames[i]] *= s
+
             # Add a time variable in datetime format
             obs['time'] = pd.DatetimeIndex( pd.Timestamp(year=year,month=month,day=day) +
                                          pd.TimedeltaIndex(obs[tname],tunit) )
-        
+
             # Add flight number
             obs['file'] = n+1
 
             # Use time variable for index
-            if (timeIndex):
+            if timeIndex:
                 obs.index = obs.time
-                
+
             # Save pickle
-            if (usePickle):         
+            if usePickle:
                 obs.to_pickle(pklfile)
 
-        # Add to list 
+        # Add to list
         obsall.append(obs)
-    
+
     # Concatenate all files into one dataframe
     obs = pd.concat( obsall, sort=True )
-    
+
     return obs
 
 def write_icartt(filename, df, **kwargs):
     '''Write an ICARTT ffi1001 file
 
-    filename -- File to be created
-    df       -- Pandas dataframe containing data and metadata
-                df attributes must include all of the "required" and "normal_comments" names.
-                The INDEPENDENT_VARIABLE_DEFINITION and DEPENDENT_VARIABLE_DEFINITION should be dicts containing
-                {'VariableName':'units, standard name, description'}
-                Only variables listed in INDEPENDENT_VARIABLE_DEFINITION and DEPENDENT_VARIABLE_DEFINITION
-                will be written to the output file.
-    **kwags  -- passed to pandas.to_csv
+    Arguments
+    ---------
+    filename : str
+        File to be created
+    df : Pandas dataframe
+        df should contain data and metadata
+        df attributes must include all of the "required" and "normal_comments" names.
+        The INDEPENDENT_VARIABLE_DEFINITION and DEPENDENT_VARIABLE_DEFINITION should be dicts containing
+        {'VariableName':'units, standard name, description'}
+        Only variables listed in INDEPENDENT_VARIABLE_DEFINITION and DEPENDENT_VARIABLE_DEFINITION
+        will be written to the output file.
+    **kwargs
+        passed to pandas.to_csv
     '''
 
     normal_comments = ['PI_CONTACT_INFO',
@@ -169,7 +193,7 @@ def write_icartt(filename, df, **kwargs):
                 'DEPENDENT_VARIABLE_DEFINITION',
                 'SPECIAL_COMMENTS',
                 'NORMAL_COMMENTS']
-    
+
     # Variables that will be written to file
     ictvars = list(df.INDEPENDENT_VARIABLE_DEFINITION.keys()) + \
               list(df.DEPENDENT_VARIABLE_DEFINITION.keys())
@@ -222,7 +246,7 @@ def write_icartt(filename, df, **kwargs):
                 else:    
                     nc.append( '{:s}: {:s}'.format(kn,v) )
             nc.append( ', '.join(ictvars)) # Also add list of variable names
-            
+
             # Add normal comments to the header
             header.append( str(len(nc)) )
             header.extend( nc )
@@ -231,12 +255,12 @@ def write_icartt(filename, df, **kwargs):
             header.append( v )
 
     # Write the file
-    with open(filename,'w') as f:
+    with open(filename,'w',encoding='ascii') as f:
         f.write('{:d}, 1001\n'.format(len(header)+1))  # +1 accounts for this line
         for line in header:
             f.write(line+'\n')
         df[ictvars].to_csv( f,
                             index=False,
-                            header=False, 
+                            header=False,
                             na_rep='-9999',
-                            **kwargs ) 
+                            **kwargs )

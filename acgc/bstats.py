@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-""" Statistical measures of bias between two populations
+""" Bivariate statistics
+
+Statistical measures of bias between two populations
 Includes: 
 Normalized Mean Bias Factor (NMBF) and Normalized Mean Absolute Error Factor (NMAEF)
 
@@ -14,106 +16,163 @@ Created on June 4 2019
 """
 
 import numpy as np
-import xarray as xr
+from scipy import stats
+from .smafit import smafit
+# import xarray as xr
 
-def nmb( xObs, xMod=None ):
+def nmb( ref_values, exp_values ):
     '''Compute Normalized Mean Bias (NMB)
-    nmb = (<xMod> - <xObs>) / <xObs>
+    nmb = (<exp> - <ref>) / <ref>
 
-    xObs : Observed values
-    xMod : Model values
+    Parameters
+    ----------
+    ref_values : reference values
+    exp_values : experiment values
     '''
 
-    # Ensure that xObs has the same length as xMod
-    if (xMod is not None):
-        assert (len(xMod) == len(xObs)), "xMod must have the same length as xObs"
+    assert (len(exp_values) == len(ref_values)), \
+        "exp_values must have the same length as ref_values"
 
     # Mean values
-    oMean = np.mean(xObs)
-    mMean = np.mean(xMod)
+    ref_mean = np.mean(ref_values)
+    exp_mean = np.mean(exp_values)
 
     # Metric value
-    nmb = mMean / oMean - 1
- 
-    return nmb
+    return exp_mean / ref_mean - 1
 
-def nmae( xObs, xMod ):
+def nmae( ref_values, exp_values ):
     '''Compute Normalized Mean Absolute Error (NMAE)
+    < |exp - ref| > / |<ref>|
+
+    Parameters
+    ---------
+    ref_values : reference values
+    exp_values : experiment values
     '''
 
      # Mean values
-    oMean = np.mean(xObs)
+    ref_mean = np.mean(ref_values)
 
     # Mean absolute difference
-    aDiff = np.mean( np.abs(xMod - xObs) )
+    abs_diff = np.mean( np.abs(exp_values - ref_values) )
 
     # Metric value
-    nmae = aDiff / np.abs( oMean ) 
+    return abs_diff / np.abs( ref_mean )
 
-    return nmae
 
-def nmbf( xObs, xMod=None ):
+def nmbf( ref_values, exp_values ):
     '''Compute Normalized Mean Bias Factor (NMBF)
     Definition from Yu et al. (2006, Atmos. Sci. Lett.)
 
-    xObs : Observed values
-    xMod : Model values
+    Parameters
+    ----------
+    ref_values : reference values
+    exp_values : experiment values
     '''
 
-    # Ensure that xObs has the same length as xMod
-    if (xMod is not None):
-        assert (len(xMod) == len(xObs)), "xMod must have the same length as xObs"
+    # Ensure that arguments have the same length
+    assert (len(exp_values) == len(ref_values)), \
+        "exp_values must have the same length as ref_values"
 
     # Mean values
-    oMean = np.mean(xObs)
-    mMean = np.mean(xMod)
+    ref_mean = np.mean(ref_values)
+    exp_mean = np.mean(exp_values)
 
     # Metric value
-    if (mMean >= oMean):
-        nmbf = mMean / oMean - 1
+    if exp_mean >= ref_mean:
+        result = exp_mean / ref_mean - 1
     else:
-        nmbf = 1 - oMean / mMean
+        result= 1 - ref_mean / exp_mean
     # Equivalent (faster?) implementation
     #S = (mMean - oMean) / np.abs(mMean - oMean)
-    #nmbf = S * ( np.exp( np.abs( mMean / oMean )) - 1 )
+    #result = S * ( np.exp( np.abs( mMean / oMean )) - 1 )
 
-    return nmbf
+    return result
 
-def nmaef( xObs, xMod ):
-    '''Compute Normalized Mean Absolute Error Factor (NMAE)
+def nmaef( ref_values, exp_values ):
+    '''Compute Normalized Mean Absolute Error Factor (NMAEF)
     Definition from Yu et al. (2006, Atmos. Sci. Lett.)
     
-    xObs : Observed values
-    xMod : Model values
+    Parameters
+    ----------
+    ref_values : reference values
+    exp_values : experiment values
     '''
-     # Mean values
-    oMean = np.mean(xObs)
-    mMean = np.mean(xMod)
+
+    # Mean values
+    ref_mean = np.mean(ref_values)
+    exp_mean = np.mean(exp_values)
 
     # Mean absolute difference
-    aDiff = np.mean( np.abs(xMod - xObs))
+    abs_diff = np.mean( np.abs(exp_values - ref_values))
 
     # Metric value
-    if (mMean >= oMean):
-        nmaef = aDiff / oMean 
+    if exp_mean >= ref_mean:
+        result = abs_diff / ref_mean 
     else:
-        nmaef = aDiff / mMean
+        result = abs_diff / exp_mean
     # Equivalent (faster?) implementation
-    #S = (mMean - oMean) / np.abs(mMean - oMean)
-    #nmaef = aDiff / ( oMean**((1+S)/2) * mMean**((1-S)/2) )
+    #S = (exp_mean - ref_mean) / np.abs(exp_mean - ref_mean)
+    #result = abs_diff / ( oMean**((1+S)/2) * mMean**((1-S)/2) )
 
-    return nmaef
+    return result
 
 
-class bivariate_statistics(object):
+class BivariateStatistics:
+    '''A suite of common statistics to quantify bivariate relationships
+
+    Class method 'summary' provides a formatted summary of these statistics
     
-    def __init__(self,x,y,w=None,**kwargs):
+    Attributes:
+        xmean, ymean (float) : mean of x and y variables
+        xmedian, ymedian (float) : median of x and y variables
+        xstd, ystd (float): standard deviation of x and y variables
 
-        from scipy import stats
+        mean_difference, md (float) : ymean - xmean
+        mean_absolute_difference, mad (float) : <|y-x|>
+        relative_mean_difference, rmd (float) : md / xmean
+        relative_mean_absolute_difference, rmad (float) : mad / xmean
+        standardized_mean_difference, smd (float) : md / xstd
+        standardized_mean_absolute_difference, smad (float) : mad /xstd
+        mean_relative_difference, mrd (float) : <y/x> - 1
         
+        median_difference (float) : median(y-x)
+        median_absolute_difference (float) : median(|y-x|)
+        relative_median_difference (float) : median(y-x) / xmedian
+        relative_median_absolute_difference (float) : median(|y-x|) / xmedian
+        median_relative_difference, medianrd (float) : median(y/x)-1
+        
+        normalized_mean_bias_factor, nmbf (float) : see nmbf function
+        normalized_mean_absolute_error_factor, nmaef (float) : see nmaef
+
+        root_mean_square_difference, rmsd (float) :
+        covariance (float) : cov(x,y)
+        correlation_pearson, correlation, R, r (float) : 
+        correlation_spearman (float) :
+        R2, r2 (float) : correlation_pearson**2
+        '''
+
+    def __init__(self,x,y,w=None):
+        '''Compute suite of bivariate statistics during initialization
+        
+        Statistic values are save in attributes.
+        CAUTION: Weights w are ignored except in SMA fit
+
+        Parameters
+        ----------
+        x : ndarray
+            independent variable values
+        y : ndarray
+            dependent variable values, same size as x
+        w : ndarray (optional)
+            weights for points (x,y), same size as x and y
+        '''
+
         #Ensure that x and y have same length
         if len(x) != len(y):
             raise ValueError( 'Arguments x and y must have the same length' )
+        if (w is not None) and (len(w) != len(x)):
+            raise ValueError( 'Argument w (if present) must have the same length as x' )                
 
         diff = y - x
         absdiff = np.abs( y - x )
@@ -146,11 +205,11 @@ class bivariate_statistics(object):
         self.median_relative_difference = self.medianrd= np.median( ratio - 1 )
 
         # Median and median absolute differences
-        self.median_difference            = np.median( diff ) 
+        self.median_difference            = np.median( diff )
         self.median_absolute_difference   = np.median( absdiff )
 
         # Relative median differences
-        self.relative_median_difference   = self.rmd  = self.median_difference / self.xmedian
+        self.relative_median_difference               = self.median_difference / self.xmedian
         self.relative_median_absolute_difference      = self.median_absolute_difference / self.xmedian
 
         self.normalized_mean_bias_factor            = self.nmbf  = nmbf(x,y)
@@ -164,17 +223,18 @@ class bivariate_statistics(object):
         self.correlation = self.correlation_pearson = self.R = self.r = np.corrcoef(x,y)[0][1]
         self.correlation_spearman = stats.spearmanr(x,y).statistic
         self.R2 = self.r2 = self.R**2
-      
+
     def __getitem__(self,key):
+        '''Accesses attribute values via object['key']'''
         return getattr(self,key)
 
     def fitline(self,method='sma',intercept=True,**kwargs):
         '''Compute bivariate line fit
         
-        Arguments
-        ---------
+        Parameters
+        ----------
         method : str
-            line fitting method: sma (default) or old
+            line fitting method: sma (default), ols, wls, York
         intercept : bool
             defines whether non-zero intercept should be fitted
         **kwargs passed to smafit (e.g. robust=True)
@@ -186,9 +246,7 @@ class bivariate_statistics(object):
             intercept : intercept of fitted line
             fittedvalues : values on fit line
             residuals : residual from fit line
-        '''  
-
-        from smafit import smafit
+        '''
 
         if method.lower()=='sma':
             sma = smafit(self._x,
@@ -198,14 +256,22 @@ class bivariate_statistics(object):
                         **kwargs) 
             slope = sma['slope']
             intercept= sma['intercept']
-        
+
         elif method.lower()=='ols':
             if intercept:
-                ols = np.linalg.lstsq( np.vstack([self._x,np.ones(len(self._x))]).T, self._y, rcond=None )
+                ols = np.linalg.lstsq( np.vstack([self._x,np.ones(len(self._x))]).T, 
+                                      self._y, rcond=None )
             else:
                 ols = np.linalg.lstsq( np.vstack([self._x]).T, self._y, rcond=None )
             slope = ols[0][0]
             intercept = ols[0][1]
+
+        elif method.lower()=='wls':
+            raise NotImplementedError('WLS regression not implemented yet')
+
+        elif method.lower()=='york':
+            raise NotImplementedError('York regression not implemented yet')
+
         else:
             raise ValueError('Undefined method '+method)
 
@@ -219,10 +285,10 @@ class bivariate_statistics(object):
     def slope(self,method='sma',intercept=True,**kwargs):
         '''Compute slope of bivariate line fit
         
-        Arguments
-        ---------
+        Parameters
+        ----------
         method : str
-            line fitting method: sma (default) or old
+            line fitting method: sma (default), ols, wls
         intercept : bool
             defines whether non-zero intercept should be fitted
         **kwargs passed to fitline()
@@ -231,16 +297,16 @@ class bivariate_statistics(object):
         -------
         slope : float
             value of y intercept
-        '''        
+        '''
         return self.fitline(method,intercept,**kwargs)['slope']
-    
+
     def intercept(self,method='sma',intercept=True,**kwargs):
         '''Compute intercept of bivariate line fit
         
-        Arguments
-        ---------
+        Parameters
+        ----------
         method : str
-            line fitting method: sma (default) or old
+            line fitting method: sma (default) or ols
         intercept : bool
             defines whether non-zero intercept should be fitted
         **kwargs passed to fitline()
@@ -256,19 +322,24 @@ class bivariate_statistics(object):
                 fitline_kw=None ):
         '''Summarize bivariate statistics
 
-        Arguments
-        ---------
+        Parameters
+        ----------
         vars : list
-            names of variables to include in summary
-        floatformat : str
+            names of attribute variables to include in summary
+            names are case insensitive
+        floatformat : str (default='{:10f}')
             format specifier for floating point values
-        stringlength : int
+        stringlength : int (default=None)
             length of the variables on output
+            default (None) is to use the length of the longest variable name
+        fitline_kw : dict (default=None)
+            keywords passed to self.fitline()
         
         Returns
         -------
         summary : str
-            names and values of variables'''
+            names and values of variables
+        '''
 
         if variables is None:
             variables=['R','RMD']
@@ -283,7 +354,8 @@ class bivariate_statistics(object):
 
         # Extract length of the float numbers from floatformat
         # import re
-        # floatlength = np.floor( float( re.findall("[-+]?(?:\d*\.*\d+)", floatformat )[0] ) ).astype(int)
+        # floatlength = np.floor( float( re.findall("[-+]?(?:\d*\.*\d+)", 
+        #       floatformat )[0] ) ).astype(int)
 
         # summary = (stringformat+'{:>10s}').format('Variable','Value')
         summary = ''
@@ -295,7 +367,6 @@ class bivariate_statistics(object):
             else:
                 # Retrieve values
                 value = getattr(self,v.lower())
-            
+
             summary += (stringformat+'='+floatformat+'\n').format(v,value)
         return summary
-    

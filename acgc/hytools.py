@@ -1,15 +1,6 @@
 #!/usr/bin/env python3
+'''Package of functions to read HYSPLIT output 
 
-# Package of functions to read HYSPLIT output 
-
-import numpy  as np
-import pandas as pd
-import datetime as dt
-import os
-import glob
-import netCDF4 as nc
-
-'''
 Assumed directory structure for meteorological data. 
 All directories are archived meteorology except for "forecast/" directory.
 metroot/
@@ -22,17 +13,48 @@ metroot/
   nam12/ - what ARL calls nams
   nam3/ - pieced forecast of NAM CONUS nest (3 km)
 '''
-metroot = '/data/MetData/ARL/'
 
-def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False, dropOneTime=False, pack=False ):
-    # Convert a HYSPLIT tdump file to netCDF
-    # Works with single point or ensemble trajectories
+import os
+import glob
+import datetime as dt
+import numpy  as np
+import pandas as pd
+from . import nctools as nct
 
+# Location for ARL met data
+METROOT = '/data/MetData/ARL/'
+
+def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, 
+             altIsMSL=False, dropOneTime=False, pack=False ):
+    '''Convert a HYSPLIT tdump file to netCDF
+    Works with single point or ensemble trajectories
+
+    Parameters
+    ----------
+    inFile : str
+        name/path of HYSPLIT tdump file
+    outFile : str
+        name/path of netCDF file that will be created
+    clobber : bool (default=False)
+        determines whether outFile will be overwrite any previous file
+    globalAtt : dict (default=None)
+        If present, dict keys will be added to outFile as global attributes
+    altIsMSL : bool (default=False)
+        Determines whether altitude in HYSPLIT tdump file is treated as altitude above sea level
+        (altIsMSL=True) or altitude above ground (altIsMSL=False). In either case, the netCDF
+        file will contain both altitude variables.
+    dropOneTime : bool (default=False)
+        Kludge to address back trajectories that start 1 minute after the hour,
+        due to CONTROL files created with write_control(... exacttime=False )
+        set True only for trajectories using this setup.
+    pack : bool (default=False)
+        NOT IMPLEMENTED
+        determines whether variables in the netCDF file should be compressed with *lossy*
+        integer packing. 
+    '''
     # Return if the file already exists and not set to clobber
     if os.path.exists(outFile) and clobber==False:
-        return 
-
-    import nctools as nct
+        return
 
     # Trajectory points
     traj = read_tdump( inFile )
@@ -78,15 +100,13 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False, dr
 
     for t in tnums:
 
-        # Find entries for this trajectory 
-        idx = traj.tnum==t 
+        # Find entries for this trajectory
+        idx = traj.tnum==t
 
         # Number of times in this trajectory
         nt = np.sum(idx)
 
         if dropOneTime:
-            # Kludge to address trajectories that start 1 minute after the hour, 
-            # due to CONTROL files created with write_control(... exacttime=False )
             # Drop the second time element (at minute 0) to retain one point per hour
             # Find entries and Drop the second element
             tmpidx = np.where(traj.tnum==t)[0]
@@ -99,22 +119,22 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False, dr
         alt[t-1,:nt] = traj.alt[idx]
 
         # Add optional variables
-        if (doP):
+        if doP:
             p[t-1,:nt] = traj.PRESSURE[idx]
-        if (doT):
+        if doT:
             T[t-1,:nt]      = traj.AIR_TEMP[idx]
-        if (doQ):
+        if doQ:
             Q[t-1,:nt]      = traj.SPCHUMID[idx]
-        if (doU):
+        if doU:
             U[t-1,:nt]      = traj.UWIND[idx]
-        if (doV):
+        if doV:
             V[t-1,:nt]      = traj.VWIND[idx]
-        if (doPrecip):
+        if doPrecip:
             precip[t-1,:nt] = traj.RAINFALL[idx]
-        if (doTerr):
+        if doTerr:
             altTerr[t-1,:nt]= traj.TERR_MSL[idx]
-        if (doBL):
-            inBL[t-1,:nt]   = (traj.alt[idx] < traj.MIXDEPTH[idx])
+        if doBL:
+            inBL[t-1,:nt]   = traj.alt[idx] < traj.MIXDEPTH[idx]
             zmix[t-1,:nt]   = traj.MIXDEPTH[idx]
 
     if altIsMSL:
@@ -151,62 +171,62 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False, dr
            'fill_value':np.float32(np.nan)} ]
 
     # Add optional variables to output list
-    if (doTerr):
-        variables.append( 
+    if doTerr:
+        variables.append(
            {'name':'altTerr',
            'long_name':'altitude of terrain',
            'units':'m',
            'value':np.expand_dims(altTerr,axis=0),
            'fill_value':np.float32(np.nan)} )
-        variables.append( 
+        variables.append(
            {'name':alt2Name,
            'long_name':alt2LongName,
            'units':'m',
            'value':np.expand_dims(alt2,axis=0),
            'fill_value':np.float32(np.nan)} )
-    if (doP):
+    if doP:
         variables.append(
             {'name':'p',
            'long_name':'pressure',
            'units':'hPa',
            'value':np.expand_dims(p,axis=0),
            'fill_value':np.float32(np.nan)} )
-    if (doT):
+    if doT:
         variables.append(
             {'name':'T',
            'long_name':'temperature',
            'units':'K',
            'value':np.expand_dims(T,axis=0),
            'fill_value':np.float32(np.nan)} )
-    if (doQ):
+    if doQ:
         variables.append(
             {'name':'q',
            'long_name':'specific humidity',
            'units':'g/kg',
            'value':np.expand_dims(Q,axis=0),
            'fill_value':np.float32(np.nan)} )
-    if (doU):
+    if doU:
         variables.append(
             {'name':'U',
            'long_name':'eastward wind speed',
            'units':'m/s',
            'value':np.expand_dims(U,axis=0),
            'fill_value':np.float32(np.nan)} )
-    if (doV):
+    if doV:
         variables.append(
             {'name':'V',
            'long_name':'northward wind speed',
            'units':'m/s',
            'value':np.expand_dims(V,axis=0),
            'fill_value':np.float32(np.nan)} )
-    if (doPrecip):
+    if doPrecip:
         variables.append(
             {'name':'precipitation',
            'long_name':'precipitation',
            'units':'mm/hr',
            'value':np.expand_dims(precip,axis=0),
            'fill_value':np.float32(np.nan)} )
-    if (doBL):
+    if doBL:
         variables.append(
             {'name':'inBL',
            'long_name':'trajectory in boundary layer flag',
@@ -227,7 +247,7 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False, dr
     # Construct global attributes
     # Start with default and add any provided by user input
     gAtt = {'Content': 'HYSPLIT trajectory'}
-    if (type(globalAtt) is dict):
+    if isinstance(globalAtt, dict):
         gAtt.update(globalAtt)
 
     # Create the output file
@@ -249,17 +269,33 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, altIsMSL=False, dr
         globalAtt=gAtt,
         nc4=True, classic=True, clobber=clobber )
 
-
-
-# Read trajectory file output from HYSPLIT
 def read_tdump(file):
+    '''Read trajectory file output from HYSPLIT
+    
+    Parameters
+    ----------
+    file : str
+        name of trajectory file to read
+        
+    Returns
+    -------
+    Pandas dataframe containing data from file. Columns:
+        time : datetime object
+        year, month, day, hour, minute : floats, same as time
+        lat, lon, alt : trajectory location
+        thour : hours since trajectory initialization, negative for back trajectories
+        tnum : trajectory number tnum=1 for single trajectory, tnum=1-27 for trajectory ensemble
+        metnum : index number of met file used at this point in trajectory, 
+            see tdump file for corresponding file paths
+        fcasthr : hours since the meteorological dataset was initialized
+    '''
 
     # Open the file
-    with open(file,"r") as fid:
+    with open(file,"r",encoding="ascii") as fid:
 
         # First line gives number of met fields
         nmet = int(fid.readline().split()[0])
-        
+
         # Skip the met file lines
         for i in range(nmet):
             next(fid)
@@ -275,28 +311,28 @@ def read_tdump(file):
         line = fid.readline()
         nvar = int(line.split()[0])
         vnames = line.split()[1:]
-        
+
         # Read the data
         df = pd.read_csv( fid, delim_whitespace=True,
                           header=None, index_col=False, na_values=['NaN','********'],
                 names=['tnum','metnum',
                        'year','month','day','hour','minute','fcasthr',
                        'thour','lat','lon','alt']+vnames )
-        
-        # Convert year to 4-digits
+
+        # Convert 2-digit year to 4-digits
         df.loc[:,'year'] += 2000
 
         # Convert to time
         df['time'] = pd.to_datetime( df[['year','month','day','hour','minute']] )
-        
+
         #print(df.iloc[-1,:])
         return df
 
-# Directory and File names for GDAS 1 degree meteorology, for given date    
 def get_gdas1_filename( time ):
+    '''Directory and File names for GDAS 1 degree meteorology, for given date'''
 
     # Directory for GDAS 1 degree
-    dirname = metroot+'gdas1/'
+    dirname = METROOT+'gdas1/'
 
     # Filename template
     filetmp = 'gdas1.{mon:s}{yy:%y}.w{week:d}'
@@ -309,11 +345,11 @@ def get_gdas1_filename( time ):
 
     return filename
 
-# Directory and File names for hrrr meteorology, for given date
 def get_hrrr_filename( time ):
+    '''Directory and File names for HRRR meteorology, for given date'''
 
     # Directory
-    dirname = metroot+'hrrr/'
+    dirname = METROOT+'hrrr/'
 
     # There are four files per day containing these hours
     hourstrings = ['00-05','06-11','12-17','18-23']
@@ -321,42 +357,54 @@ def get_hrrr_filename( time ):
     filenames = [ '{:s}/{:%Y%m%d}_{:s}_hrrr'.format( dirname, time, hstr )
                   for hstr in hourstrings ]
     dirnames = [ dirname for i in range(4) ]
-    
+
     # Return
     return filenames
 
-
-# Directory and file names for given meteorology and date
-def get_met_filename( metversion, time ):
+def get_met_filename( metmodel, time ):
+    '''Directory and file names for given meteorology and date
+    
+    Parameters
+    ----------
+    metmodel : str
+        met model wanted: gdas1, gdas0p5, gfs0p25, nam12, nam3, hrrr
+    time : pandas.Timestamp, datetime.date, datetime.datetime
+        day of desired meteorology
+    
+    Returns
+    -------
+    filename : str or list
+        name of met file or files containing met data for input date
+    '''
 
     # Ensure that time is a datetime object
-    if (not isinstance( time, dt.date) ):
+    if not isinstance( time, dt.date) :
         raise TypeError( "get_met_filename: time must be a datetime object" )
-    
+
     # Directory and filename template
     doFormat=True
-    if (metversion == 'gdas1' ):
+    if metmodel == 'gdas1':
         # Special treatment
         filename = get_gdas1_filename( time )
-    elif (metversion == 'gdas0p5'):
-        dirname  = metroot+'gdas0p5/'
+    elif metmodel == 'gdas0p5':
+        dirname  = METROOT+'gdas0p5/'
         filename = dirname+'{date:%Y%m%d}_gdas0p5'
-    elif (metversion == 'gfs0p25'):
-        dirname  = metroot+'gfs0p25/'
+    elif metmodel == 'gfs0p25':
+        dirname  = METROOT+'gfs0p25/'
         filename = dirname+'{date:%Y%m%d}_gfs0p25'
-    elif (metversion == 'nam3' ):
-        dirname  = metroot+'nam3/'
+    elif metmodel == 'nam3':
+        dirname  = METROOT+'nam3/'
         filename = dirname+'{date:%Y%m%d}_hysplit.namsa.CONUS'
-    elif (metversion == 'nam12' ):
-        dirname  = metroot+'nam12/'
+    elif metmodel == 'nam12':
+        dirname  = METROOT+'nam12/'
         filename = dirname+'{date:%Y%m%d}_hysplit.t00z.namsa'
-    elif (metversion == 'hrrr' ):
+    elif metmodel == 'hrrr':
         # Special treatment
         filename = get_hrrr_filename( time )
         doFormat=False
     else:
         raise NotImplementedError(
-            "get_met_filename: {metversion:s} unrecognized".format(metversion) )
+           f"get_met_filename: {metmodel} unrecognized" )
 
     # Build the filename
     if doFormat:
@@ -364,42 +412,62 @@ def get_met_filename( metversion, time ):
 
     return filename
 
-# Get a list of met directories and files
-# When there are two met version provided, the first result will be used
-def get_archive_filelist( metversion, time, useAll=True ):
+def get_archive_filelist( metmodels, time, useAll=True ):
+    '''Get a list of met directories and files
+    When there are two met version provided, the first result will be used
+    
+        
+    Parameters
+    ----------
+    metmodels : list or str
+        met models wanted: gdas1, gdas0p5, gfs0p25, nam12, nam3, hrrr
+        commonly provide a list with both regional and global models e.g. ['hrrr','gfs0p25']
+    time : pandas.Timestamp, datetime.date, datetime.datetime
+        day of desired meteorology
+    useAll : bool (default=True)
+        if True, then return files for all metmodels found
+        if False, then return files only for the first metmodel found
+    
+    Returns
+    -------
+    filename : list
+        names of files containing met data for input date
+        typically 
+    '''
 
-    if isinstance( metversion, str ):
+    if isinstance( metmodels, str ):
 
-        # If metversion is a single string, then get value from appropriate function
-        filename = get_met_filename( metversion, time )
+        # If metmodels is a single string, then get value from appropriate function
+        filename = get_met_filename( metmodels, time )
 
         # Convert to list, if isn't already
         if isinstance(filename, str):
             filename = [filename]
-        
-    elif isinstance( metversion, list ):
 
-        # If metversion is a list, then get files for each met version in list
+    elif isinstance( metmodels, list ):
+
+        # If metmodels is a list, then get files for each met version in list
 
         filename = []
 
-        # Loop over all the metversions
+        # Loop over all the metmodelss
         # Use the first one with a file present
-        for met in metversion:
+        for met in metmodels:
 
             # Find filename for this met version
             f = get_met_filename( met, time )
 
-            if (useAll):
+            if useAll:
 
                 # Ensure that directory and file are lists so that we can use extend below
-                if (type(f) is str):
+                if isinstance(f, str):
                     f = [f]
-                elif (type(f) is list):
+                elif isinstance(f, list):
                     pass
                 else:
-                    raise NotImplementedError( 'Variable expected to be string or list but is actually ',type(f) )
-                
+                    raise NotImplementedError(
+                        'Variable expected to be string or list but is actually ',type(f) )
+
                 # Append to the list so that all can be used
                 filename.extend(f)
 
@@ -421,41 +489,58 @@ def get_archive_filelist( metversion, time, useAll=True ):
                 #        break
 
         # Raise an error if 
-        if (filename is []):
+        if filename is []:
             raise FileNotFoundError(
-                "get_archive_filename: no files found for " + ','.join(metversion) )
+                "get_archive_filename: no files found for " + ','.join(metmodels) )
 
     else:
-        raise TypeError( "get_archive_filelist: metversion must be a string or list" )
+        raise TypeError( "get_archive_filelist: metmodels must be a string or list" )
 
     return filename
 
-def get_hybrid_filelist( metversion, time ):
+def get_hybrid_filelist( metmodels, time ):
+    '''Get list of met files combining archive and forecast
+    
+    Starting 1 day before 'time' and extending 10 days ahead, find all archived analysis
+    files, then add forecast files
+
+    Parameters
+    ----------
+    metmodels : str 
+        IGNORED
+        Current implementation uses nam3 for past meteorology and namsfCONUS for forecast
+    time : datetime.datetime or pandas.Timestamp
+        date of interest, should be near present. 
+        If farther in past, then use archived met. Distance future won't have any forecst available.
+
+    Returns
+    -------
+    metfiles : list
+        file path names that are found
+    '''
 
     print( "Hybrid Archive/Forecast meteorology using NAM3 CONUS nest" )
 
     archivemet = 'nam3'
     forecastmet = 'namsfCONUS'
-    
-    # Starting at "time" get all of the available analysis files, then add forecast files
 
     # List of met directories and met files that will be used
     metfiles = []
 
     # Loop over 10 days, because that's probably enough for FIREX-AQ
     for d in range(-1,10):
-        
+
         # date of met data
         metdate = time.date() + pd.Timedelta( d, "D" )
-        
-        #dirname, filename = get_archive_filelist( metversion, metdate )
+
+        #dirname, filename = get_archive_filelist( metmodel, metdate )
         filename = get_met_filename( archivemet, metdate )
 
         # Check if the file exists
-        if ( os.path.isfile( filename ) ):
-            
+        if os.path.isfile( filename ):
+
             # Add the file, if it isn't already in the list
-            if ( filename not in metfiles ):
+            if filename not in metfiles:
                 metfiles.append( filename )
 
         else:
@@ -466,14 +551,14 @@ def get_hybrid_filelist( metversion, time ):
             for hr in [0,6,12,18]:
 
                 cy =  dt.datetime.combine( metdate, dt.time( hour=hr ) )
-                
+
                 try:
                     # If this works, then the file exists
                     f = get_forecast_filename( forecastmet, cy, partial=True )
                     # Add the first 6-hr forecast period
                     metfiles.append( f[0] )
                     # If we have a full forecast cycle, save it
-                    if (len(f)==8):
+                    if len(f)==8:
                         flast = f
                 except FileNotFoundError:
                     # We have run out of forecast meteorology,
@@ -481,27 +566,56 @@ def get_hybrid_filelist( metversion, time ):
                     metfiles.extend( flast[1:] )
 
                     return metfiles
-                    
+
     return metfiles
 
-def get_forecast_template( metversion ):
-    # Get filename template for forecast meteorology
-    
-    if (metversion == 'namsfCONUS'):
+def get_forecast_template( metmodel ):
+    '''Get filename template for forecast meteorology
+
+    Parameters
+    ----------
+    metmodel : str
+        name of forecast model: namsfCONUS, namf, gfs0p25, hrrr
+
+    Returns
+    -------
+    template : str
+        template filename with {:%H} field for initialization time and ?? for forecast hour
+    nexpected : int
+        number of forecast files expected for each forecast initialization
+    '''
+
+    if metmodel == 'namsfCONUS':
         # Filename template
         filetemplate = 'hysplit.t{:%H}z.namsf??.CONUS'
         nexpected = 8
     else:
-        filetemplate = 'hysplit.t{:%H}z.'+metversion
+        filetemplate = 'hysplit.t{:%H}z.'+metmodel
         nexpected = 1
 
     return filetemplate, nexpected
+
+def get_forecast_filename( metmodel, cycle, partial=False ):
+    '''Find files for a particular met model and forecast cycle
     
-def get_forecast_filename( metversion, cycle, partial=False ): 
-    # Find files for a particular met version and forecast cycle
-    
-    dirname  = metroot + 'forecast/{:%Y%m%d}/'.format(cycle)
-    filename, nexpected  = get_forecast_template( metversion )
+    Parameters
+    ----------
+    metmodel : str
+        name of forecast model: namsfCONUS, namf, gfs0p25, hrrr
+    cycle : datetime.datetime or pandas.Timestamp
+        forecast initialization time UTC (date and hour)
+    partial : bool (default=True)
+        With partial=True, function will raise error if some forecast files are missing
+        With partial=False, function will return all forecast files that are found
+
+    Returns
+    -------
+    filenames : list
+        file paths to all files that are found
+    '''
+
+    dirname  = METROOT + f'forecast/{cycle:%Y%m%d}/'
+    filename, nexpected  = get_forecast_template( metmodel )
 
     # Filename for this cycle
     filename = filename.format(cycle)
@@ -510,86 +624,248 @@ def get_forecast_filename( metversion, cycle, partial=False ):
     files = glob.glob( dirname + filename )
 
     # Check if we found the expected number of files
-    if ( (len(files) == nexpected) or (partial and len(files) >=1) ):
+    if (len(files) == nexpected) or (partial and len(files) >=1):
 
         # When we find then, sort and combine into one list
         filenames = sorted( files )
-              
+
         # Return
         return filenames
-        
+
     # Raise an error if no forecasts are found
     raise FileNotFoundError('ARL forecast meteorology found' )
+
+def get_forecast_filename_latest( metmodel ):
+    '''Find files for the latest available forecast cycle for the requested met version.
     
-def get_forecast_filename_latest( metversion ):
-    # Find files for the latest available forecast cycle for the requested met version.
+    Requires a complete set of forecast files for a cycle
+
+    Parameter
+    ---------
+    metmodel : str 
+        name of forecast model: namsfCONUS, namf, gfs0p25, hrrr
     
+    Returns
+    -------
+    filenames : list
+        file paths to all files that are found    
+    '''
+
     # Filename template for forecast files
-    filetemplate, nexpected = get_forecast_template( metversion )
+    filetemplate, nexpected = get_forecast_template( metmodel )
 
     # Find all of the forecast directories, most recent first
     dirs = [item for item
-            in sorted( glob.glob( metroot+'forecast/????????' ), reverse=True )
+            in sorted( glob.glob( METROOT+'forecast/????????' ), reverse=True )
             if os.path.isdir(item) ]
 
     for d in dirs:
-        
+
         # Loop backwards over the forecast cycles
         for hh in [18,12,6,0]:
-            
+
             # Check if the forecast files exist
             files = glob.glob(d+'/'+filetemplate.format(dt.time(hh)))
             #'hysplit.t{:02d}z.{:s}'.format(hh,metsearch))
 
             # Check if we found the expected number of files
-            if ( len(files) == nexpected ):
+            if len(files) == nexpected:
 
                 # When we find then, sort and combine into one list
                 filenames = sorted( files )
-                               
+
                 # Return
                 return filenames
 
     # Raise an error if no forecasts are found
     raise FileNotFoundError('No ARL forecast meteorology found' )
 
-def get_forecast_filelist( metversion=['namsfCONUS','namf'], cycle=None ):
+def get_forecast_filelist( metmodels=None, cycle=None ):
+    '''Get list of filenames for forecast cycle
+    
+    This function calls itself recursively
 
-    # If metversion is a single string, then get value from appropriate function
-    if isinstance( metversion, str ):
+    Parameters
+    ----------
+    metmodels : str or list (default=['namsfCONUS','namf'])
+        name of forecast model: namsfCONUS, namf, gfs0p25, hrrr
+    cycle : datetime.datetime or pandas.Timestamp or None
+        forecast initialization time UTC (date and hour) 
+        if cycle=None, then will use the latest available forecast cycle       
 
-        if (cycle is None):
-            filenames = get_forecast_filename_latest( metversion )
+    Returns
+    -------
+    filenames : list
+        file paths to all files that are found            
+    '''
+
+    if metmodels is None:
+        metmodels = ['namsfCONUS','namf']
+
+    # If metmodel is a single string, then get value from appropriate function
+    if isinstance( metmodels, str ):
+
+        if cycle is None:
+            filenames = get_forecast_filename_latest( metmodels )
         else:
-            filenames = get_forecast_filename( metversion, cycle )
-            
+            filenames = get_forecast_filename( metmodels, cycle )
+
     else:
 
         filenames = []
-        
+
         # Loop over the list of met types, combine them all
-        for met in metversion:
+        for met in metmodels:
 
             # Get directory and file names for one version
             f = get_forecast_filelist( met, cycle )
 
             # Combine them into one list
-            filenames = filenames + f            
-            
+            filenames = filenames + f
+
     return filenames
 
+def find_arl_metfiles( start_time, ndays, back=False, metmodels=None,
+                       forecast=False, forecastcycle=None, hybrid=False ):
+    '''Find ARL meteorology files for specified dates, models, forecast and archive
+    
+    Files will be located for start_time and extending ndays forward or backward
+
+    Parameters
+    ----------
+    start_time : datetime.datetime or pandas.Timestamp
+        start date and time for finding meteorology data files
+    ndays : int
+        number of days of files to retrieve
+    back : bool (default=False)
+        specifies files should go ndays backward (back=True) from start_time
+    metmodels : list or str (default=['gdas0p5','gdas1'])
+        meteorological models that will be used, in order of decreasing resolution and priority
+    forecast : bool (default=False)
+        set forecast=True to use forecast meteorology for trajectory computation
+        set forecast=False to use archived (past) meteorology for trajectory computation
+        Note: hybrid=True will supercede forecast=True
+    forecastcycle : datetime.datetime, pandas.Timestamp, or None (default=None)
+        if forecast=True, this sets the forecast initialization cycle that will be used
+        set forecastcycle=None to use the latest available cycle for which files are found
+        if forecast=False, this parameter has no effect
+    hybrid : bool (default=False)
+        set hybrid=True for trajectories that use a combination of past archive and 
+        forecast meteorlogy. This supercedes forecast=True
+
+    Returns
+    -------
+    metfiles : list
+        path to meteorology files meeting the criteria
+    '''
+
+    if metmodels is None:
+        metmodels = ['gdas0p5','gdas1']
+
+    # Find the meteorology files
+    if hybrid is True:
+
+        # "Hybrid" combines past (archived) and future (forecast) meteorology
+        if back:
+            raise NotImplementedError( "Combined Analysis/Forecast meteorology "
+                                   + "not supported for back trajectories" )
+        metfiles = get_hybrid_filelist( metmodels, start_time )
+
+    elif forecast is True:
+        # Get the forecast meteorology
+        metfiles = get_forecast_filelist( metmodels, forecastcycle )
+
+        # Check if the forecast meteorology covers the entire trajectory duration
+    else:
+        # Use archived (past) meteorology
+
+        # Relative to trajectory start day,
+        # we need meteorology for days d0 through d1
+        if back:
+            d0 = -ndays+1
+            d1 = 1
+            # For trajectories that start 23-0Z (nam) or 21-0Z (gfs0p25), 
+            # also need the next day to bracket first time step
+            if   (('nam3'    in metmodels) and (start_time.hour==23)) \
+              or (('gfs0p25' in metmodels) and (start_time.hour>=21)):
+                d1 = 2
+        else:
+            d0 = 0
+            d1 = ndays
+            # For trajectories that start 00-01Z (nam) or 00-03Z (gfs0p25), 
+            # also need the prior day to bracket first time step
+            if start_time.hour==0:
+                d0 = -1
+
+        # Debug output
+        # print('Initial Date Range',d0,d1)
+        # datelist = np.unique( ( time +
+        #   pd.TimedeltaIndex( np.sign(trajhours) * np.arange(0,np.abs(trajhours)+1),"H" ) ).date )
+        # print(datelist)
+
+        # List of met directories and met files that will be used
+        metfiles = []
+        for d in range(d0,d1):
+
+            # date of met data
+            metdate = start_time.date() + pd.Timedelta( d, "D" )
+
+            # Met data for a single day 
+            filename = get_archive_filelist( metmodels, metdate )
+
+            # Add the files to the list
+            metfiles.extend( filename )
+        # Keep only the unique files
+        metfiles = np.unique(metfiles)
+
+    if len(metfiles) <= 0:
+        raise ValueError( 'Meteorology files not found for ' + str( metmodels ) )
+
+    return metfiles
 
 def write_control( time, lat, lon, alt, trajhours,
                    fname='CONTROL.000', clobber=False,
-                   metversion=['gdas0p5','gdas1'],
-                   forecast=False, forecastcycle=None, hybrid=False, exacttime=True,
-                   maxheight=15000., outdir='./', tfile='tdump' ):
-
-    # Write a control file for trajectory starting at designated time and coordinates
+                   maxheight=15000., outdir='./', tfile='tdump',
+                   metfiles=None, exacttime=True, **kwargs ):
+    '''Write HYSPLIT control file for trajectory starting at designated time and coordinates
+    
+    Parameters
+    ----------
+    time : datetime.datetime or pandas.Timestamp
+        trajectory initialization time
+    lat, lon : float or list
+        trajectory initialization latitude and longitude in degrees
+    alt : float or list
+        trajectory initialization altitude in meters
+        The setup.cfg determines whether this is above ground or above mean sea level
+    trajhours : int
+        desired trajectory duration in hours. Use negative for back trajectories
+    fname : str (default='CONTROL.000')
+        path and name for the file that will be written
+    clobber : bool (default=False)
+        if clobber=True, then fname will be overwritten
+    maxheight : float (default=15000)
+        terminate trajectories that exceed maxheight altitude in meters
+    outdir : str (default='./')
+        directory path where HYSPLIT output will be written
+    tfile : str (default='tdump')
+        name of the trajectory file that HYSPLIT will write
+    metfiles : list, str (default=None) 
+        paths to ARL meteorology files needed for the trajectory computation
+        If metfiles=None, then find_arl_metfiles will be used to locate necessary files
+    exacttime : bool (default=True)
+        It is not recommended to change this default, but keyword is retained for backward
+        compatibility with some scripts. Setting exacttime=False will shift the actual 
+        start time of trajectories that begin at 00:00 UTC to 00:01 UTC to avoid reading
+        an additional day of meteorological data.
+    **kwargs :
+        kwargs will be passed to find_arl_metfiles to locate ARL meteorlogy files if metfiles=None
+        These keywords should include metmodels and possibly forecast, forecastcycle, or hybrid
+        See find_arl_metfiles for definitions of these parameters 
+    '''
 
     if os.path.isfile( fname ) and (clobber is False):
-        raise OSError( 'File exists. Set clobber=True to overwrite: {:s}'.format(fname) )
-        return
+        raise OSError( f'File exists. Set clobber=True to overwrite: {fname:s}' )
 
     # Ensure that lat, lon, and alt are lists
     try:
@@ -612,69 +888,16 @@ def write_control( time, lat, lon, alt, trajhours,
     # have conformable lengths
     if ( (nlat != nlon) or (nlat != nalt) ):
         raise ValueError( "lon, lat, alt must be conformable" )
-        
+
     # Number of days of met data
     ndays = int( np.ceil( np.abs( trajhours ) / 24 ) + 1 )
 
-    # Find the meteorology files
-    if (hybrid is True):
-
-        # "Hybrid" combines past (archived) and future (forecast) meteorology
-        if (trajhours < 0):
-            raise NotImplementedError( "Combined Analysis/Forecast meteorology "+
-                                       "not supported for back trajectories" )
-        metfiles = get_hybrid_filelist( metversion, time )
-
-    elif (forecast is True):
-        # Get the forecast meteorology
-        metfiles = get_forecast_filelist( metversion, forecastcycle )
-        
-        # Check if the forecast meteorology covers the entire trajectory duration
-    else:
-        # Use archived (past) meteorology
-
-        # Relative to trajectory start day,
-        # we need meteorology for days d0 through d1
-        if ( trajhours < 0 ):
-            d0 = -ndays+1
-            d1 = 1
-            # For trajectories that start 23-0Z (nam) or 21-0Z (gfs0p25), 
-            # also need the next day to bracket first time step
-            if ( (('nam3'    in metversion) and (time.hour==23)) or
-                 (('gfs0p25' in metversion) and (time.hour>=21)) ):
-                d1 = 2 
-        else:
-            d0 = 0
-            d1 = ndays
-            # For trajectories that start 00-01Z (nam) or 00-03Z (gfs0p25), 
-            # also need the prior day to bracket first time step
-            if (time.hour==0):
-                d0 = -1
-
-        #print('Initial Date Range',d0,d1)
-        #datelist = np.unique( ( time + pd.TimedeltaIndex( np.sign(trajhours) * np.arange(0,np.abs(trajhours)+1),"H" ) ).date )
-        #print(datelist)
-
-        # List of met directories and met files that will be used
-        metfiles = []
-        for d in range(d0,d1):
-
-            # date of met data
-            metdate = time.date() + pd.Timedelta( d, "D" )
-
-            # Met data for a single day 
-            filename = get_archive_filelist( metversion, metdate )
-
-            # Add the files to the list
-            metfiles.extend( filename )
-        # Keep only the unique files
-        metfiles = np.unique(metfiles)
-
+    # Get met file names, if not provided
+    if (metfiles is None) or (len(metfiles)==0):
+        metfiles = find_arl_metfiles( time, ndays, back=trajhours<0, **kwargs )
 
     # Number of met files
     nmet = len( metfiles )
-    if (nmet <= 0):
-        raise ValueError( 'Meteorology not found for ' + str( metversion ) )
 
     # Runs will fail if the initial time is not bracketed by met data.
     # When met resolution changes on the first day, this condition may not be met.
@@ -687,20 +910,18 @@ def write_control( time, lat, lon, alt, trajhours,
     startdate = time.strftime( "%y %m %d %H %M" )
 
     # Write the CONTROL file
-    with open( fname, 'w' ) as f:
-    
+    with open( fname, 'w', encoding='ascii' ) as f:
+
         f.write( startdate+'\n' )
-        f.write( '{:d}\n'.format( nlat ) )
+        f.write( f'{nlat:d}\n' )
         for i in range(nlat):
-            f.write( '{:<10.4f} {:<10.4f} {:<10.4f}\n'.format( lat[i], lon[i], alt[i] ) )
-        f.write( '{:d}\n'.format( trajhours ) )
+            f.write( f'{lat[i]:<10.4f} {lon[i]:<10.4f} {alt[i]:<10.4f}\n' )
+        f.write( f'{trajhours:d}\n' )
         f.write( "0\n" )
-        f.write( "{:<10.1f}\n".format( maxheight ) )
-        f.write( '{:d}\n'.format( nmet ) )
-        for i in range( nmet ):
-            f.write( os.path.dirname(  metfiles[i] ) + '/\n' )
-            f.write( os.path.basename( metfiles[i] ) + '\n'  )
-        f.write( '{:s}\n'.format(outdir) )
-        f.write( '{:s}\n'.format(tfile) )
-
-
+        f.write( f"{maxheight:<10.1f}\n" )
+        f.write( f'{nmet:d}\n' )
+        for file in metfiles:
+            f.write( os.path.dirname(  file ) + '/\n' )
+            f.write( os.path.basename( file ) + '\n'  )
+        f.write( f'{outdir:s}\n' )
+        f.write( f'{tfile:s}\n' )

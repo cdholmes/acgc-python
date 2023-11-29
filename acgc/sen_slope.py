@@ -1,30 +1,43 @@
 # -*- coding: utf-8 -*-
-"""
+"""Thiel-Sen slope estimate
 Created on Thu Apr 23 11:39:27 2015
-
-PURPOSE:
-Estimate the trend in a time series using Sen's method. 
-This non-parametric method finds the median slope among all
-combinations of time points.
-
-See also scipy.stats.theilslopes, which provides confidence intervals.
-However, this function is faster for large datasets due to Numba 
-
 @author: cdholmes
 """
 
 import numpy as np
 from numba import jit
 
-@jit
-def sen_slope( X, Y ):
+@jit(nopython=True)
+def sen_slope( x, y ):
+    '''Estimate linear trend using the Thiel-Sen method
+    
+    This non-parametric method finds the median slope among all
+    combinations of time points. 
+    scipy.stats.theilslopes provides the same slope estimate, with  
+    confidence intervals. However, this function is faster for 
+    large datasets due to Numba 
+    
+    Parameters
+    ----------
+    x : array-like
+        independent variable
+    y : array-like 
+        dependent variable
+    
+    Returns
+    -------
+    sen : float
+        the median slope
+    slopes :array
+        all slope estimates from all combinations of x and y
+    '''
 
-    if (len( X ) != len( Y )):
-         print('Inputs X and Y must have same dimension')
-         return np.nan
+    if len( x ) != len( y ):
+        print('Inputs x and y must have same dimension')
+        return np.nan
 
     # Find number of time points
-    n = len( X )
+    n = len( x )
 
     # Array to hold all slope estimates
     slopes = np.zeros(  np.ceil( n * ( n-1 ) / 2 ).astype('int') )
@@ -34,9 +47,9 @@ def sen_slope( X, Y ):
 
     for i in range(n):
         for j in range(i+1, n):
-      
+
             # Slope between elements i and j
-            slopeij = ( Y[j] - Y[i] ) / ( X[j] - X[i] )
+            slopeij = ( y[j] - y[i] ) / ( x[j] - x[i] )
 
             slopes[count] = slopeij
 
@@ -46,5 +59,3 @@ def sen_slope( X, Y ):
     sen = np.nanmedian( slopes )
 
     return sen, slopes
-
-

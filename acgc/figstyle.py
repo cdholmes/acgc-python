@@ -1,18 +1,26 @@
 #!/usr/bin/env python3
-'''Style settings for matplotlib, inspired by Proplot'''
+'''Style settings for matplotlib, for publication-ready figures
 
+Inspired by Proplot'''
+
+import os
+import warnings
 import matplotlib as mpl
 import matplotlib.style as mstyle
 import matplotlib.font_manager as mfonts
 import matplotlib_inline
-import warnings
-import os
 
 # Path to this module
 path = os.path.dirname(__file__)
 
 def load_style(grid=True):
-    '''Load style sheet'''
+    '''Load style sheet
+    
+    Parameters
+    ----------
+    grid : bool (default=True)
+        turn grid lines on (True) or off (False)
+    '''
     mstyle.use(os.path.join(path,'acgc.mplstyle'))
 
     # Turn grid on or off
