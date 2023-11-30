@@ -309,7 +309,7 @@ def sma(X,Y,W=None,
 # Alias
 smafit = sma
 
-def york( x, y, sigx=1, sigy=1, rxy=0 ):
+def york( x, y, err_x=1, err_y=1, rerr_xy=0 ):
     '''York regression accounting for error in x and y
     Follows the notation and algorithm of York et al. (2004) Section III
     
@@ -317,12 +317,12 @@ def york( x, y, sigx=1, sigy=1, rxy=0 ):
     ----------
     x, y : ndarray
         dependent (x) and independent (y) variables for fitting
-    sigx, sigy : ndarray (default=1)
-        errors or uncertainty corresponding to x and y
-    rxy : float (default=0)
+    err_x, err_y : ndarray (default=1)
+        standard deviation of errors/uncertainty in x and y
+    rerr_xy : float (default=0)
         correlation coefficient for errors in x and y, 
-        default to rxy=0 meaning that the errors in x are unrelated to errors in y
-        sigx, sigy, and rxy can be constants or arrays of the same length as x and y
+        default to rerr_xy=0 meaning that the errors in x are unrelated to errors in y
+        err_x, err_y, and rerr_xy can be constants or arrays of the same length as x and y
     
     Returns
     -------
@@ -357,8 +357,8 @@ def york( x, y, sigx=1, sigy=1, rxy=0 ):
     b = result[0]
 
     # Weights for x and y
-    wx = 1 / sigx**2
-    wy = 1 / sigy**2
+    wx = 1 / err_x**2
+    wy = 1 / err_y**2
 
     # Combined weights
     alpha = np.sqrt( wx * wy )
@@ -368,10 +368,10 @@ def york( x, y, sigx=1, sigy=1, rxy=0 ):
     for i in range(1,maxiter):
 
         # Weight for point i
-        W = wx * wy / ( wx + b**2 * wy - 2 * b * rxy * alpha )
+        W = wx * wy / ( wx + b**2 * wy - 2 * b * rerr_xy * alpha )
         Wsum = np.sum( W )
 
-        # Weighted means        
+        # Weighted means
         Xbar = np.sum( W * x ) / Wsum
         Ybar = np.sum( W * y ) / Wsum
 
@@ -380,7 +380,7 @@ def york( x, y, sigx=1, sigy=1, rxy=0 ):
         V = y - Ybar
 
         # parameter needed for slope
-        beta = W * ( U / wy + b*V / wx - (b*U + V) * rxy / alpha )
+        beta = W * ( U / wy + b*V / wx - (b*U + V) * rerr_xy / alpha )
 
         # Update slope estimate
         bnew = np.sum( W * beta * V ) / np.sum( W * beta * U )
@@ -398,7 +398,7 @@ def york( x, y, sigx=1, sigy=1, rxy=0 ):
     a = Ybar - b * Xbar
 
     # least-squares adjusted points, expectation values of X and Y
-    xa = Xbar + beta 
+    xa = Xbar + beta
     ya = Ybar + b*beta
 
     # Mean of adjusted points
@@ -426,7 +426,7 @@ def york( x, y, sigx=1, sigy=1, rxy=0 ):
     dfmod = 2
     N = np.sum( ~np.isnan(x) * ~np.isnan(y) )
 
-    result = dict( slope            = b,
+    result = dict( slope         = b,
                 intercept        = a,
                 slope_ste        = sigb,
                 intercept_ste    = siga,

@@ -142,19 +142,19 @@ class BivariateStatistics:
         standardized_mean_absolute_difference, smad (float) : mad /xstd
         mean_relative_difference, mrd (float) : <y/x> - 1
         
-        median_difference (float) : median(y-x)
-        median_absolute_difference (float) : median(|y-x|)
-        relative_median_difference (float) : median(y-x) / xmedian
-        relative_median_absolute_difference (float) : median(|y-x|) / xmedian
-        median_relative_difference, medianrd (float) : median(y/x)-1
+        median_difference, medd (float) : median(y-x)
+        median_absolute_difference, medad (float) : median(|y-x|)
+        relative_median_difference, rmedd (float) : median(y-x) / xmedian
+        relative_median_absolute_difference, rmedad (float) : median(|y-x|) / xmedian
+        median_relative_difference, medianrd, medrd (float) : median(y/x)-1
         
         normalized_mean_bias_factor, nmbf (float) : see nmbf function
         normalized_mean_absolute_error_factor, nmaef (float) : see nmaef
 
         root_mean_square_difference, rmsd (float) :
         covariance (float) : cov(x,y)
-        correlation_pearson, correlation, R, r (float) : 
-        correlation_spearman (float) :
+        correlation_pearson, correlation, pearsonr, R, r (float) : 
+        correlation_spearman, spearmanr (float) :
         R2, r2 (float) : correlation_pearson**2
         '''
 
@@ -208,15 +208,15 @@ class BivariateStatistics:
 
         # Mean and median relative differences
         self.mean_relative_difference   = self.mrd  = np.mean( ratio - 1 )
-        self.median_relative_difference = self.medianrd= np.median( ratio - 1 )
+        self.median_relative_difference = self.medianrd = self.medrd = np.median( ratio - 1 )
 
         # Median and median absolute differences
-        self.median_difference            = np.median( diff )
-        self.median_absolute_difference   = np.median( absdiff )
+        self.median_difference          = self.medd  = np.median( diff )
+        self.median_absolute_difference = self.medad = np.median( absdiff )
 
         # Relative median differences
-        self.relative_median_difference               = self.median_difference / self.xmedian
-        self.relative_median_absolute_difference      = self.median_absolute_difference / self.xmedian
+        self.relative_median_difference          = self.rmedd  = self.median_difference / self.xmedian
+        self.relative_median_absolute_difference = self.rmedad = self.median_absolute_difference / self.xmedian
 
         self.normalized_mean_bias_factor            = self.nmbf  = nmbf(x,y)
         self.normalized_mean_absolute_error_factor  = self.nmaef = nmaef(x,y)
@@ -226,8 +226,9 @@ class BivariateStatistics:
 
         # Covariance, correlation
         self.covariance = np.cov(x,y)[0][1]
-        self.correlation = self.correlation_pearson = self.R = self.r = np.corrcoef(x,y)[0][1]
-        self.correlation_spearman = stats.spearmanr(x,y).statistic
+        self.correlation = self.correlation_pearson = self.R = self.r = self.pearsonr = \
+            np.corrcoef(x,y)[0][1]
+        self.correlation_spearman = self.spearmanr = stats.spearmanr(x,y).statistic
         self.R2 = self.r2 = self.R**2
 
     def __getitem__(self,key):
@@ -240,7 +241,7 @@ class BivariateStatistics:
         Parameters
         ----------
         method : str
-            line fitting method: sma (default), ols, wls, York
+            line fitting method: sma (default), ols, wls, York, sen, siegel
         intercept : bool
             defines whether non-zero intercept should be fitted
         **kwargs passed to sma (e.g. robust=True)
@@ -271,6 +272,18 @@ class BivariateStatistics:
                 ols = np.linalg.lstsq( np.vstack([self._x]).T, self._y, rcond=None )
             slope = ols[0][0]
             intercept = ols[0][1]
+
+        elif method.lower() in ['theil','sen','theilsen']:
+            sen = stats.theilslopes( self._x,
+                                     self._y )
+            slope = sen.slope
+            intercept = sen.intercept
+
+        elif method.lower()=='siegel':
+            siegel = stats.siegelslopes( self._x,
+                                         self._y )
+            slope = siegel.slope
+            intercept = siegel.intercept
 
         elif method.lower()=='wls':
             raise NotImplementedError('WLS regression not implemented yet')
@@ -330,9 +343,12 @@ class BivariateStatistics:
 
         Parameters
         ----------
-        vars : list
+        vars : list, None, or str (default='common')
             names of attribute variables to include in summary
-            names are case insensitive
+            names are case insensitive            
+            The following strings are also accepted in place of a list 
+                "all" (displays all variables)
+                "common" (displays all measures of mean difference)
         floatformat : str (default='{:10f}')
             format specifier for floating point values
         stringlength : int (default=None)
@@ -348,7 +364,17 @@ class BivariateStatistics:
         '''
 
         if variables is None:
-            variables=['R','RMD']
+            variables='common'
+        if variables=='all':
+            variables=['MD','MAD','RMD','RMAD','MRD','SMD','SMAD',
+                       'MedD','MedAD','RMedD','RMedAD','MedRD',
+                       'NMBF','NMAEF','RMSD',
+                       'R','R2','spearmanr','slope','intercept']
+        elif variables=='common':
+            variables=['MD','MAD','RMD','RMAD','MRD','R2','slope']
+        if not isinstance(variables,list):
+            raise ValueError(
+                'variables must be a list, None, or one of these strings: "all","common"')
 
         if stringlength is None:
             stringlength = np.max([len(v) for v in variables])+1
@@ -360,7 +386,7 @@ class BivariateStatistics:
 
         # Extract length of the float numbers from floatformat
         # import re
-        # floatlength = np.floor( float( re.findall("[-+]?(?:\d*\.*\d+)", 
+        # floatlength = np.floor( float( re.findall("[-+]?(?:\d*\.*\d+)",
         #       floatformat )[0] ) ).astype(int)
 
         # summary = (stringformat+'{:>10s}').format('Variable','Value')
