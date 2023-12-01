@@ -42,16 +42,14 @@ def wmean(x,w=None,robust=False):
     result : float
         weighted mean of x 
     '''
-    if w is not None:
+    if w is None:
+        if robust:
+            # Use FastMCD to calculate weights; Another method could be used here
+            w = MinCovDet().fit( np.array([x,x]).T ).support_
+        else:
+            raise ValueError('must specify weights w or select robust=True')
+    else:
         assert len(w) == len(x), 'w must be the same length as x'
-
-    # Use FastMCD to calculate weights; Another method could be used here
-    if robust and (w is None):
-        w = MinCovDet().fit( np.array([x,x]).T ).support_
-
-    if len(w) == 0: 
-        raise ValueError('must specify weights w or select robust=True')
-    assert len(w) == len(x), 'w must be the same length as x'
 
     return np.sum( x * w ) / np.sum(w)
 
@@ -78,7 +76,13 @@ def wstd(x,w=None,ddof=1,robust=False):
     result : float
         weighted standard deviation of x 
     '''
-    if w is not None:
+    if w is None:
+        if robust:
+            # Use FastMCD to calculate weights; Another method could be used here
+            w = MinCovDet().fit( np.array([x,x]).T ).support_
+        else:
+            raise ValueError('must specify weights w or select robust=True')
+    else:
         assert len(w) == len(x), 'w must be the same length as x'
 
     return np.sqrt( wcov(x,x,w,ddof,robust) )
@@ -106,7 +110,13 @@ def wvar(x,w=None,ddof=1,robust=False):
     result : float
         weighted variance of x 
     '''
-    if w is not None:
+    if w is None:
+        if robust:
+            # Use FastMCD to calculate weights; Another method could be used here
+            w = MinCovDet().fit( np.array([x,x]).T ).support_
+        else:
+            raise ValueError('must specify weights w or select robust=True')
+    else:
         assert len(w) == len(x), 'w must be the same length as x'
 
     return wcov(x,x,w,ddof,robust)
@@ -137,16 +147,17 @@ def wcov(x,y,w=None,ddof=1,robust=False):
     result : float
         weighted covariance of x and y
     '''
-    n = len(x)
-    assert len(y) == n, 'y must be the same length as x'
 
-    # Use FastMCD to calculate weights; Another method could be used here
-    if robust and (w is None):
-        w = MinCovDet().fit( np.array([x,y]).T ).support_
+    assert len(y) == len(x), 'y must be the same length as x'
 
-    if len(w) == 0:
-        raise ValueError('must specify weights w or select robust=True')
-    assert len(w) == n, 'w must be the same length as x and y'
+    if w is None:
+        if robust:
+            # Use FastMCD to calculate weights; Another method could be used here
+            w = MinCovDet().fit( np.array([x,x]).T ).support_
+        else:
+            raise ValueError('must specify weights w or select robust=True')
+    else:
+        assert len(w) == len(x), 'w must be the same length as x'
 
     w = _wscale(w)
     nw = np.count_nonzero(w)
@@ -217,16 +228,17 @@ def wcorr(x,y,w=None,robust=False):
         42(3), 236–238, 1988.
     '''
 
-    n = len(x)
-    assert len(y) == n, 'y must be the same length as x'
+    assert len(y) == len(x), 'y must be the same length as x'
 
-    # Use FastMCD to calculate weights; Another method could be used here
-    if robust and (w is None):
-        w = MinCovDet().fit( np.array([x,y]).T ).support_
+    if w is None:
+        if robust:
+            # Use FastMCD to calculate weights; Another method could be used here
+            w = MinCovDet().fit( np.array([x,x]).T ).support_
+        else:
+            raise ValueError('must specify weights w or select robust=True')
+    else:
+        assert len(w) == len(x), 'w must be the same length as x'
 
-    if len(w) == 0:
-        raise ValueError('must specify weights w or select robust=True')
-    assert len(w) == n, 'w must be the same length as x and y'
     w = _wscale(w)
     return wcov(x,y,w) / np.sqrt( wvar(x,w) * wvar(y,w) )
 
@@ -307,8 +319,8 @@ def wquantile(x,q,w,interpolation='partition'):
                         When two elements both satisfy partition, then average them.
                         This is the Edgeworth method (https://en.wikipedia.org/wiki/Weighted_median)
         'partition0': Same as partition, but result is always an element of x (no averaging). 
-                        Instead return the element of x that partitions weights most closely to q and (1-q) 
-                        or, if there is still a tie, then the smaller element.
+                        Instead return the element of x that partitions weights most closely 
+                        to q and (1-q) or, if there is still a tie, then the smaller element.
         'linear'  : i + (j-1) * fraction. replicates behavior of numpy.quantile when all 
                     weights are equal
         'nearest' : i or j element that most closely divides data at the q quantile
