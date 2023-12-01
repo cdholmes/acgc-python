@@ -3,7 +3,7 @@
 ## Font
 font.size       : 10.0
 font.family     : sans-serif
-font.serif      : TeX Gyre Pagella, TeX Gyre Termes, TeX Gyre Schola, TeX Gyre Bonum, DejaVu Serif, Bitstream Vera Serif, Computer Modern Roman, New Century Schoolbook, Century Schoolbook L, Utopia, ITC Bookman, Bookman, Nimbus Roman No9 L, Times New Roman, Times, Palatino, Charter, serif
+font.serif      : TeX Gyre Pagella, TeX Gyre Termes, DejaVu Serif, Bitstream Vera Serif, Computer Modern Roman, New Century Schoolbook, Century Schoolbook L, Utopia, ITC Bookman, Bookman, Nimbus Roman No9 L, Times New Roman, Times, Palatino, Charter, serif
 font.sans-serif : TeX Gyre Heros, Arial, Helvetica, DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid, Avant Garde, sans-serif
 font.cursive    : TeX Gyre Chorus, Apple Chancery, Textile, Zapf Chancery, Sand, Script MT, Felipa, Comic Neue, Comic Sans MS, cursive
 font.fantasy    : TeX Gyre Adventor, Chicago, Charcoal, Impact, Western, Humor Sans, xkcd, fantasy

@@ -15,7 +15,7 @@ If you plan to edit, update, and improve the python source code within this pack
 The local files can then be managed with git, including keeping up-to-date with the github source repository via `git pull`.
 
 #### Classic version
-The old version of this package, which is a regular file directory, not an importable python module is accessible as the "classic" branch of this repository.
+The old version of this package (before conversion to an importable python module) is accessible as the "classic" branch of this repository.
 
 ## Contents
 
@@ -42,7 +42,7 @@ Add a length scale bar on a map
 Miscelaneous functions for PBL properties
 - modetools	    
 Visualization of eigenmode systems
-- nctools.py          
+- nctools          
 High-level functions for reading and writing netCDF files. Legacy code. write_geo_nc is still useful for concisely creating netCDF files, but xarray is better for reading netCDF.
 - solar        
 Solar zenith angle, declination, equation of time
@@ -52,5 +52,3 @@ Functions for calculating with dates. e.g. converting dates to fractional years.
 ## Demos
 The [`demo`](./demo/) folder contains examples of how to accomplish common data analysis and visualization tasks, including using many of the functions within the `acgc` library.
 
-## Author
-This package is written by Christopher Holmes (cdholmes@fsu.edu).
