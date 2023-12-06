@@ -23,7 +23,7 @@ jobs:
     - name: Test with Pytest
       run: |
         pip install pytest 
-        pytest -v -s    
+        pytest -v -s tests/
     - name: Install pypa/build
       run: >-
         python3 -m
