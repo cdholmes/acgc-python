@@ -24,7 +24,7 @@ authors = [
 maintainers = [
   { name="Christopher Holmes", email="cdholmes@fsu.edu" },
 ]
-description = "A collection of data analysis programs used by the Atmospheric Chemistry and Global Change research group"
+description = "A collection of data analysis programs used by the Atmospheric Chemistry and Global Change (ACGC) research group"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.4"
