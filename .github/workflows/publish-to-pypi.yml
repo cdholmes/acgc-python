@@ -15,6 +15,14 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: "3.x"
+    - name: Install dependencies for testing
+      run: |
+        python -m pip install --upgrade pip
+        pip install .
+    - name: Test with Pytest
+      run: |
+        pip install pytest 
+        pytest -v -s    
     - name: Install pypa/build
       run: >-
         python3 -m
