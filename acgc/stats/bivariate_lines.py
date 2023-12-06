@@ -11,7 +11,8 @@ import scipy.stats as stats
 from sklearn.covariance import MinCovDet
 import statsmodels.formula.api as smf
 import statsmodels.robust.norms as norms
-from numba import jit
+import warnings
+#from numba import jit
 
 __all__ = [
     "sma",
@@ -441,7 +442,7 @@ def york( x, y, err_x=1, err_y=1, rerr_xy=0 ):
 
     return result
 
-@jit(nopython=True)
+#@jit(nopython=True)
 def sen( x, y ):
     '''Estimate linear trend using the Thiel-Sen method
     
@@ -466,6 +467,11 @@ def sen( x, y ):
         all slope estimates from all combinations of x and y
     '''
 
+    with warnings.catch_warnings():
+        warnings.simplefilter('always', DeprecationWarning)
+        warnings.warn(f'Sen function is slow unless numba.jit is used. Use scipy.stats.theilslopes instead.',
+                    DeprecationWarning, stacklevel=2)
+        
     if len( x ) != len( y ):
         print('Inputs x and y must have same dimension')
         return np.nan
