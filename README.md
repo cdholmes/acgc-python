@@ -5,17 +5,21 @@ The acgc package is a collection of data analysis functions used by the Atmosphe
 
 ## Installation
 
-`pip install git+https://github.com/cdholmes/acgc-python`
+For conda users:
 
-The package can then be imported and used via `from acgc import <submodule>`.
+ `conda install -c conda-forge acgc`
 
-#### Editable installation
-If you plan to edit, update, and improve the python source code within this package, an editable installation may be better:
+For pip users:
+
+ `pip install acgc`
+
+#### For developers
+If you plan to modify or improve the acgc package, an editable installation may be better:
 `pip install -e git+https://github.com/cdholmes/acgc-python`
-The local files can then be managed with git, including keeping up-to-date with the github source repository via `git pull`.
+Your local files can then be managed with git, including keeping up-to-date with the github source repository (e.g. `git pull`).
 
 #### Classic version
-The old version of this package (before conversion to an importable python module) is accessible as the "classic" branch of this repository.
+The old version of this package (before conversion to an importable python module) is accessible as the "classic" branch of this repository on github.
 
 ## Contents
 
