@@ -8,7 +8,7 @@ import numpy as np
 import scipy.linalg as la 
 import scipy.stats as stats
     
-from numba import jit
+#from numba import jit
 
 __all__ = ['sma_warton_fit']
 
@@ -171,7 +171,7 @@ def sma_warton_fit(X0,Y0,alpha=0.05,intercept=True,robust=False,wartonrobust=Fal
         
     return slope, Intercept, ste_slope, ste_int, ci_slope, ci_int
 
-@jit
+#@jit
 def robust_factor( X, rm, rcov, c=0.777 ):
 
     rfac1=1
@@ -234,7 +234,7 @@ def gamma_fun( r, k, q ):
     
     return gamma
 
-@jit
+#@jit
 def huber_cov( X, c=1.73):
     ''' Mean and covariance of x and y, using Huber's M estimator
      Method is taken from Taskinen and Warton, 2013 '''
