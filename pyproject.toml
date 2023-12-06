@@ -42,7 +42,6 @@ dependencies = [
     "cartopy",
     "numpy",
     "scipy",
-    "numba",
     "pandas",
     "netCDF4",
     "scikit-learn",
