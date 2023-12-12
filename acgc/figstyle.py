@@ -8,7 +8,8 @@ import warnings
 import matplotlib as mpl
 import matplotlib.style as mstyle
 import matplotlib.font_manager as mfonts
-import matplotlib_inline
+if 'inline' in mpl.get_backend():
+    import matplotlib_inline
 
 # Path to this module
 PATH = os.path.dirname(__file__)
@@ -29,9 +30,10 @@ def load_style(grid=True,gridaxis='both'):
     if grid:
         grid_on(axis=gridaxis)
 
-    # Use high quality for inline images
+    # Use high quality for inline images; Only use this if the inline backend is active
     # 'png' is default, 'svg' is also good
-    matplotlib_inline.backend_inline.set_matplotlib_formats('retina')
+    if 'inline' in mpl.get_backend():
+        matplotlib_inline.backend_inline.set_matplotlib_formats('retina')
 
 
 def grid_off():

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import gctools as gct
+from . import gctools as gct
 import numpy as np
 import matplotlib.pyplot as plt
 
