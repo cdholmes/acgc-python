@@ -26,7 +26,8 @@ The old version of this package (before conversion to an importable python modul
 The acgc package includes the following sub-modules. Import these via `from acgc import <submodule>` or `import acgc.<submodule> as <alias>`. Example: `import acgc.gctools as gct`. 
 See `help(acgc.<submodule>)` for complete list of features.
 
-- [figstyle](./docs/demo_figstyle.html)
+- [figstyle](./demo/demo_figstyle.ipynb)
+
 Changes Matplotlib style to make figures closer to publication ready. 
 - stats  
 Collection of statistical methods. Useful functions include BivariateStatistics, line fitting methods (sma, sen, york), weighted statistics (wmean, wmedian, wcov, wcorr, etc.), partial_corr, among others. See help(acgc.stats) for complete list of methods.
