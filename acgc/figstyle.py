@@ -11,20 +11,23 @@ import matplotlib.font_manager as mfonts
 import matplotlib_inline
 
 # Path to this module
-path = os.path.dirname(__file__)
+PATH = os.path.dirname(__file__)
 
-def load_style(grid=True):
+def load_style(grid=True,gridaxis='both'):
     '''Load style sheet
     
     Parameters
     ----------
     grid : bool (default=True)
         turn grid lines on (True) or off (False)
+    gridaxis : str (default='both')
+        specifies which axes should have grid lines: 'x', 'y', 'both'
     '''
-    mstyle.use(os.path.join(path,'acgc.mplstyle'))
+    mstyle.use(os.path.join(PATH,'acgc.mplstyle'))
 
     # Turn grid on or off
-    mpl.rcParams['axes.grid'] = grid
+    if grid:
+        grid_on(axis=gridaxis)
 
     # Use high quality for inline images
     # 'png' is default, 'svg' is also good
@@ -34,15 +37,22 @@ def load_style(grid=True):
 def grid_off():
     '''Turn off grid lines'''
     mpl.rcParams['axes.grid'] = False
-def grid_on():
-    '''Turn on grid lines'''
+def grid_on(axis='both'):
+    '''Turn on grid lines
+    
+    Parameter
+    ---------
+    axis : str (default='both')
+        specifies which axes should have grid lines: 'x', 'y', 'both' 
+    '''
     mpl.rcParams['axes.grid'] = True
+    mpl.rcParams['axes.grid.axis'] = axis
 
 def load_fonts():
     '''Load fonts contained in the ./fonts subdirectory'''
 
     # User fonts
-    fonts_pylib = mfonts.findSystemFonts(os.path.join(path,'fonts'))
+    fonts_pylib = mfonts.findSystemFonts(os.path.join(PATH,'fonts'))
 
     # Cached fonts
     fonts_cached = mfonts.fontManager.ttflist
