@@ -7,7 +7,7 @@ font.serif      : TeX Gyre Pagella, TeX Gyre Termes, DejaVu Serif, Bitstream Ver
 font.sans-serif : TeX Gyre Heros, Arial, Helvetica, DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid, Avant Garde, sans-serif
 font.cursive    : TeX Gyre Chorus, Apple Chancery, Textile, Zapf Chancery, Sand, Script MT, Felipa, Comic Neue, Comic Sans MS, cursive
 font.fantasy    : TeX Gyre Adventor, Chicago, Charcoal, Impact, Western, Humor Sans, xkcd, fantasy
-font.monospace  : TeX Gyre Cursor, DejaVu Sans Mono, Bitstream Vera Sans Mono, Computer Modern Typewriter, Andale Mono, Nimbus Mono L, Courier New, Courier, Fixed, Terminal, monospace
+font.monospace  : DejaVu Sans Mono, TeX Gyre Cursor, Bitstream Vera Sans Mono, Computer Modern Typewriter, Andale Mono, Nimbus Mono L, Courier New, Courier, Fixed, Terminal, monospace
 
 
 ## Figure display
