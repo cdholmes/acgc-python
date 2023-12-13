@@ -207,7 +207,7 @@ def sma(X,Y,W=None,
 
         else:
 
-            raise NotImplementedError("smafit.py hasn't implemented robust_method={:%s}".\
+            raise NotImplementedError("sma hasn't implemented robust_method={:%s}".\
                                       format(robust_method))
     else:
 
