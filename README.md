@@ -28,7 +28,7 @@ See `help(acgc.<submodule>)` for complete list of features.
 
 - [figstyle](./demo/demo_figstyle.ipynb)
 
-Changes Matplotlib style to make figures closer to publication ready. 
+Changes Matplotlib style to make figures closer to publication ready with `from acgc import figstyle`.
 - [stats](./demo/demo_stats.ipynb)  
 
 Collection of statistical methods. Useful functions include BivariateStatistics, line fitting methods (sma, sen, york), weighted statistics (wmean, wmedian, wcov, wcorr, etc.), partial_corr, among others. See help(acgc.stats) for complete list of methods.
