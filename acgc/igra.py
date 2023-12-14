@@ -10,8 +10,8 @@ import pandas as pd
 def read_igra_country(file):
     '''Read file of IGRA country codes
     
-    Arguments
-    ---------
+    Parameters
+    ----------
     file : str
         name/path of file to read
         
@@ -32,8 +32,8 @@ def read_igra_country(file):
 def read_igra_stations(file):
     '''Read file of IGRA station coordinates and dates of observations
     
-    Arguments
-    ---------
+    Parameters
+    ----------
     file : str
         name/path of file to read
         
@@ -71,8 +71,8 @@ def read_igra_file( file, derived=False, readprofiles=True ):
     This function can read IGRA files with and without derived variables.
     If only the derived variables are needed, reading the profiles can be skipped to improve speed.
     
-    Arguments
-    ---------
+    Parameters
+    ----------
     file : str
         name/path of file to read
     derived : bool
@@ -93,7 +93,7 @@ def read_igra_file( file, derived=False, readprofiles=True ):
         - profile = sub-dataframe containing vertical profile (numlev rows). 
             See below for data columns. profile is only present when readprofiles=True
 
-        For "derived" files dataframe also contains the following profile summary columns        
+        For "derived" files, the returned DataFrame also contains the following profile summary columns        
         - pw         = precipitable water, mm
         - invpress   = inversion pressure, hPa
         - invhgt     = inversion height, m AGL
@@ -114,8 +114,8 @@ def read_igra_file( file, derived=False, readprofiles=True ):
         - TTI        = Total totals index, C
         - CAPE       = CAPE, J/kg
         - CIN        = Convective inhibition, J/kg
-        
-        The "profile" field is a sub-dataframe containing the following variables and "numlev" rows"
+
+        The "profile" field is a sub-DataFrame containing the following variables and "numlev" rows"
         - p       = pressure, hPa 
         - z       = altitude, m
         - T       = temperature, C

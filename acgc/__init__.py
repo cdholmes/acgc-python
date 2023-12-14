@@ -10,3 +10,20 @@ def _package_version(package_name):
     return result
 
 __version__ = _package_version('acgc')
+
+__all__ = [
+    'erroranalysis',
+    'figstyle',
+    'gc',
+    'geoschem',
+    'hysplit',
+    'icartt',
+    'igra',
+    'map_scalebar',
+    'met',
+    'modetools',
+    'netcdf',
+    'stats',
+    'solar',
+    'time'
+]

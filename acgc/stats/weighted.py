@@ -29,17 +29,17 @@ def wmean(x,w=None,robust=False):
     
     Parameters
     ----------
-    x : ndarray 
+    x : array_like 
         values to be averaged
-    w : ndarray (default=None)
+    w : array_like, default=None
         weights for each element of x; can be ommitted if robust=True
-    robust : bool (default=False) 
+    robust : bool, default=False
         if robust=True, weights will be internally calculated using FastMCD;
         ignored if w is used
         
     Returns
     -------
-    result : float
+    float
         weighted mean of x 
     '''
     if w is None:
@@ -61,19 +61,19 @@ def wstd(x,w=None,ddof=1,robust=False):
     
     Parameters
     ----------
-    x : ndarray 
+    x : array_like 
         values to be analyzed
-    w : ndarray (default=None)
+    w : array_like, default=None
         weights for each element of x; can be ommitted if robust=True
-    ddof : int (default=1)
+    ddof : int, default=1
         differential degrees of freedom. See note above.
-    robust : bool (default=False) 
+    robust : bool, default=False
         if robust=True, weights will be internally calculated using FastMCD;
         ignored if w is used
         
     Returns
     -------
-    result : float
+    float
         weighted standard deviation of x 
     '''
     if w is None:
@@ -95,19 +95,19 @@ def wvar(x,w=None,ddof=1,robust=False):
     
     Parameters
     ----------
-    x : ndarray 
+    x : array_like 
         values to be analyzed
-    w : ndarray (default=None)
+    w : array_like, default=None
         weights for each element of x; can be ommitted if robust=True
-    ddof : int (default=1)
+    ddof : int, default=1
         differential degrees of freedom. See note above.
-    robust : bool (default=False) 
+    robust : bool, default=False
         if robust=True, weights will be internally calculated using FastMCD;
         ignored if w is used
         
     Returns
     -------
-    result : float
+    float
         weighted variance of x 
     '''
     if w is None:
@@ -132,19 +132,19 @@ def wcov(x,y,w=None,ddof=1,robust=False):
     
     Parameters
     ----------
-    x, y : ndarray 
+    x, y : array_like 
         values to be analyzed
-    w : ndarray (default=None)
+    w : array_like, default=None
         weights for each element of x; can be ommitted if robust=True
     ddof : int (default=1)
         differential degrees of freedom. See note above.
-    robust : bool (default=False) 
+    robust : bool, default=False 
         if robust=True, weights will be internally calculated using FastMCD;
         ignored if w is used
         
     Returns
     -------
-    result : float
+    float
         weighted covariance of x and y
     '''
 
@@ -175,19 +175,19 @@ def wcorr(x,y,w=None,robust=False):
     
     Parameters
     ----------
-    x, y : ndarray 
+    x, y : array_like 
         values to be analyzed
-    w : ndarray (default=None)
+    w : array_like, default=None
         weights for each element of x; can be ommitted if robust=True
-    ddof : int (default=1)
+    ddof : int, default=1
         differential degrees of freedom. See note above.
-    robust : bool (default=False) 
+    robust : bool, default=False
         if robust=True, weights will be internally calculated using FastMCD;
         ignored if w is used
         
     Returns
     -------
-    result : float
+    float
         weighted correlation coefficient of x and y
 
     Notes
@@ -254,12 +254,12 @@ def _wscale(w):
     
     Parameters
     ----------
-    w : ndarray
+    w : array_like
         weights 
         
     Returns
     -------
-    result : float
+    array_like
         input array rescaled so the largest element is 1
     '''
     return w / np.max( w )
@@ -267,19 +267,19 @@ def _wscale(w):
 def wmedian(x,w,**kwargs):
     '''Weighted median
 
-    See documentation for wquantile
+    See documentation for `wquantile`
 
     Parameters
     ----------
-    x : ndarray 
+    x : array_like 
         values to be analyzed
-    w : ndarray
-        weights for each element of x
-    **kwargs passed to wquantile
+    w : array_like
+        weights for each element of x, representing frequency
+    **kwargs passed to `wquantile`
 
     Returns
     -------
-    result : float
+    float
         weighted median of x 
 
     '''
@@ -304,32 +304,32 @@ def wquantile(x,q,w,interpolation='partition'):
     
     Parameters
     ----------
-    x : ndarray 
+    x : array_like (N,)
         values to be analyzed
-    q : list
+    q : list (m,)
         quantiles that will be calculated, in range 0-1
-    w : ndarray
+    w : array_like (N,)
         weights for each element of x. 
         These represent the frequency of elements x in a large population
-    interpolation : str (default='partition')
+    interpolation : {'partition' (default),'partition0','linear','nearest','lower','higher'}
         This parameter specifies the interpolation method to use when the desired quantile 
         lies bewteen elements i < j in x. Allowed values:
-        'partition': [default] choose the element of x that partitions the 
+        - 'partition': [default] choose the element of x that partitions the 
                         sum of weights on either side to q and (1-q)
                         When two elements both satisfy partition, then average them.
                         This is the Edgeworth method (https://en.wikipedia.org/wiki/Weighted_median)
-        'partition0': Same as partition, but result is always an element of x (no averaging). 
+        - 'partition0': Same as partition, but result is always an element of x (no averaging). 
                         Instead return the element of x that partitions weights most closely 
                         to q and (1-q) or, if there is still a tie, then the smaller element.
-        'linear'  : i + (j-1) * fraction. replicates behavior of numpy.quantile when all 
+        - 'linear'  : i + (j-1) * fraction. replicates behavior of numpy.quantile when all 
                     weights are equal
-        'nearest' : i or j element that most closely divides data at the q quantile
-        'lower'   : i, the largest element <= the q quantile
-        'higher'  : j, the smallest element >= the q quantile
+        - 'nearest' : i or j element that most closely divides data at the q quantile
+        - 'lower'   : i, the largest element <= the q quantile
+        - 'higher'  : j, the smallest element >= the q quantile
                          
     Result
     ------
-    xq : ndarray
+    array (m,)
         weighted quantiles of x. Length is the same as input q
     '''
 
