@@ -1,15 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-'''Wrapper for acgc.stats for backwards compatibility. Deprecated
-
-Classes:
-    BivariateStatistics
-
-Functions:
-    nmb
-    nmae
-    nmbf
-    nmaef
+'''Alias for `acgc.stats.bivariate` for backwards compatibility. Deprecated
 '''
 import warnings
 from .stats.bivariate import nmb, nmae, nmbf, nmaef, BivariateStatistics

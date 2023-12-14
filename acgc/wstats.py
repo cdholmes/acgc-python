@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-'''Wrapper for acgc.stats for backwards compatibility. Deprecated
+'''Alias for `acgc.stats.weighted` for backwards compatibility. Deprecated
 
 Functions:
     wcorr

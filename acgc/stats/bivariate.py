@@ -3,11 +3,6 @@
 """ Bivariate statistics
 
 Statistical measures of relationships between two populations
-
-
-Created on June 4 2019
-
-@author: cdholmes
 """
 
 import numpy as np

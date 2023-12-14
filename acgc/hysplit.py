@@ -328,7 +328,7 @@ def read_tdump(file):
         #print(df.iloc[-1,:])
         return df
 
-def get_gdas1_filename( time ):
+def _get_gdas1_filename( time ):
     '''Directory and File names for GDAS 1 degree meteorology, for given date'''
 
     # Directory for GDAS 1 degree
@@ -345,7 +345,7 @@ def get_gdas1_filename( time ):
 
     return filename
 
-def get_hrrr_filename( time ):
+def _get_hrrr_filename( time ):
     '''Directory and File names for HRRR meteorology, for given date'''
 
     # Directory
@@ -361,7 +361,7 @@ def get_hrrr_filename( time ):
     # Return
     return filenames
 
-def get_met_filename( metmodel, time ):
+def _get_met_filename( metmodel, time ):
     '''Directory and file names for given meteorology and date
     
     Parameters
@@ -379,13 +379,13 @@ def get_met_filename( metmodel, time ):
 
     # Ensure that time is a datetime object
     if not isinstance( time, dt.date) :
-        raise TypeError( "get_met_filename: time must be a datetime object" )
+        raise TypeError( "_get_met_filename: time must be a datetime object" )
 
     # Directory and filename template
     doFormat=True
     if metmodel == 'gdas1':
         # Special treatment
-        filename = get_gdas1_filename( time )
+        filename = _get_gdas1_filename( time )
     elif metmodel == 'gdas0p5':
         dirname  = METROOT+'gdas0p5/'
         filename = dirname+'{date:%Y%m%d}_gdas0p5'
@@ -400,11 +400,11 @@ def get_met_filename( metmodel, time ):
         filename = dirname+'{date:%Y%m%d}_hysplit.t00z.namsa'
     elif metmodel == 'hrrr':
         # Special treatment
-        filename = get_hrrr_filename( time )
+        filename = _get_hrrr_filename( time )
         doFormat=False
     else:
         raise NotImplementedError(
-           f"get_met_filename: {metmodel} unrecognized" )
+           f"_get_met_filename: {metmodel} unrecognized" )
 
     # Build the filename
     if doFormat:
@@ -412,7 +412,7 @@ def get_met_filename( metmodel, time ):
 
     return filename
 
-def get_archive_filelist( metmodels, time, useAll=True ):
+def _get_archive_filelist( metmodels, time, useAll=True ):
     '''Get a list of met directories and files
     When there are two met version provided, the first result will be used
     
@@ -438,7 +438,7 @@ def get_archive_filelist( metmodels, time, useAll=True ):
     if isinstance( metmodels, str ):
 
         # If metmodels is a single string, then get value from appropriate function
-        filename = get_met_filename( metmodels, time )
+        filename = _get_met_filename( metmodels, time )
 
         # Convert to list, if isn't already
         if isinstance(filename, str):
@@ -455,7 +455,7 @@ def get_archive_filelist( metmodels, time, useAll=True ):
         for met in metmodels:
 
             # Find filename for this met version
-            f = get_met_filename( met, time )
+            f = _get_met_filename( met, time )
 
             if useAll:
 
@@ -491,14 +491,14 @@ def get_archive_filelist( metmodels, time, useAll=True ):
         # Raise an error if 
         if filename is []:
             raise FileNotFoundError(
-                "get_archive_filename: no files found for " + ','.join(metmodels) )
+                "_get_archive_filename: no files found for " + ','.join(metmodels) )
 
     else:
-        raise TypeError( "get_archive_filelist: metmodels must be a string or list" )
+        raise TypeError( "_get_archive_filelist: metmodels must be a string or list" )
 
     return filename
 
-def get_hybrid_filelist( metmodels, time ):
+def _get_hybrid_filelist( metmodels, time ):
     '''Get list of met files combining archive and forecast
     
     Starting 1 day before 'time' and extending 10 days ahead, find all archived analysis
@@ -533,8 +533,8 @@ def get_hybrid_filelist( metmodels, time ):
         # date of met data
         metdate = time.date() + pd.Timedelta( d, "D" )
 
-        #dirname, filename = get_archive_filelist( metmodel, metdate )
-        filename = get_met_filename( archivemet, metdate )
+        #dirname, filename = _get_archive_filelist( metmodel, metdate )
+        filename = _get_met_filename( archivemet, metdate )
 
         # Check if the file exists
         if os.path.isfile( filename ):
@@ -554,7 +554,7 @@ def get_hybrid_filelist( metmodels, time ):
 
                 try:
                     # If this works, then the file exists
-                    f = get_forecast_filename( forecastmet, cy, partial=True )
+                    f = _get_forecast_filename( forecastmet, cy, partial=True )
                     # Add the first 6-hr forecast period
                     metfiles.append( f[0] )
                     # If we have a full forecast cycle, save it
@@ -569,7 +569,7 @@ def get_hybrid_filelist( metmodels, time ):
 
     return metfiles
 
-def get_forecast_template( metmodel ):
+def _get_forecast_template( metmodel ):
     '''Get filename template for forecast meteorology
 
     Parameters
@@ -595,7 +595,7 @@ def get_forecast_template( metmodel ):
 
     return filetemplate, nexpected
 
-def get_forecast_filename( metmodel, cycle, partial=False ):
+def _get_forecast_filename( metmodel, cycle, partial=False ):
     '''Find files for a particular met model and forecast cycle
     
     Parameters
@@ -615,7 +615,7 @@ def get_forecast_filename( metmodel, cycle, partial=False ):
     '''
 
     dirname  = METROOT + f'forecast/{cycle:%Y%m%d}/'
-    filename, nexpected  = get_forecast_template( metmodel )
+    filename, nexpected  = _get_forecast_template( metmodel )
 
     # Filename for this cycle
     filename = filename.format(cycle)
@@ -635,7 +635,7 @@ def get_forecast_filename( metmodel, cycle, partial=False ):
     # Raise an error if no forecasts are found
     raise FileNotFoundError('ARL forecast meteorology found' )
 
-def get_forecast_filename_latest( metmodel ):
+def _get_forecast_filename_latest( metmodel ):
     '''Find files for the latest available forecast cycle for the requested met version.
     
     Requires a complete set of forecast files for a cycle
@@ -652,7 +652,7 @@ def get_forecast_filename_latest( metmodel ):
     '''
 
     # Filename template for forecast files
-    filetemplate, nexpected = get_forecast_template( metmodel )
+    filetemplate, nexpected = _get_forecast_template( metmodel )
 
     # Find all of the forecast directories, most recent first
     dirs = [item for item
@@ -680,7 +680,7 @@ def get_forecast_filename_latest( metmodel ):
     # Raise an error if no forecasts are found
     raise FileNotFoundError('No ARL forecast meteorology found' )
 
-def get_forecast_filelist( metmodels=None, cycle=None ):
+def _get_forecast_filelist( metmodels=None, cycle=None ):
     '''Get list of filenames for forecast cycle
     
     This function calls itself recursively
@@ -706,9 +706,9 @@ def get_forecast_filelist( metmodels=None, cycle=None ):
     if isinstance( metmodels, str ):
 
         if cycle is None:
-            filenames = get_forecast_filename_latest( metmodels )
+            filenames = _get_forecast_filename_latest( metmodels )
         else:
-            filenames = get_forecast_filename( metmodels, cycle )
+            filenames = _get_forecast_filename( metmodels, cycle )
 
     else:
 
@@ -718,7 +718,7 @@ def get_forecast_filelist( metmodels=None, cycle=None ):
         for met in metmodels:
 
             # Get directory and file names for one version
-            f = get_forecast_filelist( met, cycle )
+            f = _get_forecast_filelist( met, cycle )
 
             # Combine them into one list
             filenames = filenames + f
@@ -769,11 +769,11 @@ def find_arl_metfiles( start_time, ndays, back=False, metmodels=None,
         if back:
             raise NotImplementedError( "Combined Analysis/Forecast meteorology "
                                    + "not supported for back trajectories" )
-        metfiles = get_hybrid_filelist( metmodels, start_time )
+        metfiles = _get_hybrid_filelist( metmodels, start_time )
 
     elif forecast is True:
         # Get the forecast meteorology
-        metfiles = get_forecast_filelist( metmodels, forecastcycle )
+        metfiles = _get_forecast_filelist( metmodels, forecastcycle )
 
         # Check if the forecast meteorology covers the entire trajectory duration
     else:
@@ -811,7 +811,7 @@ def find_arl_metfiles( start_time, ndays, back=False, metmodels=None,
             metdate = start_time.date() + pd.Timedelta( d, "D" )
 
             # Met data for a single day 
-            filename = get_archive_filelist( metmodels, metdate )
+            filename = _get_archive_filelist( metmodels, metdate )
 
             # Add the files to the list
             metfiles.extend( filename )

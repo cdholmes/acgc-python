@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Jun 13 21:23:38 2019
-
-@author: cdholmes
+"""Propagation of error through complex numerical models
 """
 import numpy as np
 

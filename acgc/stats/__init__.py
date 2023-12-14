@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-'''A collection of statistical methods'''
+'''A collection of statistical methods
+
+The contents of all sub-modules are imported into `acgc.stats`. 
+For example, `acgc.stats.sma` is the function `acgc.stats.bivariate_lines.sma`
+within `acgc.stats.bivariate_lines`.
+
+See documentation within sub-modules.
+
+'''
 
 from .bivariate import *
 from .bivariate_lines import *

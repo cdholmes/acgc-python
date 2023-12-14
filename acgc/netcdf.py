@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Jun 29 15:49:33 2015
+"""High-level tools for writing and reading netCDF files
 
-@author: cdholmes
 """
 
 

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Standard Major Axis (SMA) line fitting
+"""Specialized methods of bivariate line fitting
 
-Created on Fri May 20 19:13:26 2016
-
-@author: cdholmes
+* Standard major axis (SMA) also called reduced major axis (RMA)
+* York regression, for data with errors in x and y
+* Theil-Sen, non-parametric slope estimation (use numba to accelerate the function in this module)
 """
 # from collections import namedtuple
 import numpy as np
@@ -21,6 +21,13 @@ __all__ = [
     "sen_slope",
     "york"
 ]
+# Aliases
+def sen_slope(*args,**kwargs):
+    '''Alias for `sen`'''
+    return sen(*args,**kwargs)
+def smafit(*args,**kwargs):
+    '''Alias for `sma`'''
+    return sma(*args,**kwargs)
 
 def sma(X,Y,W=None,
            data=None,
@@ -307,8 +314,6 @@ def sma(X,Y,W=None,
 
     # return Slope, Intercept, ste_slope, ste_int, ci_grad, ci_int
     return result
-# Alias
-smafit = sma
 
 def york( x, y, err_x=1, err_y=1, rerr_xy=0 ):
     '''York regression accounting for error in x and y
@@ -500,5 +505,4 @@ def sen( x, y ):
 
     return sen, slopes
 
-# Alias
-sen_slope = sen
+

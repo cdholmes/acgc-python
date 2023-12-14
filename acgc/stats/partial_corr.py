@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Partial Correlation in Python (clone of Matlab's partialcorr)
-Date: Nov 2014
-Author: Fabian Pedregosa-Izquierdo, f@bianp.net
-Testing: Valentina Borghesani, valentinaborghesani@gmail.com
+"""Partial Correlation in Python 
+
+Clone of Matlab's partialcorr, written by Fabian Pedregosa-Izquierdo, f@bianp.net
 """
 
 import numpy as np

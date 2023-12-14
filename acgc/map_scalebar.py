@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-""" Scale bar from StackOverflow
+""" Scale bar for display on maps
+
+From StackOverflow
 https://stackoverflow.com/questions/32333870/how-can-i-show-a-km-ruler-on-a-cartopy-matplotlib-plot
 """
 
