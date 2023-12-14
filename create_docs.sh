@@ -3,3 +3,4 @@
 # Can use '.. include documentation.md' in docstring
 pdoc3 --html --force -o 'docs' acgc
 cp -r docs/acgc/* docs/
+rm -rf docs/acgc

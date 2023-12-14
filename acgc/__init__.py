@@ -1,6 +1,6 @@
 """Data analysis programs from the ACGC research group"""
 
-def package_version(package_name):
+def _package_version(package_name):
     '''Find version string for package name'''
     from importlib.metadata import version, PackageNotFoundError
     try:
@@ -9,4 +9,4 @@ def package_version(package_name):
         result = "unknown version"
     return result
 
-__version__ = package_version('acgc')
+__version__ = _package_version('acgc')
