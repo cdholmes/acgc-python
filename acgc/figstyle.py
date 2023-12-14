@@ -12,19 +12,19 @@ if 'inline' in mpl.get_backend():
     import matplotlib_inline
 
 # Path to this module
-PATH = os.path.dirname(__file__)
+_PATH = os.path.dirname(__file__)
 
-def load_style(grid=True,gridaxis='both'):
-    '''Load style sheet
+def activate_style(grid=True,gridaxis='both'):
+    '''Activate style sheet 
     
     Parameters
     ----------
-    grid : bool (default=True)
+    grid : bool, default=True
         turn grid lines on (True) or off (False)
-    gridaxis : str (default='both')
-        specifies which axes should have grid lines: 'x', 'y', 'both'
+    gridaxis : str, default='both'
+        specifies which axes should have grid lines
     '''
-    mstyle.use(os.path.join(PATH,'acgc.mplstyle'))
+    mstyle.use(os.path.join(_PATH,'acgc.mplstyle'))
 
     # Turn grid on or off
     if grid:
@@ -39,22 +39,23 @@ def load_style(grid=True,gridaxis='both'):
 def grid_off():
     '''Turn off grid lines'''
     mpl.rcParams['axes.grid'] = False
+
 def grid_on(axis='both'):
     '''Turn on grid lines
     
-    Parameter
-    ---------
-    axis : str (default='both')
-        specifies which axes should have grid lines: 'x', 'y', 'both' 
+    Parameters
+    ----------
+    axis : {'both', 'x', 'y'}
+        specifies which axes should have grid lines 
     '''
     mpl.rcParams['axes.grid'] = True
     mpl.rcParams['axes.grid.axis'] = axis
 
 def load_fonts():
-    '''Load fonts contained in the ./fonts subdirectory'''
+    '''Load fonts contained in the acgc/fonts subdirectory'''
 
     # User fonts
-    fonts_pylib = mfonts.findSystemFonts(os.path.join(PATH,'fonts'))
+    fonts_pylib = mfonts.findSystemFonts(os.path.join(_PATH,'fonts'))
 
     # Cached fonts
     fonts_cached = mfonts.fontManager.ttflist
@@ -80,4 +81,4 @@ def load_fonts():
 
 ###
 load_fonts()
-load_style()
+activate_style()

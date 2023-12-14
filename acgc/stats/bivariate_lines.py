@@ -59,46 +59,47 @@ def sma(X,Y,W=None,
 
     Parameters
     ----------
-    X, Y : array_like, str
+    X, Y : array_like or str
         Input values, Must have same length.
-    W    : array_like, str, optional
+    W    : array_like or str, optional
         array of weights for each X-Y point, typically W_i = 1/(var(X_i)+var(Y_i)) 
     data : dict_like, optional
         data structure containing variables. Used when X, Y, or W are str.
     cl   : float (default = 0.95)
         Desired confidence level for output. 
-    intercept : boolean (default=True)
+    intercept : bool, default=True
         Specify if the fitted model should include a non-zero intercept.
         The model will be forced through the origin (0,0) if intercept=False.
-    robust : boolean (default=False)
+    robust : bool, default=False
         Use statistical methods that are robust to the presence of outliers
-    robust_method: string (default='FastMCD')
+    robust_method: {'FastMCD' (default), 'Huber', 'Biweight'}
         Method for calculating robust variance and covariance. Options:
-        'MCD' or 'FastMCD' for Fast MCD
-        'Huber' for Huber's T: reduce, not eliminate, influence of outliers
-        'Biweight' for Tukey's Biweight: reduces then eliminates influence of outliers
+        - 'MCD' or 'FastMCD' for Fast MCD
+        - 'Huber' for Huber's T: reduce, not eliminate, influence of outliers
+        - 'Biweight' for Tukey's Biweight: reduces then eliminates influence of outliers
 
         
     Returns
     -------
-    resut : dict containing the following fields
-        slope     : float
+    fitresult : dict 
+        Contains the following keys:
+        - slope (float)
             Slope or Gradient of Y vs. X
-        intercept : float
+        - intercept (float)
             Y intercept.
-        slope_ste : float
+        - slope_ste (float)
             Standard error of slope estimate
-        intercept_ste : float
+        - intercept_ste (float)
             standard error of intercept estimate
-        slope_interval : [float, float]
+        - slope_interval ([float, float])
             confidence interval for gradient at confidence level cl
-        intercept_interval : [float, float]
+        - intercept_interval ([float, float])
             confidence interval for intercept at confidence level cl
-        df_model : float
+        - df_model (float)
             degrees of freedom for model
-        df_resid : float
+        - df_resid (float)
             degrees of freedom for residuals
-        params : [float,float]
+        - params ([float,float])
             array of fitted parameters
     '''
 
@@ -332,26 +333,25 @@ def york( x, y, err_x=1, err_y=1, rerr_xy=0 ):
     
     Returns
     -------
-    resut : dict containing the following fields
-        slope     : float
+    fitresult : dict 
+        Contains the following keys:
+        - slope (float)
             Slope or Gradient of Y vs. X
-        intercept : float
+        - intercept (float)
             Y intercept.
-        slope_ste : float
+        - slope_ste (float)
             Standard error of slope estimate
-        intercept_ste : float
+        - intercept_ste (float)
             standard error of intercept estimate
-        slope_interval : [float, float]
+        - slope_interval ([float, float])
             confidence interval for gradient at confidence level cl
-            Not implemented
-        intercept_interval : [float, float]
+        - intercept_interval ([float, float])
             confidence interval for intercept at confidence level cl
-            Not implemented.
-        df_model : float
+        - df_model (float)
             degrees of freedom for model
-        df_resid : float
+        - df_resid (float)
             degrees of freedom for residuals
-        params : [float,float]
+        - params ([float,float])
             array of fitted parameters
     '''
 
@@ -459,16 +459,16 @@ def sen( x, y ):
     
     Parameters
     ----------
-    x : array-like
+    x : array_like (N,)
         independent variable
-    y : array-like 
+    y : array_like (N,)
         dependent variable
     
     Returns
     -------
     sen : float
         the median slope
-    slopes :array
+    slopes : array (N*N,)
         all slope estimates from all combinations of x and y
     '''
 
@@ -504,5 +504,3 @@ def sen( x, y ):
     sen = np.nanmedian( slopes )
 
     return sen, slopes
-
-

@@ -18,10 +18,10 @@ def read_icartt( files, usePickle=False, timeIndex=False ):
     files : list or str
         path to ICARTT file or files that will be read. 
         Data within these files will be concatenated, so files should all contain the same variables
-    usePickle : bool (default=False)
+    usePickle : bool, default=False
         if usePickle=True, the data will be written to a pkl file with ".pkl" appended to path
         On subsequent read_icartt calls, data will be read from the .pkl file, if it exists
-    timeIndex : bool (default=False)
+    timeIndex : bool, default=False
         sets DataFrame index to the time variable from the ICARTT file, rather than a row counter
         
     Returns
@@ -150,12 +150,12 @@ def write_icartt(filename, df, **kwargs):
     ---------
     filename : str
         File to be created
-    df : Pandas dataframe
+    df : pandas.DataFrame
         df should contain data and metadata
-        df attributes must include all of the "required" and "normal_comments" names.
-        The INDEPENDENT_VARIABLE_DEFINITION and DEPENDENT_VARIABLE_DEFINITION should be dicts containing
-        {'VariableName':'units, standard name, description'}
-        Only variables listed in INDEPENDENT_VARIABLE_DEFINITION and DEPENDENT_VARIABLE_DEFINITION
+        df attributes must include all of the `required` and `normal_comments` names.
+        The `INDEPENDENT_VARIABLE_DEFINITION` and `DEPENDENT_VARIABLE_DEFINITION` should be dicts containing
+        `{'VariableName':'units, standard name, description'}`
+        Only variables listed in `INDEPENDENT_VARIABLE_DEFINITION` and `DEPENDENT_VARIABLE_DEFINITION`
         will be written to the output file.
     **kwargs
         passed to pandas.to_csv

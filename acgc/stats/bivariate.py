@@ -18,101 +18,113 @@ __all__ = [
     "nmaef"
 ]
 
-def nmb( ref_values, exp_values ):
+def nmb( x0, x1 ):
     '''Compute Normalized Mean Bias (NMB)
-    nmb = (<exp> - <ref>) / <ref>
+
+    NMB = ( mean(x1) - mean(x0) ) / mean(x0)
 
     Parameters
     ----------
-    ref_values : reference values
-    exp_values : experiment values
+    x0 : array_like
+        reference values
+    x1 : array_like
+        experiment values
     '''
 
-    assert (len(exp_values) == len(ref_values)), \
-        "exp_values must have the same length as ref_values"
+    assert (len(x0) == len(x1)), \
+        "Parameters x0 and x1 must have the same length"
 
     # Mean values
-    ref_mean = np.mean(ref_values)
-    exp_mean = np.mean(exp_values)
+    x0_mean = np.mean(x0)
+    x1_mean = np.mean(x1)
 
     # Metric value
-    return exp_mean / ref_mean - 1
+    return x1_mean / x0_mean - 1
 
-def nmae( ref_values, exp_values ):
+def nmae( x0, x1 ):
     '''Compute Normalized Mean Absolute Error (NMAE)
-    < |exp - ref| > / |<ref>|
+
+    NMAE = mean(abs(x1 - x0)) / abs(mean(x0))
 
     Parameters
     ---------
-    ref_values : reference values
-    exp_values : experiment values
+    x0 : array_like
+        reference values
+    x1 : array_like
+        experiment values
     '''
 
      # Mean values
-    ref_mean = np.mean(ref_values)
+    x0_mean = np.mean(x0)
 
     # Mean absolute difference
-    abs_diff = np.mean( np.abs(exp_values - ref_values) )
+    abs_diff = np.mean( np.abs(x1 - x0) )
 
     # Metric value
-    return abs_diff / np.abs( ref_mean )
+    return abs_diff / np.abs( x0_mean )
 
 
-def nmbf( ref_values, exp_values ):
+def nmbf( x0, x1 ):
     '''Compute Normalized Mean Bias Factor (NMBF)
+
     Definition from Yu et al. (2006) https://doi.org/10.1002/asl.125
 
     Parameters
     ----------
-    ref_values : reference values
-    exp_values : experiment values
+    x0 : array_like
+        reference values
+    x1 : array_like
+        experiment values
     '''
 
     # Ensure that arguments have the same length
-    assert (len(exp_values) == len(ref_values)), \
-        "exp_values must have the same length as ref_values"
+    assert (len(x0) == len(x1)), \
+        "Parameters x0 and x1 must have the same length"
 
     # Mean values
-    ref_mean = np.mean(ref_values)
-    exp_mean = np.mean(exp_values)
+    x0_mean = np.mean(x0)
+    x1_mean = np.mean(x1)
 
     # Metric value
-    if exp_mean >= ref_mean:
-        result = exp_mean / ref_mean - 1
+    if x1_mean >= x0_mean:
+        result = x1_mean / x0_mean - 1
     else:
-        result= 1 - ref_mean / exp_mean
+        result= 1 - x0_mean / x1_mean
     # Equivalent (faster?) implementation
     #S = (mMean - oMean) / np.abs(mMean - oMean)
     #result = S * ( np.exp( np.abs( mMean / oMean )) - 1 )
 
     return result
 
-def nmaef( ref_values, exp_values ):
+def nmaef( x0, x1 ):
     '''Compute Normalized Mean Absolute Error Factor (NMAEF)
+
     Definition from Yu et al. (2006) https://doi.org/10.1002/asl.125
     
     Parameters
     ----------
-    ref_values : reference values
-    exp_values : experiment values
+    x0 : array_like
+        reference values
+    x1 : array_like
+        experiment values
     '''
 
     # Ensure that arguments have the same length
-    assert (len(exp_values) == len(ref_values)), \
-        "exp_values must have the same length as ref_values"
+    assert (len(x0) == len(x1)), \
+        "Parameters x0 and x1 must have the same length"
 
     # Mean values
-    ref_mean = np.mean(ref_values)
-    exp_mean = np.mean(exp_values)
+    x0_mean = np.mean(x0)
+    x1_mean = np.mean(x1)
 
     # Mean absolute difference
-    abs_diff = np.mean( np.abs(exp_values - ref_values))
+    abs_diff = np.mean( np.abs(x1 - x0))
 
     # Metric value
-    if exp_mean >= ref_mean:
-        result = abs_diff / ref_mean 
+    if x1_mean >= x0_mean:
+        result = abs_diff / x0_mean 
     else:
-        result = abs_diff / exp_mean
+        result = abs_diff / x1_mean
     # Equivalent (faster?) implementation
     #S = (exp_mean - ref_mean) / np.abs(exp_mean - ref_mean)
     #result = abs_diff / ( oMean**((1+S)/2) * mMean**((1-S)/2) )
@@ -143,34 +155,53 @@ class BivariateStatistics:
 
     Class method 'summary' provides a formatted summary of these statistics
     
-    Attributes:
-        xmean, ymean (float) : mean of x and y variables
-        xmedian, ymedian (float) : median of x and y variables
-        xstd, ystd (float): standard deviation of x and y variables
-
-        mean_difference, md (float) : ymean - xmean
-        mean_absolute_difference, mad (float) : <|y-x|>
-        relative_mean_difference, rmd (float) : md / xmean
-        relative_mean_absolute_difference, rmad (float) : mad / xmean
-        standardized_mean_difference, smd (float) : md / xstd
-        standardized_mean_absolute_difference, smad (float) : mad /xstd
-        mean_relative_difference, mrd (float) : <y/x> - 1
-        
-        median_difference, medd (float) : median(y-x)
-        median_absolute_difference, medad (float) : median(|y-x|)
-        relative_median_difference, rmedd (float) : median(y-x) / xmedian
-        relative_median_absolute_difference, rmedad (float) : median(|y-x|) / xmedian
-        median_relative_difference, medianrd, medrd (float) : median(y/x)-1
-        
-        normalized_mean_bias_factor, nmbf (float) : see nmbf function
-        normalized_mean_absolute_error_factor, nmaef (float) : see nmaef
-
-        root_mean_square_difference, rmsd (float) :
-        covariance (float) : cov(x,y)
-        correlation_pearson, correlation, pearsonr, R, r (float) : 
-        correlation_spearman, spearmanr (float) :
-        R2, r2 (float) : correlation_pearson**2
-        '''
+    Attributes
+    ----------
+    xmean, ymean : float
+        mean of x and y variables
+    xmedian, ymedian :float
+        median of x and y variables
+    xstd, ystd : float
+        standard deviation of x and y variables
+    mean_difference, md : float
+        ymean - xmean
+    mean_absolute_difference, mad : float
+        mean( |y-x| )
+    relative_mean_difference, rmd : float
+        md / xmean
+    relative_mean_absolute_difference, rmad :float
+        mad / xmean
+    standardized_mean_difference, smd : float
+        md / xstd
+    standardized_mean_absolute_difference, smad : float
+        mad /xstd
+    mean_relative_difference, mrd : float
+        mean(y/x) - 1
+    median_difference, medd : float
+        median(y-x)
+    median_absolute_difference, medad : float
+        median(|y-x|)
+    relative_median_difference, rmedd : float
+        median(y-x) / xmedian
+    relative_median_absolute_difference, rmedad : float
+        median(|y-x|) / xmedian
+    median_relative_difference, medianrd, medrd : float
+        median(y/x)-1
+    normalized_mean_bias_factor, nmbf : float
+        see `nmbf` 
+    normalized_mean_absolute_error_factor, nmaef : float
+        see `nmaef`
+    root_mean_square_difference, rmsd : float
+        $\\sqrt{ \\langle (y - x)^2 \\rangle }$
+    covariance : float
+        cov(x,y)
+    correlation_pearson, correlation, pearsonr, R, r : float
+        Pearson linear correlation coefficient 
+    correlation_spearman, spearmanr : float
+        Spearman, non-parametric rank correlation coefficient
+    R2, r2 : float
+        Linear coefficient of determination, $R^2$
+    '''
 
     def __init__(self,x,y,w=None):
         '''Compute suite of bivariate statistics during initialization
@@ -184,7 +215,7 @@ class BivariateStatistics:
             independent variable values
         y : ndarray
             dependent variable values, same size as x
-        w : ndarray (optional)
+        w : ndarray, optional
             weights for points (x,y), same size as x and y
         '''
 
@@ -258,15 +289,21 @@ class BivariateStatistics:
             line fitting method: sma (default), ols, wls, York, sen, siegel
         intercept : bool
             defines whether non-zero intercept should be fitted
-        **kwargs passed to sma (e.g. robust=True)
+        **kwargs 
+            passed to `acgc.stats.sma` (e.g. robust=True)
 
         Returns
         -------
-        Result : dict containing keys
-            slope : slope of fitted line
-            intercept : intercept of fitted line
-            fittedvalues : values on fit line
-            residuals : residual from fit line
+        result : dict
+            dictionary with keys:
+            - slope (float)
+                slope of fitted line
+            - intercept (float)
+                intercept of fitted line
+            - fittedvalues (array (N,))
+                values on fit line
+            - residuals (array (N,))
+                residual from fit line
         '''
 
         if method.lower()=='sma':
@@ -324,7 +361,8 @@ class BivariateStatistics:
             line fitting method: sma (default), ols, wls
         intercept : bool
             defines whether non-zero intercept should be fitted
-        **kwargs passed to fitline()
+        **kwargs 
+            passed to `fitline`
 
         Returns
         -------
@@ -342,7 +380,8 @@ class BivariateStatistics:
             line fitting method: sma (default) or ols
         intercept : bool
             defines whether non-zero intercept should be fitted
-        **kwargs passed to fitline()
+        **kwargs 
+            passed to `fitline`
 
         Returns
         -------
@@ -356,13 +395,14 @@ class BivariateStatistics:
         
         Parameter
         ---------
-        variables : list, str or None (default='common')
+        variables : list or str, default='common'
             Special strings ("all","common") will be expanded to a list of variables
             list arguments will not be modified
 
         Returns
         -------
-        list of variable names
+        list 
+            variable names
         '''
         if variables is None:
             variables='common'
@@ -384,13 +424,13 @@ class BivariateStatistics:
 
         Parameters
         ----------
-        vars : list, None, or str (default='common')
+        vars : list or str, default='common'
             names of attribute variables to include in summary
             names are case insensitive            
             The following strings are also accepted in place of a list 
                 "all" (displays all variables)
                 "common" (displays all measures of mean difference)
-        fitline_kw : dict (default=None)
+        fitline_kw : dict, default=None)
             keywords passed to self.fitline()
         
         Returns
@@ -428,19 +468,19 @@ class BivariateStatistics:
 
         Parameters
         ----------
-        vars : list, None, or str (default='common')
+        vars : list or str, default='common'
             names of attribute variables to include in summary
             names are case insensitive            
             The following strings are also accepted in place of a list 
                 "all" (displays all variables)
                 "common" (displays all measures of mean difference)
-        floatformat : str (default='{:.4f}')
+        floatformat : str, default='{:.4f}'
             format specifier for floating point values
-        stringlength : int (default=None)
+        stringlength : int, default=None
             length of the variables on output
             default (None) is to use the length of the longest variable name
-        fitline_kw : dict (default=None)
-            keywords passed to self.fitline()
+        fitline_kw : dict, default=None
+            keywords passed to `fitline`
         
         Returns
         -------
@@ -471,7 +511,7 @@ class BivariateStatistics:
 
     def summary_fig_table(self, ax, variables=None, fitline_kw=None,
                           floatformat='{:.3f}',
-                          loc=None, loc_units='data',
+                          loc=None, loc_units='axes',
                           **kwargs):
         '''Display bivariate statistics as a table on a plot axis
 
@@ -479,25 +519,26 @@ class BivariateStatistics:
         ----------
         ax : matplotlib.Figure.Axis 
             axis where the table will be displayed
-        variables : list, None, or str (default='common')
+        variables : list or str, default='common'
             names of attribute variables to include in summary
             names are case insensitive            
             The following strings are also accepted in place of a list 
                 "all" (displays all variables)
                 "common" (displays all measures of mean difference)
-        fitline_kw : dict (default=None)
-            keywords passed to self.fitline()
-        floatformat : str (default='{:.3f}')
+        fitline_kw : dict, default=None
+            keywords passed to `fitline`
+        floatformat : str, default='{:.3f}'
             format specifier for floating point values
-        loc : tuple (x0,y0) (default=(0.85, 0.05))
-            location on the axis where the table will be drawn 
-        loc_units : str (default='data')
+        loc : tuple (x0,y0), default=(0.85, 0.05)
+            location on the axis where the table will be drawn
+            can be in data units or axes units [0-1]
+        loc_units : {'axes' (default), 'data'}
             specifies whether loc has 'data' units or 'axes' units [0-1]
                     
         Returns
         -------
-        Table 
-            Artist for the created table        
+        text1, text2 : matplotlib text object
+            Artist for the two text boxes        
         '''
         # List of variables
         variables = self._expand_variables(variables)

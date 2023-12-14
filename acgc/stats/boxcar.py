@@ -10,7 +10,7 @@ __all__ = [
 def boxcarpoly( array, width, order=2, align='center'):
     '''Calculate a boxcar polynomial (i.e. running polynomial fit) of an array. 
     
-    See boxcar for parameter definitions
+    See `boxcar` for parameter definitions
     '''
     return boxcar( array, width, order=order, align=align, method='polynomial')
 
@@ -29,7 +29,7 @@ def boxcar( array, width, align='center', method='mean', order=2 ):
 
     Parameters
     ----------
-    array : array of floats
+    array : array of float (N,)
         1D array of values to average
     width : int
         number of elements to include in the average. 
@@ -37,16 +37,18 @@ def boxcar( array, width, align='center', method='mean', order=2 ):
         specifies how the averaging window for each element of the output array
         aligns with the input array. 
         Values: center (default), forward (trailing elements), backward (leading elements)
-    method : str
-        specifies the averaging kernel function: "mean", "median", "polynomial"
-    order : int
-        specifies the polynomial order to fit within each boxcar window. A parabola is order=2.
-        order=0 is equivalent to method="mean"
+    method : {'mean' (default), 'median', 'polynomial'}
+        specifies the averaging kernel function
+    order : int, default=2
+        specifies the polynomial order to fit within each boxcar window.
+        This has no effect unless `method`='polynomial'
+        A parabola is order=2; order=0 is equivalent to method="mean"
             
     Returns
     -------
-    result : array of floats
-        1D array with averages with same size as input array. Elements on either end may be NaN
+    result : array of float (N,)
+        1D array with averages with same size as input array. 
+        Elements on either end may be NaN
     '''
 
     N = array.size

@@ -15,26 +15,26 @@ def funcerror_uncorr(func,x0,xerr,h=None,**kwargs):
     The function variables must all be continuous variables 
     (no categorical or discrete variables).
     
-    Example. To find the uncertainty in f(x,y) at for values x=1, y=2, where 
-    the uncertainty (e.g. standard error) in x is 0.1 and the uncertainty in y 
-    is 0.3...
-    $ print( funcerr_uncorr( f, [1,2], [0.1,0.3] ) )
+    Example. To find the uncertainty in `f(x,y)` at for values `x=1; y=2`, where 
+    the uncertainty (e.g. standard error) in `x` is 0.1 and the uncertainty in `y` 
+    is 0.3.
+    ```print( funcerr_uncorr( f, [1,2], [0.1,0.3] ) )```
     
     Parameters
     ----------
-    func : function handle
+    func : callable
         function to be evaluated
-    x0   : list or tuple
+    x0   : list or tuple (n,)
         parameter values for func
-    xerr : list or tuple
+    xerr : list or tuple (n,)
         uncertainty in parameter values x0
-    h    : float (default=1e-3)
+    h    : float, default=1e-3
         fractional perturbation to x0 used to estimate slope of func via finite difference 
     
     Returns
     -------
     ferr : float
-        the uncertainty in f(x0) given xerr uncertainty in x0
+        the uncertainty in `f(x0)` given `xerr` uncertainty in `x0`
     '''
 
     # Increment size for finite difference

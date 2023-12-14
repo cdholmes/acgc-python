@@ -13,11 +13,11 @@ def mapweight1d( edge1, edge2, edgelump=True ):
     
     Parameters
     ----------
-    edge1 : 1darray
+    edge1 : array (n,)
         source grid edge coordinates
-    edge2 : 1darray
+    edge2 : array (m,)
         destination grid edge coordinates
-    edgelump : bool (default=True)
+    edgelump : bool, default=True)
         edgelump only affects situations where the source grid covers a larger domain 
         than the destination grid (i.e. min(edge1)<min(edge2) or max(edge1)>max(edge2) ).
         If True, enforce total mass conservation in mapping weights by lumping excess mass 
@@ -27,7 +27,7 @@ def mapweight1d( edge1, edge2, edgelump=True ):
 
     Returns
     -------
-    weight : 2darray
+    weight : array (m,n)
         mapping weights from source to destination grid: new = np.dot(weight,old)
     '''
 
@@ -81,17 +81,17 @@ def regrid2d( array1, xe1, ye1, xe2, ye2, edgelump=True ):
 
     Parameters
     ----------
-    array1 : 2darray
+    array1 : array (n,m)
         input data. Quantities should be extensive (e.g. mass, not mixing ratio).
-    xe1 : 1darray
+    xe1 : array (n+1,)
         source grid edges in x dimension, e.g. longitude
-    ye1 : 1darray
+    ye1 : array (m+1,)
         source grid edges in y dimension, e.g. latitude
-    xe2 : 1darray
+    xe2 : array (p+1,)
         destination grid edges in x dimension, e.g. longitude
-    ye2 : 1darray
+    ye2 : array (q+1,)
         destination grid edges in y dimension, e.g. latitude
-    edgelump : bool (default=True)
+    edgelump : bool, default=True
         edgelump only affects situations where the source grid covers a larger domain 
         than the destination grid (i.e. min(edge1)<min(edge2) or max(edge1)>max(edge2) ).
         If True, enforce total mass conservation in mapping weights by lumping excess mass 
@@ -101,7 +101,7 @@ def regrid2d( array1, xe1, ye1, xe2, ye2, edgelump=True ):
 
     Returns
     -------
-    outarray : 2darray
+    outarray : array (p,q)
         input data remapped to the destination grid
     '''
 
@@ -154,30 +154,30 @@ def regrid_plevels( array1, pedge1, pedge2, intensive=False, edgelump=True ):
 
     Parameters
     ----------
-    array1 : 1darray
+    array1 : array, (p,)
         Array of data that will be remapped.
         Quantities should be extensive (e.g. mass, not mixing ratio) unless the 
         intensive keyword is used.
-    pedge1 : 1darray
+    pedge1 : array (p+1,)
         Pressure edges of the input array1. The length of pedge1 should be one greater than array1. 
         The element array1[i] is bounded by edges pedge1[i], pedge1[i+1]
-    pedge2 : 1darray
+    pedge2 : array (q+1,)
         Pressure edges of the desired output array.
-    intensive : bool (default=False) 
+    intensive : bool, default=False
         If True, then array1 will be treated as an intensive quantity (e.g mole fraction, 
         mixing ratio) during regridding. Each element array1[i] will be multiplied by 
         (pedge1[i]-pedge[i+1]), which is proportional to airmass if pedge1 is pressure, 
         before regridding. The output array2, will similarly be dividied by (pedge2[i]-pedge[i+1]) 
         so that the output is also intensive. 
         By default, intensive=False is used and the input array is assumed to be extensive.
-    edgelump : bool (default=True) 
+    edgelump : bool, default=True 
         If the max or min of pedge1 extend beyond the max or min of pedge2 and edgelump=True, 
         the mass will be placed in in the first or last grid level of the output array2, 
         ensuring that the mass of array2 is the same as array1. 
         If edgelump=False, then the mass of array2 can be less than array1.
 
     Returns
-    array2 : 1darray
+    array2 : array (q,)
         Array of remapped data. The length of array2 will be one less than pedge2.
     '''
 
@@ -318,8 +318,8 @@ def lon2i(lon,res=4):
     ----------
     lon : float
         longitude in degrees
-    res : float (default=4)
-        resolution of grid. See get_lon for allowed values
+    res : float, default=4
+        resolution of grid. See `get_lon` for allowed values
 
     Result
     ------
@@ -343,8 +343,8 @@ def lat2j(lat,res=4):
     ----------
     lat : float
         latitude in degrees
-    res : float (default=4)
-        resolution of grid. See get_lon for allowed values
+    res : float, default=4
+        resolution of grid. See `get_lon` for allowed values
 
     Result
     ------
@@ -370,8 +370,8 @@ def ll2ij(lon,lat,res=4):
     ----------
     lon, lat : float
         longitude and latitude in degrees
-    res : float (default=4)
-        resolution of grid. See get_lon for allowed values
+    res : float, default=4
+        resolution of grid. See `get_lon` for allowed values
 
     Result
     ------
@@ -394,21 +394,21 @@ def get_lon(res=4, center=None, edge=None):
     '''Get array of longitudes for grid centers or edges. 
 
     GMAO grids assumed
-    res = 0.5 for 0.5x0.625
-    res = 2 for 2x2.5
-    res = 4 for 4x5
+    - res = 0.5 for 0.5x0.625
+    - res = 2 for 2x2.5
+    - res = 4 for 4x5
 
     Parameters
     ----------
-    res : float (default=4)
+    res : float, default=4
         latitude resolution of grid
-    center, edge : bool or None (default=None)
+    center, edge : bool or None, default=None
         determines whether returned values are at grid center (center=True) or grid edge (edge=True)
         If both center and edge are None, then center is used
 
     Returns
     -------
-    lon : 1darray
+    lon : array (n,)
         longitude in degrees at grid center or edges
     '''
 
@@ -440,21 +440,21 @@ def get_lat(res=4, center=None, edge=None):
     '''Get array of latitudes at grid center or edges
 
     GMAO grids assumed
-    res = 0.5 for 0.5x0.625
-    res = 2 for 2x2.5
-    res = 4 for 4x5
+    - res = 0.5 for 0.5x0.625
+    - res = 2 for 2x2.5
+    - res = 4 for 4x5
 
     Parameters
     ----------
-    res : float (default=4)
+    res : float, default=4
         latitude resolution of grid
-    center, edge : bool or None (default=None)
+    center, edge : bool or None, default=None
         determines whether returned values are at grid center (center=True) or grid edge (edge=True)
         If both center and edge are None, then center is used
 
     Returns
     -------
-    lat : 1darray
+    lat : array (n,)
         latitude in degrees at grid center or edges
     '''
 
@@ -489,14 +489,14 @@ def get_lev_p(p_surf=1013.25, nlev=47, edge=False ):
     ----------
     p_surf : float
         surface pressure, hPa
-    nlev : int
+    nlev : {47,72}
         number of vertical levels (47 or 72)
     edge : bool
         specify edges (True) or centers (False, default)
         
     Returns
     -------
-    p : float, array
+    p : array of float
         pressures for each vertical level'''
 
     # Get A,B values for vertical coordinate
@@ -515,14 +515,14 @@ def get_lev_z(TK=[273], p_surf=1013.25, p_edge=[0], Q=0, z_surf=0, edge=False ):
 
     Parameters
     ----------
-    TK : float, array
+    TK : array of float
         Temperature for each grid level, K
     p_surf : float
         Surface pressure, hPa
-    p_edge : float, array, optional
+    p_edge : array of float, optional
         Pressure at each grid level edge, hPa
         Will be calculated if length differs from TK
-    Q : float, array
+    Q : array of float
         Specific humidity for each grid level, kg/kg 
     z_surf : float
         Surface altitude, m
@@ -531,7 +531,7 @@ def get_lev_z(TK=[273], p_surf=1013.25, p_edge=[0], Q=0, z_surf=0, edge=False ):
 
     Returns
     -------
-    z : float, array
+    z : array of float
         Geopotential height for each grid edge or center, m
     '''
 
@@ -578,14 +578,14 @@ def get_hybrid_ab(nlev=47, edge=False, center=False):
 
     Parameters
     ----------
-    nlev : int
+    nlev : {47,72}
         number of levels in the desired grid (47 or 72)
     center, edge : bool
         specify if values for level center or edges are desired
 
     Returns 
     -------
-    A, B : 1darray
+    A, B : array (n,)
     '''
 
     # Resolve any conflict between center and edge requests

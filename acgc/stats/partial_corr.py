@@ -29,11 +29,11 @@ def partial_corr(C):
 
     Parameters
     ----------
-    C : array-like, shape (n, p)
+    C : array-like, (n, p)
         Array with the different variables. Each column of C is taken as a variable
     Returns
     -------
-    P : array-like, shape (p, p)
+    P : array-like, (p, p)
         P[i, j] contains the partial correlation of C[:, i] and C[:, j] controlling
         for the remaining variables in C.
     """

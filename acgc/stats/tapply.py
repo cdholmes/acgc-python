@@ -12,19 +12,19 @@ def tapply( array, group, f ):
     
     Parameters
     ----------
-    array : ndarray or list of numeric type
+    array : array_like
         values that will be grouped
-    group : list or ndarray
+    group : array_like
         group ids for the elements of array, must have same size as array
-    f : function handle
-        function that will be applied to each group, e.g. np.mean
+    f : callable
+        function with one argument that will be applied to each group, e.g. np.mean
 
     Returns
     -------
-    result : ndarray
+    result : array_like
         value of function applied to each group. 
         The number of elements in result equals the number of unique elements of the group argument
-    groupvalues : list
+    groupvalues : array_like
         group ids corresponding to the elements of result
     '''
 

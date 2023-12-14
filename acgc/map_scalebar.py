@@ -135,23 +135,38 @@ def scale_bar(ax, location, length, metres_per_unit=1000, unit_name='km',
     slightly different angles for unknown reasons. To work around this,
     override the 'rotation' keyword argument with text_kwargs.
 
-    Args:
-        ax:              CartoPy axes.
-        location:        Position of left-side of bar in axes coordinates.
-        length:          Geodesic length of the scale bar.
-        metres_per_unit: Number of metres in the given unit. Default: 1000
-        unit_name:       Name of the given unit. Default: 'km'
-        tol:             Allowed relative error in length of bar. Default: 0.01
-        angle:           Anti-clockwise rotation of the bar.
-        color:           Color of the bar and text. Default: 'black'
-        linewidth:       Same argument as for plot.
-        text_offset:     Perpendicular offset for text in axes coordinates.
-                         Default: 0.005
-        ha:              Horizontal alignment. Default: 'center'
-        va:              Vertical alignment. Default: 'bottom'
-        **plot_kwargs:   Keyword arguments for plot, overridden by **kwargs.
-        **text_kwargs:   Keyword arguments for text, overridden by **kwargs.
-        **kwargs:        Keyword arguments for both plot and text.
+    Parameters
+    ----------
+    ax:              
+        CartoPy axes
+    location:        
+        Position of left-side of bar in axes coordinates.
+    length:          
+        Geodesic length of the scale bar.
+    metres_per_unit: default=1000
+        Number of metres in the given unit.
+    unit_name: str, default='km'       
+        Name of the given unit.
+    tol: float, default=0.01             
+        Allowed relative error in length of bar
+    angle: float           
+        Anti-clockwise rotation of the bar.
+    color: str, default='black'           
+        Color of the bar and text.
+    linewidth: float       
+        Same argument as for plot.
+    text_offset: float, default=0.005     
+        Perpendicular offset for text in axes coordinates.
+    ha: str or float [0-1], default='center'              
+        Horizontal alignment.
+    va: str or float [0-1], default='bottom'              
+        Vertical alignment.
+    plot_kwargs: dict
+        Keyword arguments for plot, overridden by **kwargs.
+    text_kwargs: dict
+        Keyword arguments for text, overridden by **kwargs.
+    **kwargs:        
+        Keyword arguments for both plot and text.
     """
     # Setup kwargs, update plot_kwargs and text_kwargs.
     if plot_kwargs is None:

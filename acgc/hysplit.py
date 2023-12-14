@@ -3,26 +3,58 @@
 
 Assumed directory structure for meteorological data. 
 All directories are archived meteorology except for "forecast/" directory.
+```
 metroot/
-  forecast/ - All forecasts organized by initialization date
-    YYYYMMDD/ 
+  forecast/     (All forecasts in subdirectories for each initialization date)
+    YYYYMMDD/   (forecasts initialized on YYYYMMDD)
   gdas1/
   gdas0p5/
   gfs0p25/
   hrrr/
-  nam12/ - what ARL calls nams
-  nam3/ - pieced forecast of NAM CONUS nest (3 km)
+  nam12/        (what ARL calls nams)
+  nam3/         (pieced forecast of NAM CONUS nest (3 km))
+```
 '''
 
 import os
 import glob
 import datetime as dt
+import warnings
 import numpy  as np
 import pandas as pd
-from . import nctools as nct
+from . import netcdf as nct
 
-# Location for ARL met data
 METROOT = '/data/MetData/ARL/'
+'''Default location for ARL met data'''
+
+def check_METROOT():
+    '''Check if METROOT is a valid directory path'''
+    if not os.path.isdir(METROOT):
+        warnings.warn('\n'
+            +'Directory with ARL meteorology data not found. '
+            +f'METROOT is currently set to {METROOT}.\n'
+            +'Use set_METROOT(path) to set the correct directory path.' 
+            )
+
+def set_METROOT(path='/data/MetData/ARL/'):
+    '''Set METROOT, the directory for ARL meteorology data
+    
+    Parameters
+    ----------
+    path : str or path
+        absolute path'''
+    # Enable access to module variable
+    global METROOT
+
+    # Ensure that path contains a trailing '/'
+    path = os.path.join(path,'')
+    
+    # Ensure that path is a valid directory
+    if not os.path.isdir(path):
+        raise NotADirectoryError(f'{path} is not a directory. '
+                                 +'It should be the path for ARL meteorology data' )
+    # Set the path
+    METROOT=path
 
 def tdump2nc( inFile, outFile, clobber=False, globalAtt=None, 
              altIsMSL=False, dropOneTime=False, pack=False ):
@@ -35,19 +67,19 @@ def tdump2nc( inFile, outFile, clobber=False, globalAtt=None,
         name/path of HYSPLIT tdump file
     outFile : str
         name/path of netCDF file that will be created
-    clobber : bool (default=False)
+    clobber : bool, default=False
         determines whether outFile will be overwrite any previous file
-    globalAtt : dict (default=None)
+    globalAtt : dict, default=None
         If present, dict keys will be added to outFile as global attributes
-    altIsMSL : bool (default=False)
+    altIsMSL : bool, default=False
         Determines whether altitude in HYSPLIT tdump file is treated as altitude above sea level
         (altIsMSL=True) or altitude above ground (altIsMSL=False). In either case, the netCDF
         file will contain both altitude variables.
-    dropOneTime : bool (default=False)
+    dropOneTime : bool, default=False
         Kludge to address back trajectories that start 1 minute after the hour,
         due to CONTROL files created with write_control(... exacttime=False )
         set True only for trajectories using this setup.
-    pack : bool (default=False)
+    pack : bool, default=False
         NOT IMPLEMENTED
         determines whether variables in the netCDF file should be compressed with *lossy*
         integer packing. 
@@ -279,15 +311,18 @@ def read_tdump(file):
         
     Returns
     -------
-    Pandas dataframe containing data from file. Columns:
-        time : datetime object
-        year, month, day, hour, minute : floats, same as time
-        lat, lon, alt : trajectory location
-        thour : hours since trajectory initialization, negative for back trajectories
-        tnum : trajectory number tnum=1 for single trajectory, tnum=1-27 for trajectory ensemble
-        metnum : index number of met file used at this point in trajectory, 
+    pandas.DataFrame
+        DataFrame contains columns:
+        - time : datetime object
+        - year, month, day, hour, minute : floats, same as time
+        - lat, lon, alt : trajectory location
+        - thour : hours since trajectory initialization, 
+            negative for back trajectories
+        - tnum : trajectory number tnum=1 for single trajectory, 
+            tnum=1-27 for trajectory ensemble
+        - metnum : index number of met file used at this point in trajectory, 
             see tdump file for corresponding file paths
-        fcasthr : hours since the meteorological dataset was initialized
+        - fcasthr : hours since the meteorological dataset was initialized
     '''
 
     # Open the file
@@ -421,18 +456,18 @@ def _get_archive_filelist( metmodels, time, useAll=True ):
     ----------
     metmodels : list or str
         met models wanted: gdas1, gdas0p5, gfs0p25, nam12, nam3, hrrr
-        commonly provide a list with both regional and global models e.g. ['hrrr','gfs0p25']
+        commonly provide a list with both regional and global models 
+        e.g. ['hrrr','gfs0p25']
     time : pandas.Timestamp, datetime.date, datetime.datetime
         day of desired meteorology
-    useAll : bool (default=True)
+    useAll : bool, default=True
         if True, then return files for all metmodels found
         if False, then return files only for the first metmodel found
     
     Returns
     -------
     filename : list
-        names of files containing met data for input date
-        typically 
+        names of files containing met data for input date 
     '''
 
     if isinstance( metmodels, str ):
@@ -604,7 +639,7 @@ def _get_forecast_filename( metmodel, cycle, partial=False ):
         name of forecast model: namsfCONUS, namf, gfs0p25, hrrr
     cycle : datetime.datetime or pandas.Timestamp
         forecast initialization time UTC (date and hour)
-    partial : bool (default=True)
+    partial : bool, default=True
         With partial=True, function will raise error if some forecast files are missing
         With partial=False, function will return all forecast files that are found
 
@@ -687,7 +722,7 @@ def _get_forecast_filelist( metmodels=None, cycle=None ):
 
     Parameters
     ----------
-    metmodels : str or list (default=['namsfCONUS','namf'])
+    metmodels : str or list, default=['namsfCONUS','namf']
         name of forecast model: namsfCONUS, namf, gfs0p25, hrrr
     cycle : datetime.datetime or pandas.Timestamp or None
         forecast initialization time UTC (date and hour) 
@@ -737,19 +772,19 @@ def find_arl_metfiles( start_time, ndays, back=False, metmodels=None,
         start date and time for finding meteorology data files
     ndays : int
         number of days of files to retrieve
-    back : bool (default=False)
+    back : bool, default=False
         specifies files should go ndays backward (back=True) from start_time
-    metmodels : list or str (default=['gdas0p5','gdas1'])
+    metmodels : list or str, default=['gdas0p5','gdas1']
         meteorological models that will be used, in order of decreasing resolution and priority
-    forecast : bool (default=False)
+    forecast : bool, default=False
         set forecast=True to use forecast meteorology for trajectory computation
         set forecast=False to use archived (past) meteorology for trajectory computation
         Note: hybrid=True will supercede forecast=True
-    forecastcycle : datetime.datetime, pandas.Timestamp, or None (default=None)
+    forecastcycle : datetime.datetime, pandas.Timestamp, or None, default=None
         if forecast=True, this sets the forecast initialization cycle that will be used
         set forecastcycle=None to use the latest available cycle for which files are found
         if forecast=False, this parameter has no effect
-    hybrid : bool (default=False)
+    hybrid : bool, default=False
         set hybrid=True for trajectories that use a combination of past archive and 
         forecast meteorlogy. This supercedes forecast=True
 
@@ -758,6 +793,8 @@ def find_arl_metfiles( start_time, ndays, back=False, metmodels=None,
     metfiles : list
         path to meteorology files meeting the criteria
     '''
+
+    check_METROOT()
 
     if metmodels is None:
         metmodels = ['gdas0p5','gdas1']
@@ -840,29 +877,31 @@ def write_control( time, lat, lon, alt, trajhours,
         The setup.cfg determines whether this is above ground or above mean sea level
     trajhours : int
         desired trajectory duration in hours. Use negative for back trajectories
-    fname : str (default='CONTROL.000')
+    fname : str, default='CONTROL.000'
         path and name for the file that will be written
-    clobber : bool (default=False)
+    clobber : bool, default=False
         if clobber=True, then fname will be overwritten
-    maxheight : float (default=15000)
+    maxheight : float, default=15000
         terminate trajectories that exceed maxheight altitude in meters
-    outdir : str (default='./')
+    outdir : str, default='./'
         directory path where HYSPLIT output will be written
-    tfile : str (default='tdump')
+    tfile : str, default='tdump'
         name of the trajectory file that HYSPLIT will write
-    metfiles : list, str (default=None) 
+    metfiles : list or str, default=None
         paths to ARL meteorology files needed for the trajectory computation
         If metfiles=None, then find_arl_metfiles will be used to locate necessary files
-    exacttime : bool (default=True)
+    exacttime : bool, default=True
         It is not recommended to change this default, but keyword is retained for backward
         compatibility with some scripts. Setting exacttime=False will shift the actual 
         start time of trajectories that begin at 00:00 UTC to 00:01 UTC to avoid reading
         an additional day of meteorological data.
-    **kwargs :
+    **kwargs
         kwargs will be passed to find_arl_metfiles to locate ARL meteorlogy files if metfiles=None
         These keywords should include metmodels and possibly forecast, forecastcycle, or hybrid
         See find_arl_metfiles for definitions of these parameters 
     '''
+
+    check_METROOT()
 
     if os.path.isfile( fname ) and (clobber is False):
         raise OSError( f'File exists. Set clobber=True to overwrite: {fname:s}' )
@@ -925,3 +964,6 @@ def write_control( time, lat, lon, alt, trajhours,
             f.write( os.path.basename( file ) + '\n'  )
         f.write( f'{outdir:s}\n' )
         f.write( f'{tfile:s}\n' )
+
+# Check METROOT path at import
+check_METROOT()
