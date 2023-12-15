@@ -185,8 +185,6 @@ def write_icartt(filename, df, metadata, **kwargs):
         Data values that will be written
     metadata : dict or obj
         See notes below for the attributes or keys that `metadata` must contain
-    measurement_start_date : pandas.Timestamp or datetime.datetime
-        date UTC when data collection began
     **kwargs
         passed to pandas.to_csv
 
@@ -198,6 +196,7 @@ def write_icartt(filename, df, metadata, **kwargs):
     - dependent_variable_definition (dict)
         Controls which variables from `df` are written to file
     - measurement_start_date (pandas.Timestamp or datetime.datetime)
+        date UTC when measurement collection began
     - pi_name (str)
     - pi_contact_info (str)
     - organization_name (str)
