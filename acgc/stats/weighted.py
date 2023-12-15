@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """ Weighted variance, covariance, correlation, median, and quantiles
-
-Created on Mon Apr 24 17:39:51 2017
-
-@author: cdholmes
 """
 
 import numpy as np

@@ -224,9 +224,11 @@ def write_icartt(filename, df, metadata, **kwargs):
     The `independent_variable_defintion` and `dependent_variable_definition` are dicts
     with entries of the form `{'VariableName':'units, standard name, [optional long name]'}`
     The keys must correspond to columns of `df`.
-    `independent_variable_definition` should have only one key. For example,
+    `independent_variable_definition` should have only one key while 
+    `dependent_variable_definition` can have many. For example,
     ``metadata.INDEPENDENT_VARIABLE_DEFINITION = 
             {'Time_Start':'seconds, time at start of measurement, seconds since midnight UTC'}``
+    See Examples below.
 
         
     Examples
