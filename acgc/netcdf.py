@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 """High-level tools for writing and reading netCDF files
 
+Comparison to xarray:
+- For *reading* netCDF files, xarray is generally better than `acgc.netcdf`.
+- For *creating* new netCDF files, using `write_geo_nc` is often more concise than xarray.
+- For *editing* netCDF files (e.g. modifying a few attributes or variables), 
+`put_nc_att` and `put_nc_var` can be convenient because the rest of the file remains unchanged, 
+unlike xarray. (As of 2023-12, using xarray to read and write a netCDF file does *not* produce 
+identical files. Command line netCDF operators (NCO) is another option for editing netCDF.)
 """
-
 
 from datetime import datetime
 import warnings
@@ -47,7 +53,7 @@ def get_nc_att(filename,varname,attname,glob=False):
         name of variable 
     attname : str
         name of attribute that will be retrieved
-    glob : bool (default=False)
+    glob : bool, default=False
         Set glob=True to access global file attribues (varname will be ignored) 
         and glob=False for variable attributes
         
@@ -104,7 +110,7 @@ def get_nc_attnames(filename,varname,glob=False):
         name/path of netCDF file
     varname : str
         name of variable
-    glob : bool (default=False)
+    glob : bool, default=False
         Set glob=True to access global file attribues (varname will be ignored) 
         and glob=False for variable attributes        
     
@@ -192,27 +198,30 @@ def write_geo_nc(filename, variables,
     for many lat-lon-lev-time and xyzt datasets. 
 
     Each variable is defined as a dict. 
-    Required keys: 
-        'name'  (str)       variable name 
-        'value' (numeric)   N-D array of variable data 
-    Special keys (all optional):
-        'dim_names' (list,str)  names of the dimension variables corresponding to dimensions of variable
-            If dim_names is not provided, the dimension variables will be inferred from the data shape.
-            If all dimensions have unique lengths, the inferred dimensions are unambiguous. 
-            If two or more dimensions have equal lengths, then the dim_names key should be used.
-        'fill_value'(numeric) value that should replace NaNs
-        'unlimited' (bool)  specifies if dimension is unlimited
-        'pack'      (bool)  specifies that variable should be compressed with integer packing
-        'packtype'  (str)   numeric type for packed data, commonly i1 or i2 (default='i2')
-        'calendar'  (str)   string for COARDS/CF calendar convention. Only used for time variable
-    All other keys are assigned to variable attributes. CF conventions expect the following:
-        'long_name' (str)   long name for variable
-        'units'     (str)   units of variable
 
-    e.g. {'name': 'O3',
+    Required keys: 
+    -    'name'  (str)       variable name 
+    -    'value' (array)     N-D array of variable data 
+    
+    Special keys (all optional):
+    -    'dim_names' (list of str)  names of the dimension variables corresponding to dimensions of variable
+        -    If dim_names is not provided, the dimension variables will be inferred from the data shape.
+        -    If all dimensions have unique lengths, the inferred dimensions are unambiguous. 
+        -    If two or more dimensions have equal lengths, then the dim_names key should be used.
+    -    'fill_value'(numeric) value that should replace NaNs
+    -    'unlimited' (bool)  specifies if dimension is unlimited
+    -    'pack'      (bool)  specifies that variable should be compressed with integer packing
+    -    'packtype'  (str, default='i2')   numeric type for packed data, commonly i1 or i2
+    -    'calendar'  (str)   string for COARDS/CF calendar convention. Only used for time variable
+    
+    All other keys are assigned to variable attributes. CF conventions expect the following:
+    -    'long_name' (str)   long name for variable
+    -    'units'     (str)   units of variable
+
+    Example: ```{'name': 'O3',
           'value': data,
           'long_name': 'ozone mole fraction',
-          'units': 'mol/mol'}
+          'units': 'mol/mol'}```
     
 
     Parameters
@@ -221,40 +230,40 @@ def write_geo_nc(filename, variables,
         name/path for file that will be created
     variables : list of dict-like
         Each variable is specified as a dict, as described above.
-    xDim : array or dict-like (optional)
+    xDim : array or dict-like, optional
         x dimension of data. If dict-like, then it should contain same keys as variables.
         If xDim is an array, then it is assumed to be longitude in degrees east and named 'lat'
-    yDim : array or dict-like (optional)
+    yDim : array or dict-like, optional
         y dimension of data. If dict-like, then it should contain same keys as variables.
         If yDim is an array, then it is assumed to be latitude in degrees north and named 'lon'
-    zDim : array or dict-like (optional)
+    zDim : array or dict-like, optional
         z dimension of data. If dict-like, then it should contain same keys as variables.
         If zDim is an array, then it is named 'lev'
         zUnits is named used to infer the variable long name:
-            m, km   -> zDim is "altitude"
-            Pa, hPa -> zDim is "pressure"
-            None    -> zDim is "level"
-    zUnits : str (optional)
-        Units for zDim, ignored if zDim is dict-like. Accepted values are m, km, Pa, level, '', None
-    tDim : array or dict-like (optional)
+        -    m, km   -> zDim is "altitude"
+        -    Pa, hPa -> zDim is "pressure"
+        -    None    -> zDim is "level"
+    zUnits : {'m','km','Pa','hPa','level','' None}
+        Units for zDim. Ignored if zDim is dict-like.
+    tDim : array or dict-like, optional
         time dimension of data. If dict-like, then it should contain the same keys as variables.
         If tDim is an array, then tUnits is used and the dimension is set as unlimited and 
         named 'time'. datetime-like variables are supported, as are floats and numeric.
-    tUnits : str (optional)
-        Units for tDim. Special treatment will be used for "<time units> since <date>"
-    globalAtt : dict-like (optional)
+    tUnits : str, optional
+        Units for tDim. Special treatment will be used for ``"<time units> since <date>"``
+    globalAtt : dict-like, optional
         dict of global file attributes
-    classic : bool (default=True)
+    classic : bool, default=True
         specify whether file should use netCDF classic data model (includes netCDF4 classic)
-    nc4 : bool (default=True)
+    nc4 : bool, default=True
         specify whether file should be netCDF4. Required for compression.
-    compress : bool (default=True)
+    compress : bool, default=True
         specify whether all variables should be compressed (lossless). 
         In addition to lossless compression, setting pack=True for individual variables enables 
         lossy integer packing compression.
-    clobber : bool (default=False)
+    clobber : bool, default=False
         specify whether a pre-existing file with the same name should be overwritten
-    verbose : bool (default=False)
+    verbose : bool, default=False
         specify whether extra output should be written while creating the netCDF file
     '''
 
@@ -582,13 +591,13 @@ def _create_geo_var( var, fid, dimIDs, compress=True, classic=True, time=False,
         reference to an open file
     dimIDs : list
         list of dimensions ID numbers corresponding to the dimensions of var.value
-    compress : bool (default=True)
+    compress : bool, default=True
         compress=True indicates that variable should be deflated with lossless compression
-    classic : bool (default=True)
+    classic : bool, default=True
         specify if file is netCDF Classic or netCDF4 Classic
-    time : bool (default=False)
+    time : bool, default=False
         specify if variable has time units that require handling with calendar
-    isDim : bool (default=False)
+    isDim : bool, default=False
         indicates dimesion variables
         
     Returns
