@@ -9,11 +9,11 @@ def test_erroranalysis():
 def test_figstyle():
     import acgc.figstyle
 
-def test_gctools():
-    import acgc.gctools
+def test_gc():
+    import acgc.gc
 
-def test_hytools():
-    import acgc.hytools
+def test_hysplit():
+    import acgc.hysplit
 
 def test_icartt():
     import acgc.icartt
@@ -24,14 +24,14 @@ def test_igra():
 def test_map_scalebar():
     import acgc.map_scalebar
 
-def test_mettools():
-    import acgc.mettools
+def test_met():
+    import acgc.met
 
 def test_modetools():
     import acgc.modetools
 
-def test_nctools():
-    import acgc.nctools
+def test_netcdf():
+    import acgc.netcdf
 
 def test_solar():
     import acgc.solar
@@ -39,5 +39,5 @@ def test_solar():
 def test_stats():
     import acgc.stats
 
-def test_timetools():
-    import acgc.timetools
+def test_time():
+    import acgc.time

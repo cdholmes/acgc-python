@@ -535,7 +535,7 @@ def get_lev_z(TK=[273], p_surf=1013.25, p_edge=[0], Q=0, z_surf=0, edge=False ):
         Geopotential height for each grid edge or center, m
     '''
 
-    funname='gctools: get_lev_z: '
+    funname='geoschem: get_lev_z: '
 
     # Acceleration due to gravity, m/s2
     g0 = 9.81

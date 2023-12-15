@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from . import gctools as gct
+from acgc import gc
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -27,7 +27,7 @@ dp2 =  pe2[1:] - pe2[:-1]
 y1 = np.sin(pc1*np.pi/mx)**6 + pc1/mx
 
 # Use mass-conservative regridding
-y2 = gct.regrid_plevels(y1, pe1, pe2, intensive=True )
+y2 = gc.regrid_plevels(y1, pe1, pe2, intensive=True )
 
 # Print the sums in the old and new coordinates; should be equal
 print('sums', np.sum(y1*dp1), np.sum(y2*dp2))
