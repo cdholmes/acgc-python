@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 '''Read and write ICARTT (ffi1001) format files
-
-Created on Mon Aug 13 16:59:25 2018
-@author: C.D. Holmes
 '''
 
 import os
@@ -143,22 +140,143 @@ def read_icartt( files, usePickle=False, timeIndex=False ):
 
     return obs
 
-def write_icartt(filename, df, **kwargs):
+def _get(obj,name,default_value=None):
+    '''Get value from either attribute or key `name` 
+    
+    Parameters
+    ----------
+    obj : dict or object
+    name : str
+        name of an attribute or key
+    default_value :
+        return value if the attribute or key do not exist
+    
+    Returns
+    -------
+    value :
+        value of attribute or dict key
+    '''
+    try:
+        # Try access as attribute
+        value = getattr(obj,name)
+    except AttributeError:
+        try:
+            # Try access as dict key
+            value = obj[name]
+        except KeyError:
+            # Not found so return default value
+            value = default_value
+    return value
+
+def write_icartt(filename, df, metadata, **kwargs):
     '''Write an ICARTT ffi1001 file
 
-    Arguments
-    ---------
+    The contents of a pandas DataFrame (``df``) are written to a text file in ICARTT format
+    using `metadata` to specify which variables are written and provide ICARTT file header.
+
+    ICARTT file format specification document:
+    https://www.earthdata.nasa.gov/esdis/esco/standards-and-practices/icartt-file-format
+
+    Parameters
+    ----------
     filename : str
         File to be created
     df : pandas.DataFrame
-        df should contain data and metadata
-        df attributes must include all of the `required` and `normal_comments` names.
-        The `INDEPENDENT_VARIABLE_DEFINITION` and `DEPENDENT_VARIABLE_DEFINITION` should be dicts containing
-        `{'VariableName':'units, standard name, description'}`
-        Only variables listed in `INDEPENDENT_VARIABLE_DEFINITION` and `DEPENDENT_VARIABLE_DEFINITION`
-        will be written to the output file.
+        Data values that will be written
+    metadata : dict or obj
+        See notes below for the attributes or keys that `metadata` must contain
+    measurement_start_date : pandas.Timestamp or datetime.datetime
+        date UTC when data collection began
     **kwargs
         passed to pandas.to_csv
+
+    Notes
+    -----
+    `metadata` can be a dict or any object, so long as it contains the following attributes or keys:
+    - independent_variable_definition (dict)
+        should have only one key
+    - dependent_variable_definition (dict)
+        Controls which variables from `df` are written to file
+    - measurement_start_date (pandas.Timestamp or datetime.datetime)
+    - pi_name (str)
+    - pi_contact_info (str)
+    - organization_name (str)
+    - dm_contact_info (str)
+    - mission_name (str)
+    - project_info (str)
+    - special_comments (list of str)
+    - platform (str)
+    - location (str)
+    - associated_data (str)
+    - intrument_info (str)
+    - data_info (str)
+    - uncertainty (str)
+    - ulod_flag (str)
+        commonly '-7777'
+    - ulod_value (str)
+    - llod_flag (str)
+        commonly '-8888'
+    - llod_value (str)
+    - stipulations_on_use (str)
+    - other_comments (str)
+    - revision (str)
+    - revision_comments (list of str)
+
+    The `independent_variable_defintion` and `dependent_variable_definition` are dicts
+    with entries of the form `{'VariableName':'units, standard name, [optional long name]'}`
+    The keys must correspond to columns of `df`.
+    `independent_variable_definition` should have only one key. For example,
+    ``metadata.INDEPENDENT_VARIABLE_DEFINITION = 
+            {'Time_Start':'seconds, time at start of measurement, seconds since midnight UTC'}``
+
+        
+    Examples
+    --------
+    ```
+    import pandas as pd
+    from acgc import icartt
+
+    df = pd.DataFrame( [[1,0,30],
+                        [2,10,29],
+                        [3,20,27],
+                        [4,30,25]],
+                        columns=['Time_Start','Alt','Temp'])
+
+    metadata = dict(
+        INDEPENDENT_VARIABLE_DEFINITION = 
+            {'Time_Start':'seconds, time, measurement time in seconds after takeoff'},
+        DEPENDENT_VARIABLE_DEFINITION = 
+            {'Alt':'m, altitude, altitude above ground level',
+             'Temp':'C, temperature, air temperature in Celsius'},
+        PI_NAME = 'Jane Doe',
+        ORGANIZATION_NAME = 'NASA',
+        SOURCE_DESCRIPTION = 'Invented Instrument',
+        MISSION_NAME = 'FIREX-AQ',
+        SPECIAL_COMMENTS = ['Special comments are optional and can be omitted.',
+                        'If used, they should be a list of one or more strings'],
+        PI_CONTACT_INFO = 'jdoe@email.com or postal address',
+        PLATFORM = 'NASA DC-8',
+        LOCATION = 'Boise, ID, USA',
+        ASSOCIATED_DATA = 'N/A',
+        INSTRUMENT_INFO = 'N/A',
+        DATA_INFO = 'N/A',
+        UNCERTAINTY = r'10% uncertainty in all values',
+        ULOD_FLAG = '-7777',
+        ULOD_VALUE = 'N/A',
+        LLOD_FLAG = '-8888',
+        LLOD_VALUE = 'N/A',
+        DM_CONTACT_INFO = 'Alice, data manager, alice@email.com',
+        STIPULATIONS_ON_USE = 'FIREX-AQ Data Use Policy',
+        PROJECT_INFO = 'FIREX-AQ 2019, https://project.com',
+        OTHER_COMMENTS = 'One line of comments',
+        REVISION = 'R1',
+        REVISION_COMMENTS = ['R0: Initial data',
+                            'R1: One string per revision'],
+        measurement_start_date = pd.Timestamp('2020-01-30 10:20')
+        )
+    
+    icartt.write_icartt( 'test.ict', df, metadata )
+    ```
     '''
 
     normal_comments = ['PI_CONTACT_INFO',
@@ -179,84 +297,89 @@ def write_icartt(filename, df, **kwargs):
                 'REVISION',
                 'REVISION_COMMENTS']
 
-    required = ['PI_NAME',
-                'ORGANIZATION_NAME',
-                'SOURCE_DESCRIPTION',
-                'MISSION_NAME',
-                'VOLUME_INFO',
-                'DATE_LINE',
-                'TIME_INTERVAL',
-                'INDEPENDENT_VARIABLE_DEFINITION',
-                'NUMBER_DEPENDENT_VARIABLES',
-                'DEPENDENT_SCALE_LINE',
-                'DEPENDENT_MISSING_FLAGS',
-                'DEPENDENT_VARIABLE_DEFINITION',
-                'SPECIAL_COMMENTS',
-                'NORMAL_COMMENTS']
-
     # Variables that will be written to file
-    ictvars = list(df.INDEPENDENT_VARIABLE_DEFINITION.keys()) + \
-              list(df.DEPENDENT_VARIABLE_DEFINITION.keys())
+    ictvars = list(_get(metadata,'INDEPENDENT_VARIABLE_DEFINITION')) + \
+              list(_get(metadata,'DEPENDENT_VARIABLE_DEFINITION'))
+
+    # Variables that are not in the dataframe
+    missingvars = set(ictvars) - set(df.columns)
+
+    # Raise an error if there are missing variables
+    if len(missingvars)>0:
+        raise KeyError('Some output variables are not in the DataFrame: '+str(missingvars))
+
+    # Coerce to Timestamp
+    measurement_start_date = pd.Timestamp( _get(metadata, 'measurement_start_date') )
 
     # Form the header
     header = []
 
-    for k in required:
-        # Special handling for some 
-        if k=='VOLUME_INFO':
-            header.append( '1, 1')
-        elif k=='DATE_LINE':
-            header.append( df.time.iloc[0].strftime('%Y, %m, %d, ') + 
-                           pd.Timestamp.today().strftime('%Y, %m, %d'))
-        elif k=='TIME_INTERVAL':
-            header.append( '1'  ) # ***UPDATE LATER: TIME INTERVAL IN SECONDS
-        elif k=='INDEPENDENT_VARIABLE_DEFINITION':
-            keydict = getattr( df, k )
-            header.append( list(keydict.keys())[0] + ', ' + list(keydict.values())[0] )            
-        elif k=='DEPENDENT_VARIABLE_DEFINITION':
-            keydict = getattr( df, k )
-            nvars = len(keydict)
-            header.append( str(nvars) )
-            header.append( ','.join(['1']*nvars) ) # Scale line
-            header.append( ','.join(['-9999']*nvars) ) # Missing flags
-            for kn in keydict.keys():
-                header.append( kn + ', ' + keydict[kn])
-        elif k in ['TIME_INTERVAL',
-                'NUMBER_DEPENDENT_VARIABLES', 
-                'DEPENDENT_SCALE_LINE',
-                'DEPENDENT_MISSING_FLAGS']:
-            #*** Handled elsewhere
-            pass
-        elif k=='SPECIAL_COMMENTS':
-            v = getattr( df, k )
-            if v:
-                # Expect a string or array of several lines
-                header.append( str(len(list(v))) )
-                header.extend( list(v) )
-            else:
-                header.append( '0' )
-        elif k=='NORMAL_COMMENTS':
-            # Form the comment block
-            nc= []
-            for kn in normal_comments:
-                v = getattr( df, kn )
-                if kn=='REVISION_COMMENTS':
-                    # Expect a string or array of several lines
-                    nc.extend( list(v) )
-                else:    
-                    nc.append( '{:s}: {:s}'.format(kn,v) )
-            nc.append( ', '.join(ictvars)) # Also add list of variable names
+    for k in ['PI_NAME',
+              'ORGANIZATION_NAME',
+              'SOURCE_DESCRIPTION',
+              'MISSION_NAME',]:
+        v = _get( metadata, k )
+        header.append( v )
 
-            # Add normal comments to the header
-            header.append( str(len(nc)) )
-            header.extend( nc )
-        else:
-            v = getattr( df, k )
-            header.append( v )
+    # File volume
+    header.append( '1, 1')
+
+    # Date line
+    header.append( measurement_start_date.strftime('%Y, %m, %d, ') +
+                    pd.Timestamp.today().strftime('%Y, %m, %d'))
+
+    # Time interval
+    # Time spacing between records, set of unique values
+    independent_variable_name = list(_get(metadata,'INDEPENDENT_VARIABLE_DEFINITION'))[0]
+    dt = set( df[independent_variable_name].diff(1).dropna() )
+    if len(dt)==1:
+        # Constant time interval, use value
+        interval = list(dt)[0]
+    else:
+        # Time interval is not constant so code as 0
+        interval = 0
+    header.append( str(interval) )
+
+    # Independent variable 
+    keydict = _get( metadata, 'INDEPENDENT_VARIABLE_DEFINITION' )
+    header.append( list(keydict)[0] + ', ' + list(keydict.values())[0] )
+
+    # Dependent variables
+    keydict = _get( metadata, 'DEPENDENT_VARIABLE_DEFINITION' )
+    nvars = len(keydict)
+    header.append( str(nvars) )                 # Number of dependent variables
+    header.append( ','.join(['1']*nvars) )      # Scale factors for dependent variables
+    header.append( ','.join(['-9999']*nvars) )  # Missing data flags for dependent vars.
+    for kn in keydict.keys():
+        header.append( kn + ', ' + keydict[kn]) # Dependent variable definitions
+
+    # Special comments
+    v = _get( metadata, 'SPECIAL_COMMENTS' )
+    if v:
+        # Expect a string or array of several lines
+        header.append( str(len(list(v))) )
+        header.extend( list(v) )
+    else:
+        header.append( '0' )
+
+    # Normal Comments
+    nc= []
+    for kn in normal_comments:
+        v = _get( metadata, kn )
+        if kn=='REVISION_COMMENTS':
+            # Expect a string or array of several lines
+            nc.extend( list(v) )
+        else:    
+            nc.append( '{:s}: {:s}'.format(kn,v) )
+    # Variable short names
+    nc.append( ', '.join(ictvars))
+    # Add normal comments to the header
+    header.append( str(len(nc)) )
+    header.extend( nc )
 
     # Write the file
     with open(filename,'w',encoding='ascii') as f:
-        f.write('{:d}, 1001\n'.format(len(header)+1))  # +1 accounts for this line
+        f.write(f'{len(header)+1:d}, 1001\n')  # +1 accounts for this line
         for line in header:
             f.write(line+'\n')
         df[ictvars].to_csv( f,
