@@ -1,9 +1,55 @@
 '''Data analysis programs from the ACGC research group
 
-# Submodules
+# Installation
+
+For conda users:
+
+ `conda install -c conda-forge acgc`
+
+For pip users:
+
+ `pip install acgc`
+
+### For developers
+If you plan to modify or improve the acgc package, an editable installation may be better:
+`pip install -e git+https://github.com/cdholmes/acgc-python`
+Your local files can then be managed with git, including keeping up-to-date with the 
+github source repository (e.g. `git pull`).
+
+<!-- ----------------------- SECTION BREAK ----------------------- -->
+
+# Get started
+
+Submodules within `acgc` contain all the capabilities of the package.
 Submodules are imported via `import acgc.<submodule>` or `from acgc import <submodule>`. 
 
-### Key submodules
+## Better looking figures
+
+The default appearance of figures from Matplotlib doesn't meet the standards of most 
+scientific journals (high-resolution, Helvetica-like font). With the `acgc.figstyle` module,
+figures meet these criteria. Simply use `from acgc import figstyle` before creating your figures.
+See [example](https://github.com/cdholmes/acgc-python/blob/main/demo/demo_figstyle.ipynb)
+ 
+## Standard major axis (SMA) line fitting
+
+SMA line fitting (also called reduced major axis or RMA) quantifies the linear relationship 
+between variables in which neither one depends on the other.
+It is available via `from acgc.stats import sma`.
+See [example](https://github.com/cdholmes/acgc-python/blob/main/demo/demo_sma.ipynb) 
+
+<!-- ----------------------- SECTION BREAK ----------------------- -->
+
+# Demos
+The [demo](https://github.com/cdholmes/acgc-python/blob/main/demo) 
+folder contains examples of how to accomplish common data analysis and visualization tasks. 
+The examples include uses of the `acgc` library as well as other libraries for 
+geospatial data analysis.
+
+<!-- ----------------------- SECTION BREAK ----------------------- -->
+
+# Quick summary of submodules
+
+## Key submodules
 
 - `acgc.figstyle`    
 Style settings for matplotlib, for publication-ready figures.
@@ -13,7 +59,7 @@ Style settings for matplotlib, for publication-ready figures.
 Collection of statistical methods. 
 [demo](https://github.com/cdholmes/acgc-python/blob/main/demo/demo_stats.ipynb) 
 
-### Other submodules
+## Other submodules
 
 - `acgc.erroranalysis`   
 Propagation of error through complex numerical models
@@ -49,12 +95,6 @@ Solar zenith angle, azimuth, declination, equation of time
 
 - `acgc.time`       
 Functions for manimulating times and dates. Legacy code.
-
-# Demos
-The [demo](https://github.com/cdholmes/acgc-python/blob/main/demo) 
-folder contains examples of how to accomplish common data analysis and visualization tasks. 
-The examples include uses of the `acgc` library as well as other libraries for 
-geospatial data analysis.
 '''
 
 def _package_version(package_name):
