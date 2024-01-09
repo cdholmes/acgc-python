@@ -12,151 +12,99 @@ import pandas as pd
 
 pi180 = np.pi / 180
 
-def solar_declination( date ):
-    '''Calculate solar declination (degrees) for specified date
+def solar_azimuth_angle( lat, lon, datetimeUTC ):
+    '''Solar azimuth angle (degrees) for a latitude, longitude, date and time
     
-    Implements Eq. 9.68-9.72 from M.Z. Jacobson, Fundamentals of Atmospheric Modeling
-    
-    Argument
-    --------
-    date : pandas.Timestamp, date, datetime, or str
-        date for calculation
-
-    Returns
-    -------
-    dec : float
-        solar declination in degrees at the specified date
-    '''
-
-    # Convert to pandas Timestamp, if needed
-    if not isinstance(date, pd.Timestamp):
-        date = pd.Timestamp(date)
-
-     # Number of days since beginning of 2000
-    NJD = np.floor( date.to_julian_date() - pd.Timestamp(2000,1,1).to_julian_date() )
-
-    # Obliquity, degrees
-    ob = 23.439 - 4e-7 * NJD
-
-    # Parameters for ecliptic, degrees
-    gm = 357.528 + 0.9856003 * NJD
-    lm = 280.460 + 0.9856474 * NJD
-
-    # Ecliptic longitude of sun, degrees
-    ec = lm + 1.915 * np.sin( gm * pi180 ) + 0.020 * np.sin( 2 * gm * pi180 )
-
-    #Solar declination, degrees
-    dec = np.arcsin( np.sin( ob * pi180 ) * np.sin( ec * pi180 ) ) / pi180
-
-    return dec
-
-def equation_of_time( date ):
-    '''Calculate equation of time (degrees) for specified date
-    
-    Implements the "alternative equation" from Wikipedia, derived from
-    https://web.archive.org/web/20120323231813/http://www.green-life-innovators.org/tiki-index.php?page=The%2BLatitude%2Band%2BLongitude%2Bof%2Bthe%2BSun%2Bby%2BDavid%2BWilliams
-    Results checked against NOAA solar calculator and agree within 10 seconds.
-    
-    Argument
-    --------
-    date : pandas.Timestamp, date, or datetime
-        date for calculation
-
-    Returns
-    -------
-    eot : float
-        equation of time in degrees on the specified date
-    '''
-    # Convert to pandas Timestamp, if needed
-    if not isinstance(date, pd.Timestamp):
-        date = pd.Timestamp(date)
-
-    # Equation of time, accounts for the solar day differing slightly from 24 hr
-    doy = date.dayofyear
-    W = 360 / 365.24
-    A = W * (doy+10)
-    B = A + 1.914 * np.sin( W * (doy-2) * pi180 )
-    C = ( A - np.arctan2( np.tan(B*pi180), np.cos(23.44*pi180) ) / pi180 ) / 180
-
-    # Equation of time in minutes of an hour
-    eotmin = 720 * ( C - np.round(C) )
-
-    # Equation of time, minutes -> degrees
-    eot = eotmin / 60 * 360 / 24
-
-    return eot
-
-def hour_angle( lon, datetimeUTC ):
-    '''Compute hour angle (degrees) for specified longitude, date and time
-
-    Hour angle is the angular displacement of the sun from the local meridian.
-    It is zero at local noon, negative in the morning, and positive is afternoon.
+    SAA is degrees clockwise from north.
     
     Parameters
     ----------
-    lon : float
-        longitude in degrees east
-    datetimeUTC : pandas.Timestamp or datetime
-        date and time for calculation, must be UTC
-    
+    lat : float or ndarray
+        latitude in degrees
+    lon : float or ndarray
+        longitudes in degrees
+    datetimeUTC : pandas.Timestamp, datetime, or str
+        date and time in UTC
+
     Returns
     -------
-    ha : float
-        hour angle in degrees at the specified location and time
+    saa : float or ndarray
+        solar azimuth angle in degrees (clockwise from north)
     '''
-
     # Convert to pandas Timestamp, if needed
     if not isinstance(datetimeUTC, pd.Timestamp):
         datetimeUTC = pd.Timestamp(datetimeUTC)
 
-    # Hour angle for mean solar time.
-    # Actual solar position has a small offset given by the equation of time (below)
-    Ha = ( datetimeUTC.hour + datetimeUTC.minute / 60 - 12 ) * 15 + lon
+    # Solar declination, degrees
+    dec = solar_declination( datetimeUTC )
 
-    # Add equation of time to the hour angle, degrees
-    Ha += equation_of_time( datetimeUTC )
+    # Hour angle, degrees
+    Ha = solar_hour_angle( lon, datetimeUTC )
 
-    return Ha
+    # Solar zenith angle, degrees
+    # Use true sza, without refraction
+    zen = sza( lat, lon, datetimeUTC, refraction=False )
 
-def refraction_angle( true_elevation_angle, pressure=101325., temperature_celsius=10. ):
-    '''Atmospheric refraction angle
+    # Solar azimuth angle, degrees
+    saa = np.arcsin( -np.sin( Ha*pi180 ) * np.cos( dec*pi180 ) /
+            np.sin( zen*pi180 ) ) / pi180
 
-    apparent elevation angle = (true elevation angle) + (refraction angle)
-    Equation from Saemundsson/Bennett
+    # Change range [-180,180] to [0,360]
+    return np.mod( saa+360, 360 )
+
+def solar_elevation_angle( lat, lon, alt, datetimeUTC,
+                       refraction=False, temperature=10., pressure=101325. ):
+    '''Solar elevation angle (degrees) above the horizon
+
+    The altitude parameter should be the vertical distance 
+    above the surrounding terrain that defines the horizon,
+    not necessarily the altitude above sea level or the altitude above ground level.
+    For example, on a mountain peak that is 4000 m above sea level and 
+    1500 m above the surrounding plateau, the relevant altitude is 1500 m.
+    For an observer on the plateau, the relevant altitude is 0 m.
+
+    See documentation for `solar_zenith_angle` and `horizon_zenith_angle`.
 
     Parameters
     ----------
-    true_elevation_angle : float
-        degrees above horizon of sun or other object
-    pressure : float
-        surface atmospheric pressure (Pa)
-    temperature_celsius : float
-        surface atmospheric temperature (C)
-
+    lat : float or ndarray
+        latitude in degrees
+    lon : float or ndarray
+        longitudes in degrees
+    alt : float or ndarray
+        altitude above surrounding terrain that defines the horizon, meters
+    datetimeUTC : pandas.Timestamp, datetime, or str
+        date and time in UTC
+    refraction : bool, optional (default=False)
+        specifies whether to account for atmospheric refraction
+    temperature : float or ndarray, optional (default=10)
+        surface atmospheric temperature (Celsius), only used for refraction calculation
+    pressure : float or ndarray, optional (default=101325)
+        surface atmospheric pressure (Pa), only used for refraction calculation
+    
     Returns
     -------
-    angle : float
-        refraction angle in degrees. Value is zero when apparent elevation is below horizon
+    sea : float or ndarray
+        solar elevation angle in degrees at the designated locations and times
+        If refraction=False, this is the true solar elevation angle
+        If refraction=True, this is the apparent solar elevation angle
+    
     '''
-    # Refraction angle, arcminutes
-    R = 1.02 / np.tan( ( true_elevation_angle + 10.3 / (true_elevation_angle + 5.11) ) * pi180 )
-    # Account for temperature and pressure, arcminutes
-    R = R * pressure / 101325 * 283 / ( 273 + temperature_celsius )
-    # Convert arcminutes -> degrees
-    R /= 60
 
-    # Result must be positive
-    R = np.maximum(R,0)
+    if refraction and np.any(alt):
+        warnings.warn( 'Atmospheric refraction is calculated for surface conditions, '
+                    + 'but an altitude above the surface was specified',
+                     category=UserWarning,
+                     stacklevel=2 )
 
-    # Refraction defined only when the apparent elevation angle is positive
-    # Set refraction to zero when the apparent elevation is below horizon
-    refraction_angle = np.where( true_elevation_angle + R <= 0, 0, R)
+    sea = horizon_zenith_angle( alt ) \
+         - solar_zenith_angle( lat, lon, datetimeUTC, refraction, temperature, pressure )
 
-    return refraction_angle
+    return sea
 
 def solar_zenith_angle( lat, lon, datetimeUTC, 
                        refraction=False, temperature=10., pressure=101325. ):
-    '''Calculate solar zenith angle for a given latitude, longitude, date and time.
+    '''Solar zenith angle (degrees) for a given latitude, longitude, date and time.
     
     Accounts for equation of time and (optionally) for atmospheric refraction.
     Altitude of the observer is not accounted for, which can be important when the sun 
@@ -195,7 +143,7 @@ def solar_zenith_angle( lat, lon, datetimeUTC,
     dec = solar_declination( datetimeUTC )
 
     # Hour angle, degrees
-    Ha = hour_angle( lon, datetimeUTC )
+    Ha = solar_hour_angle( lon, datetimeUTC )
 
     # True solar zenith angle, radians
     sza = np.arccos( np.sin(lat*pi180) * np.sin(dec*pi180) + \
@@ -211,47 +159,43 @@ def solar_zenith_angle( lat, lon, datetimeUTC,
 
     return sza
 
-def solar_azimuth_angle( lat, lon, datetimeUTC ):
-    '''Solar azimuth angle (degrees) for a latitude, longitude, date and time
+def equation_of_time( date ):
+    '''Equation of time (degrees) for specified date
     
-    SAA is degrees clockwise from north.
+    Implements the "alternative equation" from Wikipedia, derived from
+    https://web.archive.org/web/20120323231813/http://www.green-life-innovators.org/tiki-index.php?page=The%2BLatitude%2Band%2BLongitude%2Bof%2Bthe%2BSun%2Bby%2BDavid%2BWilliams
+    Results checked against NOAA solar calculator and agree within 10 seconds.
     
-    Parameters
-    ----------
-    lat : float or ndarray
-        latitude in degrees
-    lon : float or ndarray
-        longitudes in degrees
-    datetimeUTC : pandas.Timestamp, datetime, or str
-        date and time in UTC
+    Argument
+    --------
+    date : pandas.Timestamp, date, or datetime
+        date for calculation
 
     Returns
     -------
-    saa : float or ndarray
-        solar azimuth angle in degrees (clockwise from north)
+    eot : float
+        equation of time in degrees on the specified date
     '''
     # Convert to pandas Timestamp, if needed
-    if not isinstance(datetimeUTC, pd.Timestamp):
-        datetimeUTC = pd.Timestamp(datetimeUTC)
+    if not isinstance(date, pd.Timestamp):
+        date = pd.Timestamp(date)
 
-    # Solar declination, degrees
-    dec = solar_declination( datetimeUTC )
+    # Equation of time, accounts for the solar day differing slightly from 24 hr
+    doy = date.dayofyear
+    W = 360 / 365.24
+    A = W * (doy+10)
+    B = A + 1.914 * np.sin( W * (doy-2) * pi180 )
+    C = ( A - np.arctan2( np.tan(B*pi180), np.cos(23.44*pi180) ) / pi180 ) / 180
 
-    # Hour angle, degrees
-    Ha = hour_angle( lon, datetimeUTC )
+    # Equation of time in minutes of an hour
+    eotmin = 720 * ( C - np.round(C) )
 
-    # Solar zenith angle, degrees
-    # Use true sza, without refraction
-    zen = sza( lat, lon, datetimeUTC, refraction=False )
+    # Equation of time, minutes -> degrees
+    eot = eotmin / 60 * 360 / 24
 
-    # Solar azimuth angle, degrees
-    saa = np.arcsin( -np.sin( Ha*pi180 ) * np.cos( dec*pi180 ) /
-            np.sin( zen*pi180 ) ) / pi180
+    return eot
 
-    # Change range [-180,180] to [0,360]
-    return np.mod( saa+360, 360 )
-
-def horizon_zenith_angle( lat, alt ):
+def horizon_zenith_angle( alt ):
     '''Angle from the zenith to the horizon
     
     The horizon is the locii of points where a line from the 
@@ -302,55 +246,121 @@ def horizon_zenith_angle( lat, alt ):
 
     return hza
 
-def solar_elevation_angle( lat, lon, alt, datetimeUTC,
-                       refraction=False, temperature=10., pressure=101325. ):
-    '''Solar elevation angle above the horizon
+def solar_declination( date ):
+    '''Calculate solar declination (degrees) for specified date
+    
+    Implements Eq. 9.68-9.72 from M.Z. Jacobson, Fundamentals of Atmospheric Modeling
+    
+    Argument
+    --------
+    date : pandas.Timestamp, date, datetime, or str
+        date for calculation
 
-    The altitude parameter should be the vertical distance 
-    above the surrounding terrain that defines the horizon,
-    not necessarily the altitude above sea level or the altitude above ground level.
-    For example, on a mountain peak that is 4000 m above sea level and 
-    1500 m above the surrounding plateau, the relevant altitude is 1500 m.
-    For an observer on the plateau, the relevant altitude is 0 m.
+    Returns
+    -------
+    dec : float
+        solar declination in degrees at the specified date
+    '''
 
-    See documentation for `solar_zenith_angle` and `horizon_zenith_angle`.
+    # Convert to pandas Timestamp, if needed
+    if not isinstance(date, pd.Timestamp):
+        date = pd.Timestamp(date)
 
+     # Number of days since beginning of 2000
+    NJD = np.floor( date.to_julian_date() - pd.Timestamp(2000,1,1).to_julian_date() )
+
+    # Obliquity, degrees
+    ob = 23.439 - 4e-7 * NJD
+
+    # Parameters for ecliptic, degrees
+    gm = 357.528 + 0.9856003 * NJD
+    lm = 280.460 + 0.9856474 * NJD
+
+    # Ecliptic longitude of sun, degrees
+    ec = lm + 1.915 * np.sin( gm * pi180 ) + 0.020 * np.sin( 2 * gm * pi180 )
+
+    #Solar declination, degrees
+    dec = np.arcsin( np.sin( ob * pi180 ) * np.sin( ec * pi180 ) ) / pi180
+
+    return dec
+
+def solar_hour_angle( lon, datetimeUTC ):
+    '''Solar hour angle (degrees) for specified longitude, date and time
+
+    Hour angle is the angular displacement of the sun from the local meridian.
+    It is zero at local noon, negative in the morning, and positive is afternoon.
+    
     Parameters
     ----------
-    lat : float or ndarray
-        latitude in degrees
-    lon : float or ndarray
-        longitudes in degrees
-    alt : float or ndarray
-        altitude above surrounding terrain that defines the horizon, meters
-    datetimeUTC : pandas.Timestamp, datetime, or str
-        date and time in UTC
-    refraction : bool, optional (default=False)
-        specifies whether to account for atmospheric refraction
-    temperature : float or ndarray, optional (default=10)
-        surface atmospheric temperature (Celsius), only used for refraction calculation
-    pressure : float or ndarray, optional (default=101325)
-        surface atmospheric pressure (Pa), only used for refraction calculation
+    lon : float
+        longitude in degrees east
+    datetimeUTC : pandas.Timestamp or datetime
+        date and time for calculation, must be UTC
     
     Returns
     -------
-    sea : float or ndarray
-        solar elevation angle in degrees at the designated locations and times
-        If refraction=False, this is the true solar elevation angle
-        If refraction=True, this is the apparent solar elevation angle
-    
+    ha : float
+        hour angle in degrees at the specified location and time
     '''
 
-    if refraction and np.any(alt):
-        warnings.warn( 'Atmospheric refraction is calculated for surface conditions, '
-                    + 'but an altitude above the surface was specified',
-                     category=UserWarning,
-                     stacklevel=2 )
+    # Convert to pandas Timestamp, if needed
+    if not isinstance(datetimeUTC, pd.Timestamp):
+        datetimeUTC = pd.Timestamp(datetimeUTC)
 
-    sea = horizon_zenith_angle( lat, alt ) \
-         - solar_zenith_angle( lat, lon, datetimeUTC, refraction, temperature, pressure )
+    # Hour angle for mean solar time.
+    # Actual solar position has a small offset given by the equation of time (below)
+    Ha = ( datetimeUTC.hour + datetimeUTC.minute / 60 - 12 ) * 15 + lon
 
-    return sea
+    # Add equation of time to the hour angle, degrees
+    Ha += equation_of_time( datetimeUTC )
+
+    return Ha
+
+def refraction_angle( true_elevation_angle, pressure=101325., temperature_celsius=10. ):
+    '''Atmospheric refraction angle for light passing through Earth's atmosphere
+
+    The apparent locations in the sky of objects outsides Earth's atmosphere 
+    differs from their true locations due to atmospheric refraction. 
+    (e.g. sun and moon when they rise and set)
+    The apparent elevation of an object above the horizon is
+    apparent elevation angle = (true elevation angle) + (refraction angle)
+    
+    The equations here are from Saemundsson/Bennett, whose calculations use
+    a typical vertical profile of atmospheric density (i.e. temperature and pressure).
+    The profiles can be rescaled to a particular surface temperature and pressure
+    to approximately account for varying atmospheric conditions.
+    Accurate refraction calculations should use fully specified vertical profile
+    of temperature and pressure, which cannot be done here.
+
+    Parameters
+    ----------
+    true_elevation_angle : float
+        degrees above horizon of sun or other object
+    pressure : float (default=101325)
+        surface atmospheric pressure (Pa)
+    temperature_celsius : float (default=10)
+        surface atmospheric temperature (C)
+
+    Returns
+    -------
+    angle : float
+        refraction angle in degrees. Value is zero when apparent elevation is below horizon
+    '''
+    # Refraction angle, arcminutes
+    R = 1.02 / np.tan( ( true_elevation_angle + 10.3 / (true_elevation_angle + 5.11) ) * pi180 )
+    # Account for temperature and pressure, arcminutes
+    R = R * pressure / 101325 * 283 / ( 273 + temperature_celsius )
+    # Convert arcminutes -> degrees
+    R /= 60
+
+    # Result must be positive
+    R = np.maximum(R,0)
+
+    # Refraction defined only when the apparent elevation angle is positive
+    # Set refraction to zero when the apparent elevation is below horizon
+    refraction_angle = np.where( true_elevation_angle + R <= 0, 0, R)
+
+    return refraction_angle
 
 # Aliases for functions
 sza = solar_zenith_angle
