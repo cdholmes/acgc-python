@@ -7,4 +7,4 @@
 #cp -r docs/acgc/* docs/
 #rm -rf docs/acgc
 
-pdoc -d numpy --math --logo "https://acgc.eoas.fsu.edu/wiki/_media/wiki/logo.png" -o 'docs' ./acgc
+pdoc --docformat numpy --math --logo "https://acgc.eoas.fsu.edu/wiki/_media/wiki/logo.png" -o 'docs' ./acgc !acgc.stats.loess
