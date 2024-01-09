@@ -26,8 +26,6 @@ def solar_declination( date ):
     -------
     dec : float
         solar declination in degrees at the specified date
-    
-    # C.D. Holmes - 9 Nov 2018 - Initial version
     '''
 
     # Convert to pandas Timestamp, if needed
@@ -68,8 +66,6 @@ def equation_of_time( date ):
     -------
     eot : float
         equation of time in degrees on the specified date
-
-    # C.D. Holmes - 9 Nov 2018 - Initial version
     '''
     # Convert to pandas Timestamp, if needed
     if not isinstance(date, pd.Timestamp):
@@ -190,8 +186,6 @@ def solar_zenith_angle( lat, lon, datetimeUTC,
         solar zenith angle in degrees at the designated locations and times
         If refraction=False, this is the true solar zenith angle
         If refraction=True, this is the apparent solar zenith angle
-
-    C.D. Holmes - 9 Nov 2018 - Initial version
     '''
     # Convert to pandas Timestamp, if needed
     if not isinstance(datetimeUTC, pd.Timestamp):
@@ -235,8 +229,6 @@ def solar_azimuth_angle( lat, lon, datetimeUTC ):
     -------
     saa : float or ndarray
         solar azimuth angle in degrees (clockwise from north)
-
-    C.D. Holmes - 13 Jan 2023 - Initial version
     '''
     # Convert to pandas Timestamp, if needed
     if not isinstance(datetimeUTC, pd.Timestamp):
@@ -321,6 +313,8 @@ def solar_elevation_angle( lat, lon, alt, datetimeUTC,
     1500 m above the surrounding plateau, the relevant altitude is 1500 m.
     For an observer on the plateau, the relevant altitude is 0 m.
 
+    See documentation for `solar_zenith_angle` and `horizon_zenith_angle`.
+
     Parameters
     ----------
     lat : float or ndarray
@@ -361,6 +355,7 @@ def solar_elevation_angle( lat, lon, alt, datetimeUTC,
 # Aliases for functions
 sza = solar_zenith_angle
 saa = solar_azimuth_angle
+sea = solar_elevation_angle
 # Additional aliases for backwards compatibility
 equationOfTime = equation_of_time
 solarDeclination = solar_declination
