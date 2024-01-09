@@ -51,7 +51,6 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/cdholmes/pylib"
-Repository = "https://github.com/cdholmes/pylib"
-Issues = "https://github.com/cdholmes/pylib/issues"
+Homepage = "https://github.com/cdholmes/acgc-python"
+Documentation = "https://cdholmes.github.io/acgc-python"
 
