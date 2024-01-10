@@ -22,20 +22,20 @@ def loess(x,y,span=0.5,degree=2,family="symmetric"):
     
     Arguments
     ---------
-    x, y : float, array
+    x, y : float, array (n,)
         input data to be smoothed. x is the independent variable. y is dependent
-    span : float
-        width of the smoothing window
-    degree : int
+    span : float (default=0.5)
+        width of the smoothing window, as a fraction [0-1] of the range of x
+    degree : int (default=2)
         degree of polynomial in the loess filter
-    family : str
+    family : {"symmetric" (default), "gaussian"}
         see loess documentation from R
 
     Result
     ------
-    yfit : float, array
+    yfit : float, array (n,)
         values of the fitted (smooth) data at the locations of independent variable x
-    ystd, yste : float, array
+    ystd, yste : float, array (n,)
         standard deviation (pointwise prediction interval) and standard error of the yfit values
     '''
 
