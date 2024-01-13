@@ -32,8 +32,7 @@ def solar_azimuth_angle( lat, lon, datetimeUTC ):
         solar azimuth angle in degrees (clockwise from north)
     '''
     # Convert to pandas Timestamp, if needed
-    if not isinstance(datetimeUTC, pd.Timestamp):
-        datetimeUTC = pd.Timestamp(datetimeUTC)
+    datetimeUTC = _to_timestamp(datetimeUTC)
 
     # Solar declination, degrees
     dec = solar_declination( datetimeUTC )
@@ -136,8 +135,7 @@ def solar_zenith_angle( lat, lon, datetimeUTC,
         If refraction=True, this is the apparent solar zenith angle
     '''
     # Convert to pandas Timestamp, if needed
-    if not isinstance(datetimeUTC, pd.Timestamp):
-        datetimeUTC = pd.Timestamp(datetimeUTC)
+    datetimeUTC = _to_timestamp(datetimeUTC)
 
     # Solar declination, degrees
     dec = solar_declination( datetimeUTC )
@@ -177,8 +175,7 @@ def equation_of_time( date ):
         equation of time in degrees on the specified date
     '''
     # Convert to pandas Timestamp, if needed
-    if not isinstance(date, pd.Timestamp):
-        date = pd.Timestamp(date)
+    date = _to_timestamp(date)
 
     # Equation of time, accounts for the solar day differing slightly from 24 hr
     doy = date.dayofyear
@@ -263,8 +260,7 @@ def solar_declination( date ):
     '''
 
     # Convert to pandas Timestamp, if needed
-    if not isinstance(date, pd.Timestamp):
-        date = pd.Timestamp(date)
+    date = _to_timestamp(date)
 
      # Number of days since beginning of 2000
     NJD = np.floor( date.to_julian_date() - pd.Timestamp(2000,1,1).to_julian_date() )
@@ -304,8 +300,7 @@ def solar_hour_angle( lon, datetimeUTC ):
     '''
 
     # Convert to pandas Timestamp, if needed
-    if not isinstance(datetimeUTC, pd.Timestamp):
-        datetimeUTC = pd.Timestamp(datetimeUTC)
+    datetimeUTC = _to_timestamp(datetimeUTC)
 
     # Hour angle for mean solar time.
     # Actual solar position has a small offset given by the equation of time (below)
@@ -361,6 +356,28 @@ def refraction_angle( true_elevation_angle, pressure=101325., temperature_celsiu
     refraction_angle = np.where( true_elevation_angle + R <= 0, 0, R)
 
     return refraction_angle
+
+def _to_timestamp(time_in):
+    '''Convert input to Pandas Timestamp or DatetimeIndex
+    
+    Arguments
+    ---------
+    time_in : datetime-like or array
+        time to be converted
+
+    Returns
+    -------
+    time_out : pandas.DatetimeIndex or pandas.Timestamp
+        result will be a DatetimeIndex, if possible, and Timestamp otherwise
+    '''
+    if not isinstance(time_in, (pd.Timestamp,pd.DatetimeIndex) ):
+        try:
+            time_out = pd.DatetimeIndex(time_in)
+        except TypeError:
+            time_in = pd.Timestamp(time_in)
+    else:
+        time_out = time_in
+    return time_out
 
 # Aliases for functions
 sza = solar_zenith_angle
