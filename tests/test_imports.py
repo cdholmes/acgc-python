@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import warnings
 
 def test_acgc():
     import acgc 
@@ -13,7 +14,9 @@ def test_gc():
     import acgc.gc
 
 def test_hysplit():
-    import acgc.hysplit
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore",UserWarning)
+        import acgc.hysplit
 
 def test_icartt():
     import acgc.icartt

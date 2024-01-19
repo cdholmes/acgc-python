@@ -203,21 +203,33 @@ class BivariateStatistics:
         Linear coefficient of determination, $R^2$
     '''
 
-    def __init__(self,x,y,w=None):
+    def __init__(self,x,y,w=None,data=None):
         '''Compute suite of bivariate statistics during initialization
         
-        Statistic values are save in attributes.
+        Statistic values are saved in attributes.
         CAUTION: Weights w are ignored except in SMA fit
 
         Parameters
         ----------
-        x : ndarray
+        x : ndarray or str
             independent variable values
-        y : ndarray
+        y : ndarray or str
             dependent variable values, same size as x
-        w : ndarray, optional
+        w : ndarray or str, optional
             weights for points (x,y), same size as x and y
+        data : dict-like, optional
+            if x, y, or w are str, then they should be keys in data
         '''
+
+        # Get values from data if needed
+        if data is None and (isinstance(x,str) or isinstance(y,str) or isinstance(w,str)):
+            raise ValueError( 'Data argument must be used if x, y, or w is a string')
+        if isinstance(x,str):
+            x = data[x]
+        if isinstance(y,str):
+            y = data[y]
+        if isinstance(w,str):
+            w = data[w]
 
         #Ensure that x and y have same length
         if len(x) != len(y):
@@ -227,7 +239,10 @@ class BivariateStatistics:
 
         diff = y - x
         absdiff = np.abs( y - x )
+        # Ignore divide by zero and 0/0 while dividing
+        old_settings = np.seterr(divide='ignore',invalid='ignore')
         ratio = y/x
+        np.seterr(**old_settings)
 
         # Means, medians, and standard deviations
         self.xmean = np.mean(x)
