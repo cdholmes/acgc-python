@@ -17,4 +17,4 @@ def test_BivariateStatistics():
 
     assert result.r2==pytest.approx(0.9625668449197863)
 
-    assert result.slope()==pytest.approx(6.115553940568262)
+    assert result.slope(method='sma',intercept=True)==pytest.approx(6.115553940568262)
