@@ -203,7 +203,7 @@ class BivariateStatistics:
         Linear coefficient of determination, $R^2$
     '''
 
-    def __init__(self,x,y,w=None,data=None):
+    def __init__(self,x,y,w=None,dropna=False,data=None):
         '''Compute suite of bivariate statistics during initialization
         
         Statistic values are saved in attributes.
@@ -217,6 +217,8 @@ class BivariateStatistics:
             dependent variable values, same size as x
         w : ndarray or str, optional
             weights for points (x,y), same size as x and y
+        dropna : bool, optional (default=False)
+            drops NaN values from x, y, and w
         data : dict-like, optional
             if x, y, or w are str, then they should be keys in data
         '''
@@ -234,8 +236,17 @@ class BivariateStatistics:
         #Ensure that x and y have same length
         if len(x) != len(y):
             raise ValueError( 'Arguments x and y must have the same length' )
-        if (w is not None) and (len(w) != len(x)):
+        if w is None:
+            w = np.ones_like(x)
+        if len(w) != len(x):
             raise ValueError( 'Argument w (if present) must have the same length as x' )
+
+        # Drop NaN values
+        if dropna:
+            isna = np.isnan(x*y*w)
+            x = x[~isna]
+            y = y[~isna]
+            w = w[~isna]
 
         diff = y - x
         absdiff = np.abs( y - x )
@@ -252,6 +263,7 @@ class BivariateStatistics:
         self.xstd   = np.std(x)
         self.ystd   = np.std(y)
 
+        # Save values for use later
         self._x = x
         self._y = y
         self._w = w
