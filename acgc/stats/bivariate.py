@@ -536,11 +536,11 @@ class BivariateStatistics:
 
         return summarytext
 
-    def summary_fig_table(self, ax, variables=None, fitline_kw=None,
+    def summary_fig_inset(self, ax, variables=None, fitline_kw=None,
                           floatformat='{:.3f}',
                           loc=None, loc_units='axes',
                           **kwargs):
-        '''Display bivariate statistics as a table on a plot axis
+        '''Display bivariate statistics as a table inset on a plot axis
 
         Parameters
         ----------
