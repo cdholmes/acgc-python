@@ -141,6 +141,8 @@ def sma(X,Y,W=None,
             confidence interval for gradient at confidence level alpha
         - intercept_interval ([float, float])
             confidence interval for intercept at confidence level alpha
+        - alpha (float)
+            confidence level [0,1] for slope and intercept intervals
         - df_model (float)
             degrees of freedom for model
         - df_resid (float)
@@ -356,6 +358,7 @@ def sma(X,Y,W=None,
                    intercept_ste    = ste_int,
                    slope_interval   = ci_grad,
                    intercept_interval = ci_int,
+                   alpha            = alpha,
                    df_model         = dfmod,
                    df_resid         = N-dfmod,
                    params           = np.array([Slope,Intercept]),
@@ -397,6 +400,8 @@ def york( x, y, err_x=1, err_y=1, rerr_xy=0 ):
             confidence interval for gradient at confidence level alpha
         - intercept_interval ([float, float])
             confidence interval for intercept at confidence level alpha
+        - alpha (float)
+            confidence level [0,1] for slope and intercept intervals
         - df_model (float)
             degrees of freedom for model
         - df_resid (float)
@@ -492,6 +497,7 @@ def york( x, y, err_x=1, err_y=1, rerr_xy=0 ):
                 intercept_ste    = siga,
                 slope_interval   = [None,None],
                 intercept_interval = [None,None],
+                alpha            = alpha,
                 df_model         = dfmod,
                 df_resid         = N-dfmod,
                 params           = np.array([b,a]),
@@ -535,6 +541,8 @@ def sen( x, y, alpha=0.95, method='separate' ):
             confidence interval for gradient at confidence level alpha
         - intercept_interval ([float, float])
             confidence interval for intercept at confidence level alpha
+        - alpha (float)
+            confidence level [0,1] for slope and intercept intervals
         - df_model (float)
             degrees of freedom for model
         - df_resid (float)
@@ -558,6 +566,7 @@ def sen( x, y, alpha=0.95, method='separate' ):
                 intercept_ste    = None,
                 slope_interval   = [low_slope,high_slope],
                 intercept_interval = [None,None],
+                alpha            = alpha,
                 df_model         = dfmod,
                 df_resid         = N-dfmod,
                 params           = np.array([slope,intercept]),
