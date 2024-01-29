@@ -35,15 +35,15 @@ def smafit(*args,**kwargs):
 def bivariate_line_equation(fitresult,
                     floatformat='{:.3f}',
                     ystring='include' ):
-    '''Write fit line equation
+    '''Write equation for the fitted line
     
     Parameters
     ----------
     fitresult : dict
         results of the line fit
-    floatformat : str, default='{:.3f}'
-        format string for the numerical values
-    ystring : {'include','separate','none'}
+    floatformat : str
+        format string for the numerical values (default='{:.3f}')
+    ystring : {'include' (default), 'separate', 'none'}
         specifies whether "y =" should be included in result, a separate item in tuple, or none
     
     Returns
@@ -514,10 +514,10 @@ def sen( x, y, alpha=0.95, method='separate' ):
         dependent (x) and independent (y) variables for fitting
     alpha : float (default = 0.95)
         Desired confidence level [0,1] for output. 
-    method : {'separate', 'joint'}
+    method : {'separate' (default), 'joint'}
         Method for estimating intercept. 
-        'separate' uses np.median(y) - slope * np.median(x)
-        'joint' uses np.median( y - slope * x )
+        - 'separate' uses np.median(y) - slope * np.median(x)
+        - 'joint' uses np.median( y - slope * x )
             
     Returns
     -------
