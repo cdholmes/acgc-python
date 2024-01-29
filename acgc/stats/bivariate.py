@@ -7,7 +7,7 @@ Statistical measures of relationships between two populations
 
 import numpy as np
 from scipy import stats
-from .bivariate_lines import sma
+from .bivariate_lines import sen, sma, bivariate_line_equation
 # import xarray as xr
 
 __all__ = [
@@ -146,6 +146,12 @@ def _texify_name(name):
         pretty_name = f'$R^2$'
     elif name=='r2':
         pretty_name = f'$r^2$'
+    elif name.lower()=='y_ols':
+        pretty_name = r'$y_{\rm OLS}$'
+    elif name.lower()=='y_sma':
+        pretty_name = r'$y_{\rm SMA}$'
+    elif name.lower()=='y_sen':
+        pretty_name = r'$y_{\rm Sen}$'
     else:
         pretty_name = name
     return pretty_name
@@ -333,18 +339,20 @@ class BivariateStatistics:
                 residual from fit line
         '''
 
+        fitintercept = intercept
+
         if method.lower()=='sma':
             fit = sma(  self._x,
                         self._y,
                         self._w,
-                        intercept=intercept,
+                        intercept=fitintercept,
                         **kwargs)
             slope = fit['slope']
             intercept= fit['intercept']
 
         elif method.lower()=='ols':
-            if intercept:
-                ols = np.linalg.lstsq( np.vstack([self._x,np.ones(len(self._x))]).T, 
+            if fitintercept:
+                ols = np.linalg.lstsq( np.vstack([self._x,np.ones(len(self._x))]).T,
                                       self._y, rcond=None )
             else:
                 ols = np.linalg.lstsq( np.vstack([self._x]).T, self._y, rcond=None )
@@ -352,12 +360,15 @@ class BivariateStatistics:
             intercept = ols[0][1]
 
         elif method.lower() in ['theil','sen','theilsen']:
-            sen = stats.theilslopes( self._y,
-                                     self._x )
-            slope = sen.slope
-            intercept = sen.intercept
+            fitintercept = True
+            fit = sen( self._x,
+                       self._y,
+                       **kwargs)
+            slope = fit.slope
+            intercept = fit.intercept
 
         elif method.lower()=='siegel':
+            fitintercept = True
             siegel = stats.siegelslopes( self._x,
                                          self._y )
             slope = siegel.slope
@@ -375,7 +386,9 @@ class BivariateStatistics:
         line = dict( slope          = slope,
                      intercept      = intercept,
                      fittedvalues   = slope * self._x + intercept,
-                     residuals      = self._y - ( slope * self._x + intercept ) )
+                     residuals      = self._y - ( slope * self._x + intercept ),
+                     method         = method,
+                     fitintercept   = fitintercept )
 
         return line
 
@@ -437,7 +450,8 @@ class BivariateStatistics:
             variables=['MD','MAD','RMD','RMAD','MRD','SMD','SMAD',
                        'MedD','MedAD','RMedD','RMedAD','MedRD',
                        'NMBF','NMAEF','RMSD',
-                       'R','R2','spearmanr','slope','intercept']
+                       'R','R2','spearmanr','slope','intercept',
+                       'fitline']
         elif variables=='common':
             variables=['MD','MAD','RMD','RMAD','MRD','R2','slope']
         if not isinstance(variables,list):
@@ -446,7 +460,9 @@ class BivariateStatistics:
 
         return variables
 
-    def summary_dict(self, variables=None, fitline_kw=None ):
+    def summary_dict(self, variables=None,
+                     fitline_kw=None,
+                     floatformat_fiteqn='{:.3f}' ):
         '''Summarize bivariate statistics into a dict
 
         Parameters
@@ -480,6 +496,9 @@ class BivariateStatistics:
                 # These variables are object methods
                 func = getattr(self,v)
                 value = func(**fitline_kw)
+            elif v == 'fitline':
+                line = self.fitline(**fitline_kw)
+                v,value = bivariate_line_equation(line,floatformat_fiteqn,ystring='separate')
             else:
                 # Retrieve values
                 value = getattr(self,v.lower())
@@ -489,8 +508,9 @@ class BivariateStatistics:
 
         return summary
 
-    def summary(self, variables=None, fitline_kw=None, 
-                floatformat='{:.4f}', stringlength=None ):
+    def summary(self, variables=None, fitline_kw=None,
+                floatformat='{:.4f}', floatformat_fiteqn=None,
+                stringlength=None ):
         '''Summarize bivariate statistics
 
         Parameters
@@ -503,6 +523,8 @@ class BivariateStatistics:
                 "common" (displays all measures of mean difference)
         floatformat : str, default='{:.4f}'
             format specifier for floating point values
+        floatformat_fiteqn : str, default=floatformat
+            format specifier for slope and intercept (a,b) in y = a x + b
         stringlength : int, default=None
             length of the variables on output
             default (None) is to use the length of the longest variable name
@@ -517,12 +539,14 @@ class BivariateStatistics:
         # List of variables
         variables = self._expand_variables(variables)
 
+        if floatformat_fiteqn is None:
+            floatformat_fiteqn = floatformat
         if stringlength is None:
             stringlength = np.max([len(v) for v in variables])
         stringformat = '{:'+str(stringlength)+'s}'
 
         # Get a dict containing the needed variables
-        summarydict = self.summary_dict( variables, fitline_kw )
+        summarydict = self.summary_dict( variables, fitline_kw, floatformat_fiteqn )
 
         # Extract length of the float numbers from floatformat
         # import re
@@ -532,12 +556,15 @@ class BivariateStatistics:
         # summary = (stringformat+'{:>10s}').format('Variable','Value')
         summarytext = ''
         for k,v in summarydict.items():
-            summarytext += (stringformat+' = '+floatformat+'\n').format(k,v)
+            if isinstance(v,str):
+                summarytext += (stringformat+' = {:s}\n').format(k,v)
+            else:
+                summarytext += (stringformat+' = '+floatformat+'\n').format(k,v)
 
         return summarytext
 
     def summary_fig_inset(self, ax, variables=None, fitline_kw=None,
-                          floatformat='{:.3f}',
+                          floatformat='{:.3f}', floatformat_fiteqn=None,
                           loc=None, loc_units='axes',
                           **kwargs):
         '''Display bivariate statistics as a table inset on a plot axis
@@ -556,6 +583,8 @@ class BivariateStatistics:
             keywords passed to `fitline`
         floatformat : str, default='{:.3f}'
             format specifier for floating point values
+        floatformat_fiteqn : str, default=floatformat
+            format specifier for slope and intercept (a,b) in y = a x + b
         loc : tuple (x0,y0), default=(0.85, 0.05)
             location on the axis where the table will be drawn
             can be in data units or axes units [0-1]
@@ -570,6 +599,9 @@ class BivariateStatistics:
         # List of variables
         variables = self._expand_variables(variables)
 
+        if floatformat_fiteqn is None:
+            floatformat_fiteqn = floatformat
+
         # Default location in lower right corner
         if loc is None:
             loc = (0.8,0.05)
@@ -583,12 +615,13 @@ class BivariateStatistics:
             raise ValueError('Display units should be "Data" or "Axes"')
 
         # Get a dict containing the needed variables
-        summarydict = self.summary_dict( variables, fitline_kw )
+        summarydict = self.summary_dict( variables, fitline_kw, floatformat_fiteqn )
 
         # Column of label text
         label_text = '\n'.join([_texify_name(key) for key in summarydict])
         # Column of value text
-        value_text = '\n'.join([floatformat.format(value) for value in summarydict.values()])
+        value_text = '\n'.join([value if isinstance(value,str) else floatformat.format(value)
+                                for value in summarydict.values()])
 
         # Check if horizontal alignment keyword is used
         ha=''

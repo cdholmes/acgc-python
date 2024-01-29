@@ -6,19 +6,22 @@
 * Theil-Sen, non-parametric slope estimation (use numba to accelerate the function in this module)
 """
 # from collections import namedtuple
+import warnings
 import numpy as np
 import scipy.stats as stats
 from sklearn.covariance import MinCovDet
 import statsmodels.formula.api as smf
 import statsmodels.robust.norms as norms
-import warnings
+from scipy.stats import theilslopes
 #from numba import jit
 
 __all__ = [
+    "bivariate_line_equation",
     "sma",
     "smafit",
     "sen",
     "sen_slope",
+    "sen_numba",
     "york"
 ]
 # Aliases
@@ -29,9 +32,52 @@ def smafit(*args,**kwargs):
     '''Alias for `sma`'''
     return sma(*args,**kwargs)
 
+def bivariate_line_equation(fitresult,
+                    floatformat='{:.3f}',
+                    ystring='include' ):
+    '''Write fit line equation
+    
+    Parameters
+    ----------
+    fitresult : dict
+        results of the line fit
+    floatformat : str, default='{:.3f}'
+        format string for the numerical values
+    ystring : {'include','separate','none'}
+        specifies whether "y =" should be included in result, a separate item in tuple, or none
+    
+    Returns
+    -------
+    fitline_string : str
+        equation for the the fitted line, in the form "y = a x + b" or "y = a x"
+    '''
+
+    # Left-hand side
+    lhs = "y_"+fitresult['method']
+
+    # Right-hand side
+    if fitresult['fitintercept']:
+        rhs = f'{floatformat:s} x + {floatformat:s}'.\
+                format( fitresult['slope'], fitresult['intercept'] )
+    else:
+        rhs = f'{floatformat:s} x'.\
+                format( fitresult['slope'] )
+
+    # Combine right and left-hand sides
+    if ystring=='include':
+        equation = f'{lhs:s} = {rhs:s}'
+    elif ystring=='separate':
+        equation = (lhs,rhs)
+    elif ystring=='none':
+        equation = rhs
+    else:
+        raise ValueError('Unrecognized value of ystring: '+ystring)
+
+    return equation
+
 def sma(X,Y,W=None,
            data=None,
-           cl=0.95,
+           alpha=0.95,
            intercept=True,
            robust=False,robust_method='FastMCD'):
     '''Standard Major-Axis (SMA) line fitting
@@ -65,8 +111,8 @@ def sma(X,Y,W=None,
         array of weights for each X-Y point, typically W_i = 1/(var(X_i)+var(Y_i)) 
     data : dict_like, optional
         data structure containing variables. Used when X, Y, or W are str.
-    cl   : float (default = 0.95)
-        Desired confidence level for output. 
+    alpha : float (default = 0.95)
+        Desired confidence level [0,1] for output. 
     intercept : bool, default=True
         Specify if the fitted model should include a non-zero intercept.
         The model will be forced through the origin (0,0) if intercept=False.
@@ -92,15 +138,19 @@ def sma(X,Y,W=None,
         - intercept_ste (float)
             standard error of intercept estimate
         - slope_interval ([float, float])
-            confidence interval for gradient at confidence level cl
+            confidence interval for gradient at confidence level alpha
         - intercept_interval ([float, float])
-            confidence interval for intercept at confidence level cl
+            confidence interval for intercept at confidence level alpha
         - df_model (float)
             degrees of freedom for model
         - df_resid (float)
             degrees of freedom for residuals
         - params ([float,float])
             array of fitted parameters
+        - fittedvalues (ndarray)
+            array of fitted values
+        - resid (ndarray)
+            array of residual values
     '''
 
     def str2var( v, data ):
@@ -125,9 +175,9 @@ def sma(X,Y,W=None,
     else:
         assert ( len(W) == len(X) ), 'Array W must have the same length as X and Y'
 
-    # Make sure cl is within the range 0-1
-    assert (cl < 1), 'cl must be less than 1'
-    assert (cl > 0), 'cl must be greater than 0'  
+    # Make sure alpha is within the range 0-1
+    assert (alpha < 1), 'alpha must be less than 1'
+    assert (alpha > 0), 'alpha must be greater than 0'
 
     # Drop any NaN elements of X, Y, or W
     # Infinite values are allowed but will make the result undefined
@@ -266,7 +316,7 @@ def sma(X,Y,W=None,
     ste_slope = np.sqrt( 1/(N-dfmod) * Sy**2 / Sx**2 * (1-R**2) )
 
     # Confidence interval for Slope
-    B = (1-R**2)/(N-dfmod) * stats.f.isf(1-cl, 1, N-dfmod)
+    B = (1-R**2)/(N-dfmod) * stats.f.isf(1-alpha, 1, N-dfmod)
     ci_grad = Slope * ( np.sqrt( B+1 ) + np.sqrt(B)*np.array([-1,+1]) )
 
     #############
@@ -290,7 +340,7 @@ def sma(X,Y,W=None,
         ste_int = np.sqrt( Sr**2/N + Xmean**2 * ste_slope**2  )
 
         # Confidence interval for Intercept
-        tcrit = stats.t.isf((1-cl)/2,N-dfmod)
+        tcrit = stats.t.isf((1-alpha)/2,N-dfmod)
         ci_int = Intercept + ste_int * np.array([-tcrit,tcrit])
 
     else:
@@ -344,15 +394,19 @@ def york( x, y, err_x=1, err_y=1, rerr_xy=0 ):
         - intercept_ste (float)
             standard error of intercept estimate
         - slope_interval ([float, float])
-            confidence interval for gradient at confidence level cl
+            confidence interval for gradient at confidence level alpha
         - intercept_interval ([float, float])
-            confidence interval for intercept at confidence level cl
+            confidence interval for intercept at confidence level alpha
         - df_model (float)
             degrees of freedom for model
         - df_resid (float)
             degrees of freedom for residuals
         - params ([float,float])
             array of fitted parameters
+        - fittedvalues (ndarray)
+            array of fitted values
+        - resid (ndarray)
+            array of residual values
     '''
 
     # relative error tolerance required for convergence
@@ -447,8 +501,74 @@ def york( x, y, err_x=1, err_y=1, rerr_xy=0 ):
 
     return result
 
+def sen( x, y, alpha=0.95, method='separate' ):
+    ''''Theil-Sen slope estimate
+    
+    This function wraps `scipy.stats.theilslopes` and provides
+    results in the same dict format as the other line fitting methods 
+    in this module
+    
+    Parameters
+    ----------
+    x, y : ndarray
+        dependent (x) and independent (y) variables for fitting
+    alpha : float (default = 0.95)
+        Desired confidence level [0,1] for output. 
+    method : {'separate', 'joint'}
+        Method for estimating intercept. 
+        'separate' uses np.median(y) - slope * np.median(x)
+        'joint' uses np.median( y - slope * x )
+            
+    Returns
+    -------
+    fitresult : dict 
+        Contains the following keys:
+        - slope (float)
+            Slope or Gradient of Y vs. X
+        - intercept (float)
+            Y intercept.
+        - slope_ste (float)
+            Standard error of slope estimate
+        - intercept_ste (float)
+            standard error of intercept estimate
+        - slope_interval ([float, float])
+            confidence interval for gradient at confidence level alpha
+        - intercept_interval ([float, float])
+            confidence interval for intercept at confidence level alpha
+        - df_model (float)
+            degrees of freedom for model
+        - df_resid (float)
+            degrees of freedom for residuals
+        - params ([float,float])
+            array of fitted parameters
+        - fittedvalues (ndarray)
+            array of fitted values
+        - resid (ndarray)
+            array of residual values
+    '''
+
+    slope, intercept, low_slope, high_slope = theilslopes(y,x,alpha,method)
+
+    dfmod = 2
+    N = np.sum( ~np.isnan(x) * ~np.isnan(y) )
+
+    result = dict( slope         = slope,
+                intercept        = intercept,
+                slope_ste        = None,
+                intercept_ste    = None,
+                slope_interval   = [low_slope,high_slope],
+                intercept_interval = [None,None],
+                df_model         = dfmod,
+                df_resid         = N-dfmod,
+                params           = np.array([slope,intercept]),
+                nobs             = N,
+                fittedvalues     = intercept + slope * x,
+                resid            = intercept + slope * x - y )
+
+    return result
+
 #@jit(nopython=True)
-def sen( x, y ):
+def sen_numba( x, y ):
     '''Estimate linear trend using the Thiel-Sen method
     
     This non-parametric method finds the median slope among all
