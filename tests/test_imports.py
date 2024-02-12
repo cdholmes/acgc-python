@@ -24,8 +24,8 @@ def test_icartt():
 def test_igra():
     import acgc.igra
 
-def test_map_scalebar():
-    import acgc.map_scalebar
+def test_mapping():
+    import acgc.mapping
 
 def test_met():
     import acgc.met

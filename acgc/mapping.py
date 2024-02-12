@@ -1,14 +1,113 @@
 #!/usr/bin/env python3
-""" Scale bar for display on maps
+'''Package of mapping functions
 
-From StackOverflow
-https://stackoverflow.com/questions/32333870/how-can-i-show-a-km-ruler-on-a-cartopy-matplotlib-plot
-"""
+'''
 
 import numpy as np
 import cartopy.crs as ccrs
 import cartopy.geodesic as cgeo
 
+pi180 = np.pi/180
+
+def great_circle(*args,data=None,radius=None,flattening=None):
+    '''Great circle distance between two points on Earth
+
+    Usage: 
+    distance = great_circle( start_lon, start_lat, end_lon, end_lat )
+    distance = great_circle( start_points, end_points )
+
+    Parameters
+    ----------
+    *args : array_likes or str
+        Longitude and latitude of the start and end points, degrees
+        Coordinates can be passed as four 1D arrays (n,) or two 2D arrays (n,2)
+        If four arrays, they should be `start_lon`, `start_lat`, `end_lon`, `end_lat` 
+        If two arrays, they should be (n,2) shape with longitude as the first column
+        If strings, the `data` keyword must be used and args are interpreted as key names
+    data : dict_like, optional
+        If provided, *args should be strings that are keys to `data`. 
+    radius : float, optional
+        radius of the sphere in meters. If None, WGS84 will be used.
+    flattening : float, optional
+        flattening of the ellipsoid. Use 0 for a sphere. If None, WGS84 will be used.
+
+    Returns
+    -------
+    distance : ndarray
+        distance between points, m
+    '''
+
+    # Convert tuple -> list
+    args = list(args)
+
+    # Check if any args are strings
+    if np.any( [isinstance(arg,str) for arg in args] ):
+        if data is None:
+            raise ValueError('`data` keyword must be used when `*args` contain strings')
+
+        # Get the value from `data`
+        for i,item in enumerate(args):
+            if isinstance(item,str):
+                args[i] = data[item]
+
+    # Number of arguments
+    nargs = len(args)
+
+    if nargs == 4:
+        # *args contain lon, lat values; broadcast them to same shape
+        start_lon, start_lat = np.broadcast_arrays( args[0], args[1] )
+        end_lon, end_lat     = np.broadcast_arrays( args[2], args[3] )
+
+        # Stack to (n,2) needed for Geodesic
+        start_points = np.stack( [start_lon, start_lat], axis=-1 )
+        end_points   = np.stack( [end_lon,   end_lat],   axis=-1 )
+
+    elif nargs == 2:
+        # *args contain (lon,lat) arrays
+        start_points = args[0]
+        end_points = args[1]
+
+    else:
+        raise ValueError(f'Function takes either 2 or 4 arguments but {nargs} were passed.')
+
+    # # Distance on a sphere. Cartopy is fast enough that there is no reason to use this
+    #
+    # # Lat and longitude endpoints, degrees -> radians
+    # lat0 = start[:,0] * pi180
+    # lon0 = start[:,1] * pi180
+    # lat1 = end[:,0] * pi180
+    # lon1 = end[:,1] * pi180
+    # dlon = lon1 - lon0
+    # # Haversine formula for distance on a sphere
+    # # dist = 2 * radius * np.arcsin(np.sqrt(
+    # #     np.sin( (lat1-lat0)/2 )**2
+    # #     + np.cos(lat0) * np.cos(lat1)
+    # #       * np.sin( (lon1-lon0)/2 )**2 ) )
+    # # Equivalent formula with less roundoff error for antipodal points
+    # dist = radius * np.arctan2(
+    #     np.sqrt( (np.cos(lat1)*np.sin(dlon))**2
+    #             + (np.cos(lat0)*np.sin(lat1)
+    #                 - np.sin(lat0)*np.cos(lat1)*np.cos(dlon))**2 ),
+    #     np.sin(lat0)*np.sin(lat1) + np.cos(lat0)*np.cos(lat1)*np.cos(dlon)
+    # )
+
+    if radius is None:
+        # Semi-major radius of Earth, WGS84, m
+        radius = 6378137.
+    if flattening is None:
+        # Flattening of ellipsoid, WGS84
+        flattening = 1/298.257223563
+
+    geoid = cgeo.Geodesic(radius,flattening)
+
+    # Calculate the line from all trajectory points to the target
+    # The start and end points should be in (lon,lat) order
+    vec= np.asarray( geoid.inverse( start_points, end_points ) )
+
+    # Distance, m
+    dist = vec[:,0]
+
+    return dist
 
 def _axes_to_lonlat(ax, coords):
     """(lon, lat) from axes coordinates."""
@@ -134,6 +233,9 @@ def scale_bar(ax, location, length, metres_per_unit=1000, unit_name='km',
     For angles between 0 and 90 the text and line may be plotted at
     slightly different angles for unknown reasons. To work around this,
     override the 'rotation' keyword argument with text_kwargs.
+
+    From StackOverflow
+    https://stackoverflow.com/questions/32333870/how-can-i-show-a-km-ruler-on-a-cartopy-matplotlib-plot
 
     Parameters
     ----------
