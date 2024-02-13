@@ -76,8 +76,8 @@ Read and write ICARTT format files
 - `acgc.igra`		        
 Read IGRA radiosonde data files
 
-- `acgc.map_scalebar`	        
-Scale bar for display on maps
+- `acgc.mapping`        
+Distance calculation, scale bar for display on maps
 
 - `acgc.met`        
 Miscelaneous functions for PBL properties
@@ -116,7 +116,7 @@ __all__ = [
     'hysplit',
     'icartt',
     'igra',
-    'map_scalebar',
+    'mapping',
     'met',
     'modetools',
     'netcdf',
