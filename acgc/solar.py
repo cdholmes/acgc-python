@@ -304,7 +304,7 @@ def solar_hour_angle( lon, datetimeUTC ):
 
     # Hour angle for mean solar time.
     # Actual solar position has a small offset given by the equation of time (below)
-    Ha = ( datetimeUTC.hour + datetimeUTC.minute / 60 - 12 ) * 15 + lon
+    Ha = ( datetimeUTC.hour + datetimeUTC.minute / 60 + datetimeUTC.second / 3600 - 12 ) * 15 + lon
 
     # Add equation of time to the hour angle, degrees
     Ha += equation_of_time( datetimeUTC )
