@@ -183,6 +183,10 @@ class BivariateStatistics:
         mad /xstd
     mean_relative_difference, mrd : float
         mean(y/x) - 1
+    mean_log10_ratio, mlr : float
+        mean( log10(y/x) )
+    mean_absolute_log10_ratio, malr : float
+        mean( abs( log10(y/x) ) )
     median_difference, medd : float
         median(y-x)
     median_absolute_difference, medad : float
@@ -193,6 +197,10 @@ class BivariateStatistics:
         median(|y-x|) / xmedian
     median_relative_difference, medianrd, medrd : float
         median(y/x)-1
+    median_log10_ratio, medlr : float
+        median( log10(y/x) )
+    median_absolute_log10_ratio, medalr : float
+        median( abs( log10(y/x) ) )
     normalized_mean_bias_factor, nmbf : float
         see `nmbf` 
     normalized_mean_absolute_error_factor, nmaef : float
@@ -259,6 +267,7 @@ class BivariateStatistics:
         # Ignore divide by zero and 0/0 while dividing
         old_settings = np.seterr(divide='ignore',invalid='ignore')
         ratio = y/x
+        log10ratio = np.log10(ratio)
         np.seterr(**old_settings)
 
         # Means, medians, and standard deviations
@@ -299,6 +308,14 @@ class BivariateStatistics:
         self.normalized_mean_bias_factor            = self.nmbf  = nmbf(x,y)
         self.normalized_mean_absolute_error_factor  = self.nmaef = nmaef(x,y)
 
+        # Mean and mean absolute log ratio
+        self.mean_log10_ratio          = self.mlr  = np.mean( log10ratio )
+        self.mean_absolute_log10_ratio = self.malr = np.mean( np.abs( log10ratio ) )
+        
+        # Median and median absolute log ratio
+        self.median_log10_ratio          = self.medlr  = np.median( log10ratio )
+        self.median_absolute_log10_ratio = self.medalr = np.median( np.abs( log10ratio ) )
+        
         # RMS difference
         self.root_mean_square_difference    = self.rmsd     = np.sqrt( np.mean( np.power( diff, 2) ) )
 
