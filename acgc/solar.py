@@ -314,10 +314,14 @@ def solar_hour_angle( lon, datetimeUTC ):
     # Hour angle for mean solar time.
     # Actual solar position has a small offset given by the equation of time (below)
     try: 
-        # Treat as xarray DataArray
-        Ha = ( datetimeUTC.dt.hour + datetimeUTC.dt.minute / 60 + datetimeUTC.dt.second / 3600 - 12 ) * 15 + lon
-    except:
-        Ha = ( datetimeUTC.hour + datetimeUTC.minute / 60 + datetimeUTC.second / 3600 - 12 ) * 15 + lon
+        # Treat as xarray.DataArray or pandas.Series
+        Ha = lon + 15 * ( datetimeUTC.dt.hour + 
+                          datetimeUTC.dt.minute / 60 + 
+                          datetimeUTC.dt.second / 3600 - 12 )
+    except AttributeError:
+        Ha = lon + 15 * ( datetimeUTC.hour + 
+                          datetimeUTC.minute / 60 + 
+                          datetimeUTC.second / 3600 - 12 )
 
     # Add equation of time to the hour angle, degrees
     Ha += equation_of_time( datetimeUTC )
@@ -371,7 +375,7 @@ def refraction_angle( true_elevation_angle, pressure=101325., temperature_celsiu
     return refraction_angle
 
 def _to_timestamp(time_in):
-    '''Convert input to Pandas Series of datetime64 with dt accessor
+    '''Convert input to Pandas Timestamp or Series of datetime64 
     
     Arguments
     ---------
@@ -380,19 +384,18 @@ def _to_timestamp(time_in):
 
     Returns
     -------
-    time_out : pandas.Series
-        result will be a Series of datetime64 with dt accessor
+    time_out : pandas.Timestamp or pandas.Series of datetime64
     '''
     if hasattr(time_in,'dt'):
         time_out = time_in
-    elif isinstance(time_in, (pd.Timestamp,pd.DatetimeIndex) ):
+    elif isinstance(time_in, pd.DatetimeIndex ):
         time_out = pd.Series(time_in)
     else:
         try:
             # Convert list of times
             time_out = pd.Series(pd.DatetimeIndex(time_in))
         except TypeError:
-            time_out = pd.Series(pd.Timestamp(time_in))
+            time_out = pd.Timestamp(time_in)
 
     return time_out
 
