@@ -148,7 +148,7 @@ def put_nc_var(filename,varname,value):
     """
 
     # Open file for reading
-    ncfile = nc.Dataset(filename,'w')
+    ncfile = nc.Dataset(filename,'r+')
 
     # Set value
     ncfile.variables[varname][:] = value
@@ -172,7 +172,7 @@ def put_nc_att(filename,varname,attname,value,glob=False):
     """
 
     # Open file for reading
-    ncfile = nc.Dataset(filename,'w')
+    ncfile = nc.Dataset(filename,'r+')
 
     # Set attribute
     if glob:
