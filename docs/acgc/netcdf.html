@@ -258,7 +258,7 @@ identical files. Command line netCDF operators (NCO) is another option for editi
 </span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>
 </span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>    <span class="c1"># Open file for reading</span>
-</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>    <span class="n">ncfile</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>    <span class="n">ncfile</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;r+&#39;</span><span class="p">)</span>
 </span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>
 </span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>    <span class="c1"># Set value</span>
 </span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>    <span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">varname</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">value</span>
@@ -282,7 +282,7 @@ identical files. Command line netCDF operators (NCO) is another option for editi
 </span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>
 </span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a>    <span class="c1"># Open file for reading</span>
-</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>    <span class="n">ncfile</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>    <span class="n">ncfile</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;r+&#39;</span><span class="p">)</span>
 </span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a>
 </span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a>    <span class="c1"># Set attribute</span>
 </span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a>    <span class="k">if</span> <span class="n">glob</span><span class="p">:</span>
@@ -1106,7 +1106,7 @@ and glob=False for variable attributes</li>
 </span><span id="put_nc_var-149"><a href="#put_nc_var-149"><span class="linenos">149</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="put_nc_var-150"><a href="#put_nc_var-150"><span class="linenos">150</span></a>
 </span><span id="put_nc_var-151"><a href="#put_nc_var-151"><span class="linenos">151</span></a>    <span class="c1"># Open file for reading</span>
-</span><span id="put_nc_var-152"><a href="#put_nc_var-152"><span class="linenos">152</span></a>    <span class="n">ncfile</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+</span><span id="put_nc_var-152"><a href="#put_nc_var-152"><span class="linenos">152</span></a>    <span class="n">ncfile</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;r+&#39;</span><span class="p">)</span>
 </span><span id="put_nc_var-153"><a href="#put_nc_var-153"><span class="linenos">153</span></a>
 </span><span id="put_nc_var-154"><a href="#put_nc_var-154"><span class="linenos">154</span></a>    <span class="c1"># Set value</span>
 </span><span id="put_nc_var-155"><a href="#put_nc_var-155"><span class="linenos">155</span></a>    <span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">varname</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">value</span>
@@ -1160,7 +1160,7 @@ must have same shape as the current variable values</li>
 </span><span id="put_nc_att-173"><a href="#put_nc_att-173"><span class="linenos">173</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="put_nc_att-174"><a href="#put_nc_att-174"><span class="linenos">174</span></a>
 </span><span id="put_nc_att-175"><a href="#put_nc_att-175"><span class="linenos">175</span></a>    <span class="c1"># Open file for reading</span>
-</span><span id="put_nc_att-176"><a href="#put_nc_att-176"><span class="linenos">176</span></a>    <span class="n">ncfile</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+</span><span id="put_nc_att-176"><a href="#put_nc_att-176"><span class="linenos">176</span></a>    <span class="n">ncfile</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;r+&#39;</span><span class="p">)</span>
 </span><span id="put_nc_att-177"><a href="#put_nc_att-177"><span class="linenos">177</span></a>
 </span><span id="put_nc_att-178"><a href="#put_nc_att-178"><span class="linenos">178</span></a>    <span class="c1"># Set attribute</span>
 </span><span id="put_nc_att-179"><a href="#put_nc_att-179"><span class="linenos">179</span></a>    <span class="k">if</span> <span class="n">glob</span><span class="p">:</span>
