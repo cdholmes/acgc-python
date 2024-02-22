@@ -164,6 +164,8 @@ def equation_of_time( date ):
     https://web.archive.org/web/20120323231813/http://www.green-life-innovators.org/tiki-index.php?page=The%2BLatitude%2Band%2BLongitude%2Bof%2Bthe%2BSun%2Bby%2BDavid%2BWilliams
     Results checked against NOAA solar calculator and agree within 10 seconds.
     
+    Note: Leap years are not accounted for.
+
     Argument
     --------
     date : pandas.Timestamp, date, or datetime
@@ -178,7 +180,10 @@ def equation_of_time( date ):
     date = _to_timestamp(date)
 
     # Equation of time, accounts for the solar day differing slightly from 24 hr
-    doy = date.dayofyear
+    try:
+        doy = date.dt.dayofyear
+    except AttributeError:
+        doy = date.dayofyear
     W = 360 / 365.24
     A = W * (doy+10)
     B = A + 1.914 * np.sin( W * (doy-2) * pi180 )
@@ -263,7 +268,11 @@ def solar_declination( date ):
     date = _to_timestamp(date)
 
      # Number of days since beginning of 2000
-    NJD = np.floor( date.to_julian_date() - pd.Timestamp(2000,1,1).to_julian_date() )
+    NJD = ( date - np.datetime64('2000-01-01') )
+    try:
+        NJD = NJD.dt.days
+    except AttributeError:
+        NJD = NJD.days
 
     # Obliquity, degrees
     ob = 23.439 - 4e-7 * NJD
@@ -304,7 +313,11 @@ def solar_hour_angle( lon, datetimeUTC ):
 
     # Hour angle for mean solar time.
     # Actual solar position has a small offset given by the equation of time (below)
-    Ha = ( datetimeUTC.hour + datetimeUTC.minute / 60 + datetimeUTC.second / 3600 - 12 ) * 15 + lon
+    try: 
+        # Treat as xarray DataArray
+        Ha = ( datetimeUTC.dt.hour + datetimeUTC.dt.minute / 60 + datetimeUTC.dt.second / 3600 - 12 ) * 15 + lon
+    except:
+        Ha = ( datetimeUTC.hour + datetimeUTC.minute / 60 + datetimeUTC.second / 3600 - 12 ) * 15 + lon
 
     # Add equation of time to the hour angle, degrees
     Ha += equation_of_time( datetimeUTC )
@@ -358,7 +371,7 @@ def refraction_angle( true_elevation_angle, pressure=101325., temperature_celsiu
     return refraction_angle
 
 def _to_timestamp(time_in):
-    '''Convert input to Pandas Timestamp or DatetimeIndex
+    '''Convert input to Pandas Series of datetime64 with dt accessor
     
     Arguments
     ---------
@@ -367,22 +380,20 @@ def _to_timestamp(time_in):
 
     Returns
     -------
-    time_out : pandas.DatetimeIndex or pandas.Timestamp
-        result will be a DatetimeIndex, if possible, and Timestamp otherwise
+    time_out : pandas.Series
+        result will be a Series of datetime64 with dt accessor
     '''
-    if not isinstance(time_in, (pd.Timestamp,pd.DatetimeIndex) ):
-        try:
-            # Better to generate len() error here than inside pd.DatetimeIndex()
-            junk = len(time_in)
-            time_out = pd.DatetimeIndex(time_in)
-        except TypeError:
-            try:
-                time_out = pd.Timestamp(time_in)
-            except TypeError:
-                # xarray DataArrays may fail above, but this should work
-                time_out = pd.Timestamp(time_in.values)
-    else:
+    if hasattr(time_in,'dt'):
         time_out = time_in
+    elif isinstance(time_in, (pd.Timestamp,pd.DatetimeIndex) ):
+        time_out = pd.Series(time_in)
+    else:
+        try:
+            # Convert list of times
+            time_out = pd.Series(pd.DatetimeIndex(time_in))
+        except TypeError:
+            time_out = pd.Series(pd.Timestamp(time_in))
+
     return time_out
 
 # Aliases for functions
