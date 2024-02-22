@@ -372,9 +372,15 @@ def _to_timestamp(time_in):
     '''
     if not isinstance(time_in, (pd.Timestamp,pd.DatetimeIndex) ):
         try:
+            # Better to generate len() error here than inside pd.DatetimeIndex()
+            junk = len(time_in)
             time_out = pd.DatetimeIndex(time_in)
         except TypeError:
-            time_in = pd.Timestamp(time_in)
+            try:
+                time_out = pd.Timestamp(time_in)
+            except TypeError:
+                # xarray DataArrays may fail above, but this should work
+                time_out = pd.Timestamp(time_in.values)
     else:
         time_out = time_in
     return time_out
