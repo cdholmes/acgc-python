@@ -1,9 +1,10 @@
 #!/usr/local/bin/env python3
 '''Module for calculating solar position (zenith angle, elevation, azimuth)
 
-Calculations assume spherical Earth (not ellipsoidal). 
+The functions here are are vectorized and generally broadcast over xarray dimensions,
+making this program faster than PySolar. Calculations assume spherical Earth (not ellipsoidal). 
 Results should be accurate to < 0.2 degree, which is less than radius of the sun.
-Other modules should be used for high-precision calculations.
+Other modules (e.g. pvlib) should be used for high-precision calculations.
 
 '''
 
