@@ -1,9 +1,10 @@
 #!/usr/local/bin/env python3
-''' Module to calculate solar zenith angle, solar declination, and equation of time 
-Results should be accurate to < 0.1 degree, but other modules should be used for 
-high-precision calculations.
+'''Module for calculating solar position (zenith angle, elevation, azimuth)
 
-C.D. Holmes 9 Nov 2018
+Calculations assume spherical Earth (not ellipsoidal). 
+Results should be accurate to < 0.2 degree, which is less than radius of the sun.
+Other modules should be used for high-precision calculations.
+
 '''
 
 import warnings
@@ -31,22 +32,22 @@ def solar_azimuth_angle( lat, lon, datetimeUTC ):
     saa : float or ndarray
         solar azimuth angle in degrees (clockwise from north)
     '''
+
     # Convert to pandas Timestamp, if needed
     datetimeUTC = _to_timestamp(datetimeUTC)
 
-    # Solar declination, degrees
-    dec = solar_declination( datetimeUTC )
+    # Subsolar point, latitude longitude, degrees
+    solar_lat = solar_latitude( datetimeUTC )
+    solar_lon = solar_longitude( datetimeUTC )
 
-    # Hour angle, degrees
-    Ha = solar_hour_angle( lon, datetimeUTC )
+    # Vector pointing toward sun
+    x = np.cos( solar_lat * pi180 ) * np.sin( (solar_lon - lon) * pi180 )
+    y = np.cos( lat*pi180 ) * np.sin( solar_lat*pi180 ) \
+        - np.sin( lat*pi180 ) * np.cos( solar_lat*pi180 ) \
+            * np.cos( (solar_lon - lon) * pi180 )
 
-    # Solar zenith angle, degrees
-    # Use true sza, without refraction
-    zen = sza( lat, lon, datetimeUTC, refraction=False )
-
-    # Solar azimuth angle, degrees
-    saa = np.arcsin( -np.sin( Ha*pi180 ) * np.cos( dec*pi180 ) /
-            np.sin( zen*pi180 ) ) / pi180
+    # Azimuth angle from north, degrees
+    saa = np.arctan2( x, y ) / pi180
 
     # Change range [-180,180] to [0,360]
     return np.mod( saa+360, 360 )
@@ -157,8 +158,125 @@ def solar_zenith_angle( lat, lon, datetimeUTC,
 
     return sza
 
-def equation_of_time( date ):
-    '''Equation of time (degrees) for specified date
+def solar_declination( date ):
+    '''Calculate solar declination (degrees) for specified date
+    
+    Implements Eq. 9.68-9.72 from M.Z. Jacobson, Fundamentals of Atmospheric Modeling
+    
+    Argument
+    --------
+    date : pandas.Timestamp, date, datetime, or str
+        date for calculation
+
+    Returns
+    -------
+    dec : float
+        solar declination in degrees at the specified date
+    '''
+
+    # Convert to pandas Timestamp, if needed
+    date = _to_timestamp(date)
+
+     # Number of days since beginning of 2000
+    NJD = date - np.datetime64('2000-01-01')
+    try:
+        NJD = NJD.dt.days
+    except AttributeError:
+        NJD = NJD.days
+
+    # Obliquity, degrees
+    ob = 23.439 - 4e-7 * NJD
+
+    # Parameters for ecliptic, degrees
+    gm = 357.528 + 0.9856003 * NJD
+    lm = 280.460 + 0.9856474 * NJD
+
+    # Ecliptic longitude of sun, degrees
+    ec = lm + 1.915 * np.sin( gm * pi180 ) + 0.020 * np.sin( 2 * gm * pi180 )
+
+    #Solar declination, degrees
+    dec = np.arcsin( np.sin( ob * pi180 ) * np.sin( ec * pi180 ) ) / pi180
+
+    return dec
+
+def solar_latitude( datetimeUTC ):
+    '''Latitude of the subsolar point
+    
+    Parameters
+    ----------
+    datetimeUTC : pandas.Timestamp, datetime or str
+        date and time for calculation, must be UTC
+    
+    Returns
+    -------
+    latitude : float
+        degrees of latitude
+    '''
+    return solar_declination( datetimeUTC )
+
+def solar_longitude( datetimeUTC ):
+    '''Longitude of the subsolar point, degrees
+    
+    Parameters
+    ----------
+    datetimeUTC : pandas.Timestamp, datetime or str
+        date and time for calculation, must be UTC
+    
+    Returns
+    -------
+    longitude : float
+        degrees of longitude
+    '''
+
+    # Convert to pandas Timestamp, if needed
+    datetimeUTC = _to_timestamp(datetimeUTC)
+
+    # Longitude of subsolar point, degrees
+    # Equation of time will be added below
+    try:
+        # Treat as xarray.DataArray or pandas.Series
+        solar_lon = - 15 * ( datetimeUTC.dt.hour +
+                          datetimeUTC.dt.minute / 60 +
+                          datetimeUTC.dt.second / 3600 - 12 )
+    except AttributeError:
+        solar_lon = - 15 * ( datetimeUTC.hour +
+                          datetimeUTC.minute / 60 +
+                          datetimeUTC.second / 3600 - 12 )
+
+    # Add equation of time to the solar longitude, degrees
+    solar_lon -= equation_of_time( datetimeUTC, degrees=True )
+
+    return solar_lon
+
+def solar_hour_angle( lon, datetimeUTC ):
+    '''Solar hour angle (degrees) for specified longitude, date and time
+
+    Hour angle is the angular displacement of the sun from the local meridian.
+    It is zero at local noon, negative in the morning, and positive is afternoon.
+    
+    Parameters
+    ----------
+    lon : float
+        longitude in degrees east
+    datetimeUTC : pandas.Timestamp or datetime
+        date and time for calculation, must be UTC
+    
+    Returns
+    -------
+    ha : float
+        hour angle in degrees at the specified location and time
+    '''
+
+    # Subsolar longitude, degrees
+    solar_lon = solar_longitude(datetimeUTC)
+
+    # Hour angle, degrees
+    Ha = lon - solar_lon
+
+    return Ha
+
+def equation_of_time( date, degrees=False ):
+    '''Equation of time for specified date
     
     Implements the "alternative equation" from Wikipedia, derived from
     https://web.archive.org/web/20120323231813/http://www.green-life-innovators.org/tiki-index.php?page=The%2BLatitude%2Band%2BLongitude%2Bof%2Bthe%2BSun%2Bby%2BDavid%2BWilliams
@@ -170,11 +288,14 @@ def equation_of_time( date ):
     --------
     date : pandas.Timestamp, date, or datetime
         date for calculation
-
+    degrees : bool (default=False)
+        If True, then return value in compass degrees
+        If False, then return value in minutes of an hour
+        
     Returns
     -------
     eot : float
-        equation of time in degrees on the specified date
+        equation of time on the specified date, degrees or minutes
     '''
     # Convert to pandas Timestamp, if needed
     date = _to_timestamp(date)
@@ -189,11 +310,12 @@ def equation_of_time( date ):
     B = A + 1.914 * np.sin( W * (doy-2) * pi180 )
     C = ( A - np.arctan2( np.tan(B*pi180), np.cos(23.44*pi180) ) / pi180 ) / 180
 
-    # Equation of time in minutes of an hour
-    eotmin = 720 * ( C - np.round(C) )
+    # Equation of time in minutes of an hour (1440 minutes per day)
+    eot = 720 * ( C - np.round(C) )
 
-    # Equation of time, minutes -> degrees
-    eot = eotmin / 60 * 360 / 24
+    # Equation of time, minutes -> degrees (360 degrees per day)
+    if degrees:
+        eot = eot / 60 * 360 / 24
 
     return eot
 
@@ -247,86 +369,6 @@ def horizon_zenith_angle( alt ):
     # hza = 180 - np.arcsin( N / (N+alt) ) / pi180
 
     return hza
-
-def solar_declination( date ):
-    '''Calculate solar declination (degrees) for specified date
-    
-    Implements Eq. 9.68-9.72 from M.Z. Jacobson, Fundamentals of Atmospheric Modeling
-    
-    Argument
-    --------
-    date : pandas.Timestamp, date, datetime, or str
-        date for calculation
-
-    Returns
-    -------
-    dec : float
-        solar declination in degrees at the specified date
-    '''
-
-    # Convert to pandas Timestamp, if needed
-    date = _to_timestamp(date)
-
-     # Number of days since beginning of 2000
-    NJD = ( date - np.datetime64('2000-01-01') )
-    try:
-        NJD = NJD.dt.days
-    except AttributeError:
-        NJD = NJD.days
-
-    # Obliquity, degrees
-    ob = 23.439 - 4e-7 * NJD
-
-    # Parameters for ecliptic, degrees
-    gm = 357.528 + 0.9856003 * NJD
-    lm = 280.460 + 0.9856474 * NJD
-
-    # Ecliptic longitude of sun, degrees
-    ec = lm + 1.915 * np.sin( gm * pi180 ) + 0.020 * np.sin( 2 * gm * pi180 )
-
-    #Solar declination, degrees
-    dec = np.arcsin( np.sin( ob * pi180 ) * np.sin( ec * pi180 ) ) / pi180
-
-    return dec
-
-def solar_hour_angle( lon, datetimeUTC ):
-    '''Solar hour angle (degrees) for specified longitude, date and time
-
-    Hour angle is the angular displacement of the sun from the local meridian.
-    It is zero at local noon, negative in the morning, and positive is afternoon.
-    
-    Parameters
-    ----------
-    lon : float
-        longitude in degrees east
-    datetimeUTC : pandas.Timestamp or datetime
-        date and time for calculation, must be UTC
-    
-    Returns
-    -------
-    ha : float
-        hour angle in degrees at the specified location and time
-    '''
-
-    # Convert to pandas Timestamp, if needed
-    datetimeUTC = _to_timestamp(datetimeUTC)
-
-    # Hour angle for mean solar time.
-    # Actual solar position has a small offset given by the equation of time (below)
-    try: 
-        # Treat as xarray.DataArray or pandas.Series
-        Ha = lon + 15 * ( datetimeUTC.dt.hour + 
-                          datetimeUTC.dt.minute / 60 + 
-                          datetimeUTC.dt.second / 3600 - 12 )
-    except AttributeError:
-        Ha = lon + 15 * ( datetimeUTC.hour + 
-                          datetimeUTC.minute / 60 + 
-                          datetimeUTC.second / 3600 - 12 )
-
-    # Add equation of time to the hour angle, degrees
-    Ha += equation_of_time( datetimeUTC )
-
-    return Ha
 
 def refraction_angle( true_elevation_angle, pressure=101325., temperature_celsius=10. ):
     '''Atmospheric refraction angle for light passing through Earth's atmosphere
