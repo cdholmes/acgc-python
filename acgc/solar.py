@@ -24,7 +24,7 @@ def solar_azimuth_angle( lat, lon, datetimeUTC ):
         latitude in degrees
     lon : float or ndarray
         longitudes in degrees
-    datetimeUTC : pandas.Timestamp, datetime, or str
+    datetimeUTC : datetime-like or str
         date and time in UTC
 
     Returns
@@ -32,7 +32,6 @@ def solar_azimuth_angle( lat, lon, datetimeUTC ):
     saa : float or ndarray
         solar azimuth angle in degrees (clockwise from north)
     '''
-
     # Convert to pandas Timestamp, if needed
     datetimeUTC = _to_timestamp(datetimeUTC)
 
@@ -73,7 +72,7 @@ def solar_elevation_angle( lat, lon, alt, datetimeUTC,
         longitudes in degrees
     alt : float or ndarray
         altitude above surrounding terrain that defines the horizon, meters
-    datetimeUTC : pandas.Timestamp, datetime, or str
+    datetimeUTC : datetime-like or str
         date and time in UTC
     refraction : bool, optional (default=False)
         specifies whether to account for atmospheric refraction
@@ -119,7 +118,7 @@ def solar_zenith_angle( lat, lon, datetimeUTC,
         latitude in degrees
     lon : float or ndarray
         longitudes in degrees
-    datetimeUTC : pandas.Timestamp, datetime, or str
+    datetimeUTC : datetime-like or str
         date and time in UTC
     refraction : bool, optional (default=False)
         specifies whether to account for atmospheric refraction
@@ -163,9 +162,9 @@ def solar_declination( date ):
     
     Implements Eq. 9.68-9.72 from M.Z. Jacobson, Fundamentals of Atmospheric Modeling
     
-    Argument
-    --------
-    date : pandas.Timestamp, date, datetime, or str
+    Parameters
+    ----------
+    date : datetime-like or str
         date for calculation
 
     Returns
@@ -173,7 +172,6 @@ def solar_declination( date ):
     dec : float
         solar declination in degrees at the specified date
     '''
-
     # Convert to pandas Timestamp, if needed
     date = _to_timestamp(date)
 
@@ -204,8 +202,8 @@ def solar_latitude( datetimeUTC ):
     
     Parameters
     ----------
-    datetimeUTC : pandas.Timestamp, datetime or str
-        date and time for calculation, must be UTC
+    datetimeUTC : datetime-like or str
+        date and time, must be UTC
     
     Returns
     -------
@@ -219,15 +217,14 @@ def solar_longitude( datetimeUTC ):
     
     Parameters
     ----------
-    datetimeUTC : pandas.Timestamp, datetime or str
-        date and time for calculation, must be UTC
+    datetimeUTC : datetime-like or str
+        date and time, must be UTC
     
     Returns
     -------
     longitude : float
         degrees of longitude
     '''
-
     # Convert to pandas Timestamp, if needed
     datetimeUTC = _to_timestamp(datetimeUTC)
 
@@ -258,8 +255,8 @@ def solar_hour_angle( lon, datetimeUTC ):
     ----------
     lon : float
         longitude in degrees east
-    datetimeUTC : pandas.Timestamp or datetime
-        date and time for calculation, must be UTC
+    datetimeUTC : datetime-like or str
+        date and time, must be UTC
     
     Returns
     -------
@@ -284,10 +281,10 @@ def equation_of_time( date, degrees=False ):
     
     Note: Leap years are not accounted for.
 
-    Argument
-    --------
-    date : pandas.Timestamp, date, or datetime
-        date for calculation
+    Parameters
+    ----------
+    date : datetime-like or str
+        date UTC
     degrees : bool (default=False)
         If True, then return value in compass degrees
         If False, then return value in minutes of an hour
@@ -419,8 +416,8 @@ def refraction_angle( true_elevation_angle, pressure=101325., temperature_celsiu
 def _to_timestamp(time_in):
     '''Convert input to Pandas Timestamp or Series of datetime64 
     
-    Arguments
-    ---------
+    Parameters
+    ----------
     time_in : datetime-like or array
         time to be converted
 
@@ -437,6 +434,7 @@ def _to_timestamp(time_in):
             # Convert list of times
             time_out = pd.Series(pd.DatetimeIndex(time_in))
         except TypeError:
+            # Single datetime or str
             time_out = pd.Timestamp(time_in)
 
     return time_out
