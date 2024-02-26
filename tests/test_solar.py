@@ -31,7 +31,7 @@ def test_time_types():
         solar.insolation_toa(lat_brw,lon_brw,t)
         solar.solar_azimuth_angle(lat_brw,lon_brw,t)
         solar.solar_zenith_angle(lat_brw,lon_brw,t)
-        solar.solar_elevation_angle(lat_brw,lon_brw,0,t)
+        solar.solar_elevation_angle(lat_brw,lon_brw,t)
         solar.sunrise_time(lat_brw,lon_brw,t)
         solar.sunset_time(lat_brw,lon_brw,t)
         solar.solar_noon(lat_brw,lon_brw,t)

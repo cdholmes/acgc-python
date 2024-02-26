@@ -73,7 +73,7 @@ def solar_azimuth_angle( lat, lon, datetime ):
     # Change range [-180,180] to [0,360]
     return np.mod( saa+360, 360 )
 
-def solar_elevation_angle( lat, lon, alt, datetime,
+def solar_elevation_angle( lat, lon, datetime, alt=0,
                        refraction=False, temperature=10., pressure=101325. ):
     '''Solar elevation angle (degrees) above the horizon
 
@@ -92,10 +92,10 @@ def solar_elevation_angle( lat, lon, alt, datetime,
         latitude in degrees
     lon : float or ndarray
         longitudes in degrees
-    alt : float or ndarray
-        altitude above surrounding terrain that defines the horizon, meters
     datetime : datetime-like or str
         date and time. Include time zone or UTC will be assumed
+    alt : float or ndarray, optional (default=0)
+        altitude above surrounding terrain that defines the horizon, meters
     refraction : bool, optional (default=False)
         specifies whether to account for atmospheric refraction
     temperature : float or ndarray, optional (default=10)
@@ -535,6 +535,9 @@ def sun_times( lat, lon, datetime, tz_out=None, sza_sunrise=90.833, fast=False )
     2. 90.267 for first edge of sun rising, no refraction
     3. 90 degrees for center of sun rising, no refraction
 
+    Note: horizon_zenith_angle can be used to compute a more accurate horizon location
+    for sites at elevation.
+    
     Parameters
     ----------
     lat : float or ndarray
