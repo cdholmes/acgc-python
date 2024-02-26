@@ -158,7 +158,7 @@ def solar_zenith_angle( lat, lon, datetimeUTC,
 
     return sza
 
-def solar_declination( date ):
+def solar_declination( date, fast=False ):
     '''Calculate solar declination (degrees) for specified date
     
     Implements Eq. 9.68-9.72 from M.Z. Jacobson, Fundamentals of Atmospheric Modeling
@@ -167,6 +167,8 @@ def solar_declination( date ):
     ----------
     date : datetime-like or str
         date for calculation
+    fast : bool (default=False)
+        Specifies using a faster but less accurate calculation
 
     Returns
     -------
@@ -176,25 +178,34 @@ def solar_declination( date ):
     # Convert to pandas Timestamp, if needed
     date = _to_timestamp(date)
 
-     # Number of days since beginning of 2000
-    NJD = date - np.datetime64('2000-01-01')
-    try:
-        NJD = NJD.dt.days
-    except AttributeError:
-        NJD = NJD.days
+    # Select the accurate or fast calculation
+    accurate = not fast
 
-    # Obliquity, degrees
-    ob = 23.439 - 4e-7 * NJD
+    if accurate:
 
-    # Parameters for ecliptic, degrees
-    gm = 357.528 + 0.9856003 * NJD
-    lm = 280.460 + 0.9856474 * NJD
+        # Solar declination, degrees
+        dec, junk, junk, junk = solar_position( date )
 
-    # Ecliptic longitude of sun, degrees
-    ec = lm + 1.915 * np.sin( gm * pi180 ) + 0.020 * np.sin( 2 * gm * pi180 )
+    else:
+        # Number of days since beginning of 2000
+        NJD = date - np.datetime64('2000-01-01')
+        try:
+            NJD = NJD.dt.days
+        except AttributeError:
+            NJD = NJD.days
 
-    #Solar declination, degrees
-    dec = np.arcsin( np.sin( ob * pi180 ) * np.sin( ec * pi180 ) ) / pi180
+        # Obliquity, degrees
+        ob = 23.439 - 4e-7 * NJD
+
+        # Parameters for ecliptic, degrees
+        gm = 357.528 + 0.9856003 * NJD
+        lm = 280.460 + 0.9856474 * NJD
+
+        # Ecliptic longitude of sun, degrees
+        ec = lm + 1.915 * np.sin( gm * pi180 ) + 0.020 * np.sin( 2 * gm * pi180 )
+
+        #Solar declination, degrees
+        dec = np.arcsin( np.sin( ob * pi180 ) * np.sin( ec * pi180 ) ) / pi180
 
     return dec
 
@@ -273,14 +284,10 @@ def solar_hour_angle( lon, datetimeUTC ):
 
     return Ha
 
-def equation_of_time( date, degrees=False ):
+def equation_of_time( date, degrees=False, fast=False ):
     '''Equation of time for specified date
     
-    Implements the "alternative equation" from Wikipedia, derived from
-    https://web.archive.org/web/20120323231813/http://www.green-life-innovators.org/tiki-index.php?page=The%2BLatitude%2Band%2BLongitude%2Bof%2Bthe%2BSun%2Bby%2BDavid%2BWilliams
-    Results checked against NOAA solar calculator and agree within 10 seconds.
-    
-    Note: Leap years are not accounted for.
+    Accounts for the solar day being slightly different from 24 hours
 
     Parameters
     ----------
@@ -289,6 +296,8 @@ def equation_of_time( date, degrees=False ):
     degrees : bool (default=False)
         If True, then return value in compass degrees
         If False, then return value in minutes of an hour
+    fast : bool (default=False)
+        specifies whether to use a faster, but less accurate calculation
         
     Returns
     -------
@@ -298,24 +307,166 @@ def equation_of_time( date, degrees=False ):
     # Convert to pandas Timestamp, if needed
     date = _to_timestamp(date)
 
-    # Equation of time, accounts for the solar day differing slightly from 24 hr
-    try:
-        doy = date.dt.dayofyear
-    except AttributeError:
-        doy = date.dayofyear
-    W = 360 / 365.24
-    A = W * (doy+10)
-    B = A + 1.914 * np.sin( W * (doy-2) * pi180 )
-    C = ( A - np.arctan2( np.tan(B*pi180), np.cos(23.44*pi180) ) / pi180 ) / 180
+    # Determine whether to use the fast or accurate calculation
+    accurate = not fast
 
-    # Equation of time in minutes of an hour (1440 minutes per day)
-    eot = 720 * ( C - np.round(C) )
+    if accurate:
+
+        # Equation of time, minutes
+        junk, junk, eot, junk = solar_position( date )
+
+    else:
+        # Implements the "alternative equation" from Wikipedia, derived from
+        # https://web.archive.org/web/20120323231813/http://www.green-life-innovators.org/tiki-index.php?page=The%2BLatitude%2Band%2BLongitude%2Bof%2Bthe%2BSun%2Bby%2BDavid%2BWilliams
+        # Results checked against NOAA solar calculator and agree within 10 seconds.
+        # Note: Leap years are not accounted for.
+
+        # Equation of time, accounts for the solar day differing slightly from 24 hr
+        try:
+            doy = date.dt.dayofyear
+        except AttributeError:
+            doy = date.dayofyear
+        W = 360 / 365.24
+        A = W * (doy+10)
+        B = A + 1.914 * np.sin( W * (doy-2) * pi180 )
+        C = ( A - np.arctan2( np.tan(B*pi180), np.cos(23.44*pi180) ) / pi180 ) / 180
+
+        # Equation of time in minutes of an hour (1440 minutes per day)
+        eot = 720 * ( C - np.round(C) )
 
     # Equation of time, minutes -> degrees (360 degrees per day)
     if degrees:
         eot = eot / 60 * 360 / 24
 
     return eot
+
+def solar_position( datetimeUTC ):
+    '''Compute position of sun (declination, right ascension, equation of time, distance)) on specified date
+    
+    Calculations follow the NOAA solar calculator spreadsheet
+    Applicable to years 1900-2100.
+
+    Parameters
+    ----------
+    date : datetime-like or str
+        date for calculation
+    
+    Returns
+    -------
+    declination : float
+        position of the sun relative to Earth's equatorial plane, degrees
+    right_ascension : float
+        position of the sun along Earth's equatorial plane, degrees 
+        relative to the sun's position on the vernal equinox
+    equation_of_time : float
+        equation of time (minutes) between mean solar time and true solar time
+        Divide by 4 minutes per degree to obtain equation of time in degrees
+    distance : float
+        Earth-sun distance in AU (1 AU = 1.495978707e11 m)
+    '''
+    # Convert to pandas Timestamp, if needed
+    datetimeUTC = _to_timestamp(datetimeUTC)
+
+    # Raise warning if any dates are outside date range
+    # recommended for orbital parameters used here
+    if np.logical_or( np.any( datetimeUTC < np.datetime64('1900-01-01') ),
+                      np.any( datetimeUTC > np.datetime64('2100-01-01') ) ):
+        warnings.warn('Solar position accuracy declines for dates outside 1900-2100', \
+                      RuntimeWarning )
+
+    # Number of days since 1 Jan 2000
+    NJD = datetimeUTC - np.datetime64('2000-01-01')
+    try:
+        NJD = NJD.dt.days
+    except AttributeError:
+        NJD = NJD.days
+
+    # Julian day (since 12:00 1 Jan 4713 BCE)
+    NJD += 2451544.50
+
+    # Julian century
+    JC = (NJD-2451545)/36525
+
+    # Earth orbital eccentricity, unitless
+    ec = 0.016708634 - JC*( 0.000042037 + 0.0000001267*JC )
+
+    # Earth mean orbital obliquity, degree
+    mean_ob = 23 + ( 26 + ( (21.448
+                             - JC * (46.815
+                                    + JC * (0.00059 - JC * 0.001813) ) ) )/60 )/60
+
+    # Earth true orbital obliquity, corrected for nutation, degree 
+    ob = mean_ob + 0.00256 * np.cos( (125.04 - 1934.136*JC ) * pi180 )
+
+    # Sun Mean ecliptic longitude, degree
+    mean_ec_lon = np.mod( 280.46646 + JC*( 36000.76983 + JC*0.0003032 ), 360 )
+
+    # Sun Mean anomaly, degree
+    mean_anom = 357.52911 + JC*( 35999.05029 - 0.0001537*JC )
+
+    # Sun Equation of center, degree
+    eq_center = np.sin(mean_anom*pi180) * (1.914602 - JC*( 0.004817 + 0.000014*JC )) \
+                    + np.sin(2*mean_anom*pi180) * (0.019993 - 0.000101*JC) \
+                    + np.sin(3*mean_anom*pi180) * 0.000289
+
+    # Sun True ecliptic longitude, degrees
+    true_ec_lon = mean_ec_lon + eq_center
+
+    # Sun True anomaly, degree
+    true_anom = mean_anom + eq_center
+
+    # Earth-Sun distance, AU
+    distance = (1.000001018 * (1-ec**2) ) / (1 + ec * np.cos( true_anom * pi180 ))
+
+    # Sun Apparent ecliptic longitude, corrected for nutation, degrees
+    ec_lon = true_ec_lon - 0.00569 - 0.00478 * np.sin( (125.04 - 1934.136*JC ) * pi180)
+
+    # Sun Right ascension, deg
+    right_ascension = np.arctan2( np.cos(ob*pi180) * np.sin(ec_lon*pi180),
+                                  np.cos(ec_lon*pi180) ) / pi180
+
+    # Sun Declination, deg
+    declination = np.arcsin( np.sin(ob*pi180) * np.sin(ec_lon*pi180) ) / pi180
+
+    # var y
+    vary = np.tan( ob/2 * pi180 )**2
+
+    # Equation of time, minutes
+    eot = vary * np.sin( 2 * mean_ec_lon * pi180) \
+        - 2 * ec * np.sin( mean_anom * pi180 ) \
+        + 4 * ec * vary * np.sin( mean_anom * pi180 ) * np.cos( 2 * mean_ec_lon * pi180) \
+        - 0.5 * vary**2 * np.sin( 4 * mean_ec_lon * pi180) \
+        - 1.25 * ec**2 * np.sin( 2 * mean_anom * pi180)
+    eot = eot * 4 / pi180
+
+    return declination, right_ascension, eot, distance
+
+def sun_times( lat, lon, datetimeUTC, tz=0 ):
+    # Convert to pandas Timestamp, if needed
+    datetimeUTC = _to_timestamp(datetimeUTC)
+
+    dec, junk, eot, junk = solar_position( datetimeUTC )
+
+    # Sunrise hour angle, degree
+    # Degrees east of the local meridian where sun rises
+    ha_sunrise = np.arccos( np.cos(90.833*pi180) /
+                           (np.cos(lat*pi180) * np.cos(dec*pi180))
+                           - np.tan(lat*pi180)*np.tan(dec*pi180) ) / pi180
+
+    # Noon Meridian transit, local standard time, day fraction
+    noon_lst = (720 - 4*lon - eot + tz*60 ) / 1440
+
+    # Sunrise, local standard time, day fraction
+    t_sunrise = noon_lst - 4 * ha_sunrise / 1440
+    t_sunset = noon_lst + 4 * ha_sunrise / 1440
+
+    # Sunlight duration, minutes
+    day_length = 8*ha_sunrise
+
+    
+
+    return noon_lst, t_sunrise, t_sunset, day_length
+
 
 def horizon_zenith_angle( alt ):
     '''Angle from the zenith to the horizon
