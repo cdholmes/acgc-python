@@ -257,7 +257,7 @@ def solar_declination( datetime, fast=False ):
     if accurate:
 
         # Solar declination, degrees
-        dec, junk, junk, junk = solar_position( datetime )
+        dec, junk, junk, junk, junk = solar_position( datetime )
 
     else:
         # Number of days since beginning of 2000
@@ -390,7 +390,7 @@ def equation_of_time( datetime, degrees=False, fast=False ):
     if accurate:
 
         # Equation of time, minutes
-        junk, junk, eot, junk = solar_position( datetime )
+        junk, junk, eot, junk, junk = solar_position( datetime )
 
     else:
         # Implements the "alternative equation" from Wikipedia, derived from
@@ -454,11 +454,13 @@ def solar_position( datetime ):
     # Number of days since 1 Jan 2000
     NJD = datetimeUTC - np.datetime64('2000-01-01')
     try:
-        NJD = NJD.dt.days
+        NJD = NJD.dt.days \
+            + NJD.dt.seconds / 86400.
     except AttributeError:
-        NJD = NJD.days
+        NJD = NJD.days \
+            + NJD.seconds / 86400.
 
-    # Julian day (since 12:00 1 Jan 4713 BCE)
+    # Julian day (since 12:00UTC 1 Jan 4713 BCE)
     NJD += 2451544.50
 
     # Julian century
@@ -570,7 +572,7 @@ def sun_times( lat, lon, datetime, tz_out=None, sza_sunrise=90.833, fast=False )
 
     # Solar declination (degrees) and equation of time (minutes)
     if accurate:
-        dec, junk, eot, junk = solar_position( datetimeUTC )
+        dec, junk, eot, junk, junk = solar_position( datetimeUTC )
     else:
         dec = solar_declination( datetimeUTC )
         eot = equation_of_time( datetimeUTC )
