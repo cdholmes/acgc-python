@@ -282,20 +282,22 @@ def solar_declination( datetime, fast=False ):
 
     return dec
 
-def solar_latitude( datetime ):
+def solar_latitude( *args, **kwargs ):
     '''Latitude of the subsolar point
     
     Parameters
     ----------
-    datetimeUTC : datetime-like or str
+    datetime : datetime-like or str
         date and time. Include time zone or UTC will be assumed
-    
+    fast : bool
+        see `solar_declination`
+
     Returns
     -------
     latitude : float
         degrees of latitude
     '''
-    return solar_declination( datetime )
+    return solar_declination( *args, **kwargs )
 
 def solar_longitude( datetime, solar_pos=None ):
     '''Longitude of the subsolar point, degrees
@@ -311,7 +313,7 @@ def solar_longitude( datetime, solar_pos=None ):
         degrees of longitude
     '''
     # Convert to pandas Timestamp, if needed
-    datetimeUTC = _to_timestamp_utc(datetime)
+    datetimeUTC, tz_in = _to_timestamp_utc(datetime)
 
     # Longitude of subsolar point, degrees
     # Equation of time will be added below
@@ -590,12 +592,13 @@ def sun_times( lat, lon, datetime, tz_out=None, sza_sunrise=90.833, fast=False )
     t_sunrise = solar_noon - 4 * ha_sunrise / 1440
     t_sunset  = solar_noon + 4 * ha_sunrise / 1440
 
-    # Date portion only
+    # Date, ignoring the time
+    # datetimeUTC is in UTC but time-zone-naive
     try:
-        # Convert to UTC
-        dateUTC = datetimeUTC.tz_convert('UTC').normalize()
-    except TypeError:
-        # Assume already in UTC
+        # Series time objects
+        dateUTC = datetimeUTC.dt.tz_localize('UTC').dt.normalize()
+    except AttributeError:
+        # Scalar time objects
         dateUTC = datetimeUTC.tz_localize('UTC').normalize()
 
     # Convert day fraction -> date time
@@ -616,7 +619,12 @@ def sun_times( lat, lon, datetime, tz_out=None, sza_sunrise=90.833, fast=False )
     # Sunlight duration, minutes
     day_length = 8 * ha_sunrise * pd.Timedelta(1, 'minute')
 
-    return t_sunrise, t_sunset, day_length, solar_noon
+    # Define named tuple to hold result
+    sun_times_tuple = namedtuple('SunTimes',
+                        'sunrise sunset day_length solar_noon datetimeUTC')
+    result = sun_times_tuple(t_sunrise, t_sunset, day_length, solar_noon, datetimeUTC)
+
+    return result
 
 def horizon_zenith_angle( alt ):
     '''Angle from the zenith to the horizon
@@ -751,9 +759,11 @@ def _to_timestamp_utc( datetime_in ):
     # Convert to UTC, then strip timezone
     try:
         try:
+            # Pandas Series objects
             tz_in = datetime_in.dt.tz
-            datetimeUTC = datetime_in.dt.tz_convert('UTC').tz.tz_localize(None)
+            datetimeUTC = datetime_in.dt.tz_convert('UTC').dt.tz_localize(None)
         except AttributeError:
+            # Scalar time objects
             tz_in = datetime_in.tzinfo
             datetimeUTC = datetime_in.tz_convert('UTC').tz_localize(None)
     except TypeError:
