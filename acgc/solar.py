@@ -441,32 +441,50 @@ def solar_position( datetimeUTC ):
 
     return declination, right_ascension, eot, distance
 
-def sun_times( lat, lon, datetimeUTC, tz=0 ):
+def sun_times( lat, lon, datetimeUTC, tz=0, fast=False ):
     # Convert to pandas Timestamp, if needed
     datetimeUTC = _to_timestamp(datetimeUTC)
 
-    dec, junk, eot, junk = solar_position( datetimeUTC )
+    # Select fast or accurate calculation
+    accurate = not fast
+
+    # Solar declination (degrees) and equation of time (minutes)
+    if accurate:
+        dec, junk, eot, junk = solar_position( datetimeUTC )
+    else:
+        dec = solar_declination( datetimeUTC )
+        eot = equation_of_time( datetimeUTC )
+
+    #*************
+    # Solar zenith angle at sunrise
+    # Options: 
+    # 1. 90 degrees for center of sun rising, no refraction
+    # 2. 90.25 for first edge of sun rising, no refraction
+    # 3. 90.833 for first edge of sun rising, typical refraction
+    sza_sunrise = 90.833
 
     # Sunrise hour angle, degree
     # Degrees east of the local meridian where sun rises
-    ha_sunrise = np.arccos( np.cos(90.833*pi180) /
+    ha_sunrise = np.arccos( np.cos(sza_sunrise*pi180) /
                            (np.cos(lat*pi180) * np.cos(dec*pi180))
                            - np.tan(lat*pi180)*np.tan(dec*pi180) ) / pi180
 
-    # Noon Meridian transit, local standard time, day fraction
+    # Solar noon, local standard time, day fraction
     noon_lst = (720 - 4*lon - eot + tz*60 ) / 1440
 
-    # Sunrise, local standard time, day fraction
+    # Sunrise and sunset, local standard time, day fraction
     t_sunrise = noon_lst - 4 * ha_sunrise / 1440
     t_sunset = noon_lst + 4 * ha_sunrise / 1440
 
-    # Sunlight duration, minutes
-    day_length = 8*ha_sunrise
+    # Convert day fraction -> date time
+    noon_lst  = datetimeUTC.normalize() + noon_lst  * pd.Timedelta( 1, 'day' )
+    t_sunrise = datetimeUTC.normalize() + t_sunrise * pd.Timedelta( 1, 'day' )
+    t_sunset  = datetimeUTC.normalize() + t_sunset  * pd.Timedelta( 1, 'day' )
 
-    
+    # Sunlight duration, minutes
+    day_length = 8 * ha_sunrise * pd.Timedelta(1, 'minute')
 
     return noon_lst, t_sunrise, t_sunset, day_length
-
 
 def horizon_zenith_angle( alt ):
     '''Angle from the zenith to the horizon
