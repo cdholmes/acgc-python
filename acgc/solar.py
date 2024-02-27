@@ -12,6 +12,7 @@ from collections import namedtuple
 import warnings
 import numpy as np
 import pandas as pd
+import xarray as xr
 
 pi180 = np.pi / 180
 
@@ -609,15 +610,21 @@ def sun_times( lat, lon, datetime, tz_out=None, sza_sunrise=90.833, fast=False )
     t_sunrise  = dateUTC + t_sunrise  * pd.Timedelta( 1, 'day' )
     t_sunset   = dateUTC + t_sunset   * pd.Timedelta( 1, 'day' )
 
-    # Localize to input timezone
-    try:
-        solar_noon = solar_noon.dt.tz_convert(tz_out)
-        t_sunrise  = t_sunrise.dt.tz_convert(tz_out)
-        t_sunset   = t_sunset.dt.tz_convert(tz_out)
-    except AttributeError:
-        solar_noon = solar_noon.tz_convert(tz_out)
-        t_sunrise  = t_sunrise.tz_convert(tz_out)
-        t_sunset   = t_sunset.tz_convert(tz_out)
+    # Convert to output timezone
+    # if tz_out is not None:
+    if isinstance(solar_noon,(xr.DataArray,np.ndarray)) or \
+       isinstance(t_sunrise,(xr.DataArray,np.ndarray)):
+        if tz_out is not None:
+            raise ValueError("Time zone output for DataArrays not supported")
+    else:
+        try:
+            solar_noon = solar_noon.dt.tz_convert(tz_out)
+            t_sunrise  = t_sunrise.dt.tz_convert(tz_out)
+            t_sunset   = t_sunset.dt.tz_convert(tz_out)
+        except AttributeError:
+            solar_noon = solar_noon.tz_convert(tz_out)
+            t_sunrise  = t_sunrise.tz_convert(tz_out)
+            t_sunset   = t_sunset.tz_convert(tz_out)
 
     # Sunlight duration, minutes
     day_length = 8 * ha_sunrise * pd.Timedelta(1, 'minute')
@@ -756,6 +763,10 @@ def _to_timestamp(time_in):
 
 def _to_timestamp_utc( datetime_in ):
 
+    if isinstance(datetime_in,xr.DataArray):
+        # raise ValueError('xarray.DataArray time variables are not supported')
+        warnings.warn('Time variables in xarray.DataArray must be in UTC')
+
     # Ensure input is a timestamp
     datetime_in = _to_timestamp( datetime_in )
 
@@ -769,7 +780,7 @@ def _to_timestamp_utc( datetime_in ):
             # Scalar time objects
             tz_in = datetime_in.tzinfo
             datetimeUTC = datetime_in.tz_convert('UTC').tz_localize(None)
-    except TypeError:
+    except (TypeError, AttributeError):
         # No timezone info, so assume it is already UTC
         datetimeUTC = datetime_in
         tz_in = None

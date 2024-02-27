@@ -46,6 +46,25 @@ def test_time_types():
         solar.horizon_zenith_angle(0)
         solar.refraction_angle(0)
 
+def test_lat_lon_types():
+    '''Run calculations with all expected input types for lat, lon variables'''
+
+    for lat in [lat_brw,
+                np.array([lat_brw,lat_brw+1])]:
+        for lon in [lon_brw,
+                    np.array([lon_brw,lon_brw+1])]:
+            solar.insolation_toa(lat,lon,time)
+            solar.solar_azimuth_angle(lat,lon,time)
+            solar.solar_zenith_angle(lat,lon,time)
+            solar.solar_elevation_angle(lat,lon,time)
+            solar.sunrise_time(lat,lon,time)
+            solar.sunset_time(lat,lon,time)
+            solar.solar_noon(lat,lon,time)
+            solar.day_length(lat,lon,time)
+            solar.solar_hour_angle(lon,time)
+            solar.sun_times(lat,lon,time)
+
+
 def test_solar_position():
     
     # Result should be the same regardless of how time is specified
@@ -98,8 +117,10 @@ def test_sun_times():
              pd.Timestamp('2010-03-25 14:32:34.561142383-0800', tz='US/Alaska'),
              pd.Timestamp('2010-03-25 00:00:00'))
 
-    assert result == pytest.approx(ans), 'Sun times do not equal expected values'
-    assert resultAK == pytest.approx(ansAK), 'Sun times incorrect with time zone'
+    assert result == pytest.approx(ans), \
+        'Sun times do not equal expected values'
+    assert resultAK == pytest.approx(ansAK), \
+        'Sun times incorrect with time zone'
 
     assert solar.sunrise_time(lat_brw,lon_brw,time) \
         == pytest.approx(ans[0]), 'Sunrise time error'
