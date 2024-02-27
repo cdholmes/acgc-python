@@ -1,10 +1,12 @@
 #!/usr/local/bin/env python3
-'''Module for calculating solar position (zenith angle, elevation, azimuth)
+'''Module for calculating solar position and TOA insolation
 
 The functions here are are vectorized and generally broadcast over xarray dimensions,
-making this program faster than PySolar. Calculations assume spherical Earth (not ellipsoidal). 
-Results should be accurate to < 0.2 degree, which is less than radius of the sun.
-Other modules (e.g. pvlib) should be used for high-precision calculations.
+making this program faster than PySolar. Calculations here assume spherical Earth
+and use orbital parameters suitable for 1900-2100. Errors should be <0.1° within
+this time period. The "fast" calculations have lower accuracy orbital prameters 
+(e.g. neglecting leap years) and errors ~0.2°. Other modules (e.g. pvlib) should
+be used for high-precision calculations before 1900 or after 2100.
 
 '''
 
@@ -615,7 +617,7 @@ def sun_times( lat, lon, datetime, tz_out=None, sza_sunrise=90.833, fast=False )
     if isinstance(solar_noon,(xr.DataArray,np.ndarray)) or \
        isinstance(t_sunrise,(xr.DataArray,np.ndarray)):
         if tz_out is not None:
-            raise ValueError("Time zone output for DataArrays not supported")
+            raise ValueError("Time zone conversion not supported 2-D output")
     else:
         try:
             solar_noon = solar_noon.dt.tz_convert(tz_out)

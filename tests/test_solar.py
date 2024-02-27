@@ -66,7 +66,8 @@ def test_lat_lon_types():
 
 
 def test_solar_position():
-    
+    '''Check values for solar_position'''
+
     # Result should be the same regardless of how time is specified
     result    = solar.solar_position(time)
     resultUTC = solar.solar_position(timeUTC)
@@ -100,7 +101,8 @@ def test_solar_position():
         'fast equation_of_time error'
 
 def test_sun_times():
-  
+    '''Check values for sun_times'''
+
     result = solar.sun_times(lat_brw,lon_brw,time)
     resultAK = solar.sun_times(lat_brw,lon_brw,time,'US/Alaska')
 
@@ -113,7 +115,7 @@ def test_sun_times():
     # Answer in AK time
     ansAK = (pd.Timestamp('2010-03-25 08:02:08.205409628-0800', tz='US/Alaska'), 
              pd.Timestamp('2010-03-25 21:03:00.916875138-0800', tz='US/Alaska'), 
-             pd.Timedelta('0 days 13:00:52.711465510'), 
+             pd.Timedelta('0 days 13:00:52.711465510'),
              pd.Timestamp('2010-03-25 14:32:34.561142383-0800', tz='US/Alaska'),
              pd.Timestamp('2010-03-25 00:00:00'))
 
