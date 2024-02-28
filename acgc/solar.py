@@ -618,14 +618,25 @@ def sun_times( lat, lon, datetime, tz_out=None, sza_sunrise=90.833, fast=False )
         if isinstance(solar_noon,(xr.DataArray,np.ndarray)) or \
             isinstance(t_sunrise,(xr.DataArray,np.ndarray)):
             # These types don't localize tz, but we can add offset to the tz-naive time
-            try:
+            if hasattr(datetimeUTC,'tz_localize'):
                 # For scalar datetime, there is a single time offset, which we can add
                 utcoffset = np.timedelta64( datetimeUTC.tz_localize(tz_out).utcoffset() )
                 solar_noon += utcoffset
                 t_sunrise  += utcoffset
                 t_sunset   += utcoffset
-            except AttributeError:
-                raise ValueError("Time zone conversion not supported for time as DataArray or ndarray")
+            else:
+                # For Series datetime, there are potentially multiple offsets. We can only add one
+                unique_datetimeUTC = pd.DatetimeIndex(np.unique(datetimeUTC))
+                unique_utcoffsets = np.unique( unique_datetimeUTC.tz_localize('UTC') \
+                                        - unique_datetimeUTC.tz_localize(tz_out) )
+                if len(unique_utcoffsets)==1:
+                    utcoffset = unique_utcoffsets[0]
+                    solar_noon += utcoffset
+                    t_sunrise  += utcoffset
+                    t_sunset   += utcoffset
+                else:
+                    raise ValueError('Multiple timezone offsets not supported. '
+                                     +'Request output in UTC or reduce number of input times.')
         else:
             try:
                 # Series time objects

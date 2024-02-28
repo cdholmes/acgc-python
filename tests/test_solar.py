@@ -36,19 +36,20 @@ def test_time_types():
         solar.solar_azimuth_angle(lat_brw,lon_brw,t)
         solar.solar_zenith_angle(lat_brw,lon_brw,t)
         solar.solar_elevation_angle(lat_brw,lon_brw,t)
-        solar.sunrise_time(lat_brw,lon_brw,t)
-        solar.sunset_time(lat_brw,lon_brw,t)
-        solar.solar_noon(lat_brw,lon_brw,t)
-        solar.day_length(lat_brw,lon_brw,t)
         solar.solar_declination(t)
         solar.solar_latitude(t)
         solar.solar_longitude(t)
         solar.solar_hour_angle(lon_brw,t)
         solar.equation_of_time(t)
         solar.solar_position(t)
-        solar.sun_times(lat_brw,lon_brw,t)
         solar.horizon_zenith_angle(0)
         solar.refraction_angle(0)
+        for tz_out in [None,'UTC','US/Eastern']:
+            solar.sun_times(lat_brw,lon_brw,t,tz_out)
+            solar.sunrise_time(lat_brw,lon_brw,t,tz_out)
+            solar.sunset_time(lat_brw,lon_brw,t,tz_out)
+            solar.solar_noon(lat_brw,lon_brw,t,tz_out)
+            solar.day_length(lat_brw,lon_brw,t,tz_out)
 
 def test_lat_lon_types():
     '''Run calculations with all expected input types for lat, lon variables'''
