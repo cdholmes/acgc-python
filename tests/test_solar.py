@@ -1,4 +1,5 @@
 import datetime
+import warnings
 import numpy as np
 import pandas as pd
 import pytest
@@ -13,6 +14,9 @@ lon_brw = -156.611
 
 def test_time_types():
     '''Run calculations with all expected input types for time variable'''
+
+    # Ignore expected warnings about time not including timezone
+    warnings.simplefilter('ignore',RuntimeWarning)
 
     for t in [ # Scalar type types, including time zones
               time,
@@ -49,6 +53,9 @@ def test_time_types():
 def test_lat_lon_types():
     '''Run calculations with all expected input types for lat, lon variables'''
 
+    # Ignore expected warnings about time not including timezone
+    warnings.simplefilter('ignore',RuntimeWarning)
+
     for lat in [lat_brw,
                 np.array([lat_brw,lat_brw+1])]:
         for lon in [lon_brw,
@@ -67,6 +74,9 @@ def test_lat_lon_types():
 
 def test_solar_position():
     '''Check values for solar_position'''
+
+    # Ignore expected warnings about time not including timezone
+    warnings.simplefilter('ignore',RuntimeWarning)
 
     # Result should be the same regardless of how time is specified
     result    = solar.solar_position(time)
@@ -102,6 +112,9 @@ def test_solar_position():
 
 def test_sun_times():
     '''Check values for sun_times'''
+
+    # Ignore expected warnings about time not including timezone
+    warnings.simplefilter('ignore',RuntimeWarning)
 
     result = solar.sun_times(lat_brw,lon_brw,time)
     resultAK = solar.sun_times(lat_brw,lon_brw,time,'US/Alaska')

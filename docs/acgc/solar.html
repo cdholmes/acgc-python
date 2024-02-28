@@ -953,36 +953,35 @@ be used for high-precision calculations before 1900 or after 2100.</p>
 </span><span id="L-795"><a href="#L-795"><span class="linenos">795</span></a><span class="sd">        timezone of datetime_in</span>
 </span><span id="L-796"><a href="#L-796"><span class="linenos">796</span></a><span class="sd">    &#39;&#39;&#39;</span>
 </span><span id="L-797"><a href="#L-797"><span class="linenos">797</span></a>
-</span><span id="L-798"><a href="#L-798"><span class="linenos">798</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datetime_in</span><span class="p">,</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
-</span><span id="L-799"><a href="#L-799"><span class="linenos">799</span></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Time variables in xarray.DataArray must be in UTC&#39;</span><span class="p">)</span>
+</span><span id="L-798"><a href="#L-798"><span class="linenos">798</span></a>    <span class="c1"># Ensure input is a timestamp</span>
+</span><span id="L-799"><a href="#L-799"><span class="linenos">799</span></a>    <span class="n">datetime_in</span> <span class="o">=</span> <span class="n">_to_datetime</span><span class="p">(</span> <span class="n">datetime_in</span> <span class="p">)</span>
 </span><span id="L-800"><a href="#L-800"><span class="linenos">800</span></a>
-</span><span id="L-801"><a href="#L-801"><span class="linenos">801</span></a>    <span class="c1"># Ensure input is a timestamp</span>
-</span><span id="L-802"><a href="#L-802"><span class="linenos">802</span></a>    <span class="n">datetime_in</span> <span class="o">=</span> <span class="n">_to_datetime</span><span class="p">(</span> <span class="n">datetime_in</span> <span class="p">)</span>
-</span><span id="L-803"><a href="#L-803"><span class="linenos">803</span></a>
-</span><span id="L-804"><a href="#L-804"><span class="linenos">804</span></a>    <span class="c1"># Convert to UTC, then strip timezone</span>
-</span><span id="L-805"><a href="#L-805"><span class="linenos">805</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="L-806"><a href="#L-806"><span class="linenos">806</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="L-807"><a href="#L-807"><span class="linenos">807</span></a>            <span class="c1"># Pandas Series objects</span>
-</span><span id="L-808"><a href="#L-808"><span class="linenos">808</span></a>            <span class="n">tz_in</span> <span class="o">=</span> <span class="n">datetime_in</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">tz</span>
-</span><span id="L-809"><a href="#L-809"><span class="linenos">809</span></a>            <span class="n">datetimeUTC</span> <span class="o">=</span> <span class="n">datetime_in</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">tz_convert</span><span class="p">(</span><span class="s1">&#39;UTC&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">tz_localize</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-</span><span id="L-810"><a href="#L-810"><span class="linenos">810</span></a>        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-</span><span id="L-811"><a href="#L-811"><span class="linenos">811</span></a>            <span class="c1"># Scalar time objects</span>
-</span><span id="L-812"><a href="#L-812"><span class="linenos">812</span></a>            <span class="n">tz_in</span> <span class="o">=</span> <span class="n">datetime_in</span><span class="o">.</span><span class="n">tzinfo</span>
-</span><span id="L-813"><a href="#L-813"><span class="linenos">813</span></a>            <span class="n">datetimeUTC</span> <span class="o">=</span> <span class="n">datetime_in</span><span class="o">.</span><span class="n">tz_convert</span><span class="p">(</span><span class="s1">&#39;UTC&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tz_localize</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-</span><span id="L-814"><a href="#L-814"><span class="linenos">814</span></a>    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
-</span><span id="L-815"><a href="#L-815"><span class="linenos">815</span></a>        <span class="c1"># No timezone info, so assume it is already UTC</span>
-</span><span id="L-816"><a href="#L-816"><span class="linenos">816</span></a>        <span class="n">datetimeUTC</span> <span class="o">=</span> <span class="n">datetime_in</span>
-</span><span id="L-817"><a href="#L-817"><span class="linenos">817</span></a>        <span class="n">tz_in</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="L-818"><a href="#L-818"><span class="linenos">818</span></a>
-</span><span id="L-819"><a href="#L-819"><span class="linenos">819</span></a>    <span class="k">return</span> <span class="n">datetimeUTC</span><span class="p">,</span> <span class="n">tz_in</span>
-</span><span id="L-820"><a href="#L-820"><span class="linenos">820</span></a>
-</span><span id="L-821"><a href="#L-821"><span class="linenos">821</span></a><span class="c1"># Aliases for functions</span>
-</span><span id="L-822"><a href="#L-822"><span class="linenos">822</span></a><span class="n">sza</span> <span class="o">=</span> <span class="n">solar_zenith_angle</span>
-</span><span id="L-823"><a href="#L-823"><span class="linenos">823</span></a><span class="n">saa</span> <span class="o">=</span> <span class="n">solar_azimuth_angle</span>
-</span><span id="L-824"><a href="#L-824"><span class="linenos">824</span></a><span class="n">sea</span> <span class="o">=</span> <span class="n">solar_elevation_angle</span>
-</span><span id="L-825"><a href="#L-825"><span class="linenos">825</span></a><span class="c1"># Additional aliases for backwards compatibility</span>
-</span><span id="L-826"><a href="#L-826"><span class="linenos">826</span></a><span class="n">equationOfTime</span> <span class="o">=</span> <span class="n">equation_of_time</span>
-</span><span id="L-827"><a href="#L-827"><span class="linenos">827</span></a><span class="n">solarDeclination</span> <span class="o">=</span> <span class="n">solar_declination</span>
+</span><span id="L-801"><a href="#L-801"><span class="linenos">801</span></a>    <span class="c1"># Convert to UTC, then strip timezone</span>
+</span><span id="L-802"><a href="#L-802"><span class="linenos">802</span></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="L-803"><a href="#L-803"><span class="linenos">803</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="L-804"><a href="#L-804"><span class="linenos">804</span></a>            <span class="c1"># Pandas Series objects</span>
+</span><span id="L-805"><a href="#L-805"><span class="linenos">805</span></a>            <span class="n">tz_in</span> <span class="o">=</span> <span class="n">datetime_in</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">tz</span>
+</span><span id="L-806"><a href="#L-806"><span class="linenos">806</span></a>            <span class="n">datetimeUTC</span> <span class="o">=</span> <span class="n">datetime_in</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">tz_convert</span><span class="p">(</span><span class="s1">&#39;UTC&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">tz_localize</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+</span><span id="L-807"><a href="#L-807"><span class="linenos">807</span></a>        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+</span><span id="L-808"><a href="#L-808"><span class="linenos">808</span></a>            <span class="c1"># Scalar time objects</span>
+</span><span id="L-809"><a href="#L-809"><span class="linenos">809</span></a>            <span class="n">tz_in</span> <span class="o">=</span> <span class="n">datetime_in</span><span class="o">.</span><span class="n">tzinfo</span>
+</span><span id="L-810"><a href="#L-810"><span class="linenos">810</span></a>            <span class="n">datetimeUTC</span> <span class="o">=</span> <span class="n">datetime_in</span><span class="o">.</span><span class="n">tz_convert</span><span class="p">(</span><span class="s1">&#39;UTC&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tz_localize</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+</span><span id="L-811"><a href="#L-811"><span class="linenos">811</span></a>    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+</span><span id="L-812"><a href="#L-812"><span class="linenos">812</span></a>        <span class="c1"># tz-naive time objects: Timestamp, Series, (all) DataArrays</span>
+</span><span id="L-813"><a href="#L-813"><span class="linenos">813</span></a>        <span class="c1"># No timezone info, so assume it is already UTC</span>
+</span><span id="L-814"><a href="#L-814"><span class="linenos">814</span></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Time does not contain timezone. UTC will be assumed&#39;</span><span class="p">,</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+</span><span id="L-815"><a href="#L-815"><span class="linenos">815</span></a>        <span class="n">datetimeUTC</span> <span class="o">=</span> <span class="n">datetime_in</span>
+</span><span id="L-816"><a href="#L-816"><span class="linenos">816</span></a>        <span class="n">tz_in</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-817"><a href="#L-817"><span class="linenos">817</span></a>
+</span><span id="L-818"><a href="#L-818"><span class="linenos">818</span></a>    <span class="k">return</span> <span class="n">datetimeUTC</span><span class="p">,</span> <span class="n">tz_in</span>
+</span><span id="L-819"><a href="#L-819"><span class="linenos">819</span></a>
+</span><span id="L-820"><a href="#L-820"><span class="linenos">820</span></a><span class="c1"># Aliases for functions</span>
+</span><span id="L-821"><a href="#L-821"><span class="linenos">821</span></a><span class="n">sza</span> <span class="o">=</span> <span class="n">solar_zenith_angle</span>
+</span><span id="L-822"><a href="#L-822"><span class="linenos">822</span></a><span class="n">saa</span> <span class="o">=</span> <span class="n">solar_azimuth_angle</span>
+</span><span id="L-823"><a href="#L-823"><span class="linenos">823</span></a><span class="n">sea</span> <span class="o">=</span> <span class="n">solar_elevation_angle</span>
+</span><span id="L-824"><a href="#L-824"><span class="linenos">824</span></a><span class="c1"># Additional aliases for backwards compatibility</span>
+</span><span id="L-825"><a href="#L-825"><span class="linenos">825</span></a><span class="n">equationOfTime</span> <span class="o">=</span> <span class="n">equation_of_time</span>
+</span><span id="L-826"><a href="#L-826"><span class="linenos">826</span></a><span class="n">solarDeclination</span> <span class="o">=</span> <span class="n">solar_declination</span>
 </span></pre></div>
 
 

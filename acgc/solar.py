@@ -795,9 +795,6 @@ def _to_datetime_utc( datetime_in ):
         timezone of datetime_in
     '''
 
-    if isinstance(datetime_in,xr.DataArray):
-        warnings.warn('Time variables in xarray.DataArray must be in UTC')
-
     # Ensure input is a timestamp
     datetime_in = _to_datetime( datetime_in )
 
@@ -812,7 +809,9 @@ def _to_datetime_utc( datetime_in ):
             tz_in = datetime_in.tzinfo
             datetimeUTC = datetime_in.tz_convert('UTC').tz_localize(None)
     except (TypeError, AttributeError):
+        # tz-naive time objects: Timestamp, Series, (all) DataArrays
         # No timezone info, so assume it is already UTC
+        warnings.warn('Time does not contain timezone. UTC will be assumed',RuntimeWarning)
         datetimeUTC = datetime_in
         tz_in = None
 
