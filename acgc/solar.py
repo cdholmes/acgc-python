@@ -4,7 +4,8 @@
 The functions here are are vectorized and generally broadcast over xarray dimensions,
 making this program faster than PySolar. Calculations here assume spherical Earth
 and use orbital parameters suitable for 1900-2100. Errors should be <0.1° within
-this time period. The "fast" calculations have lower accuracy orbital prameters 
+this time period. The maximum difference between geocentric and geodetic latitude
+is 0.2° at about 45° latitude. The "fast" calculations have lower accuracy orbital prameters 
 (e.g. neglecting leap years) and errors ~0.2°. Other modules (e.g. pvlib) should
 be used for high-precision calculations before 1900 or after 2100.
 
@@ -58,7 +59,7 @@ def solar_azimuth_angle( lat, lon, datetime ):
         solar azimuth angle in degrees (clockwise from north)
     '''
     # Convert to pandas Timestamp, if needed
-    datetime = _to_timestamp(datetime)
+    datetime = _to_datetime(datetime)
 
     # Subsolar point, latitude longitude, degrees
     solar_lat = solar_latitude( datetime )
@@ -161,7 +162,7 @@ def solar_zenith_angle( lat, lon, datetime,
         If refraction=True, this is the apparent solar zenith angle
     '''
     # Convert to pandas Timestamp, if needed
-    datetime = _to_timestamp(datetime)
+    datetime = _to_datetime(datetime)
 
     # Solar declination, degrees
     if solar_pos is None:
@@ -252,7 +253,7 @@ def solar_declination( datetime, fast=False ):
         solar declination in degrees at the specified date
     '''
     # Convert to pandas Timestamp, if needed
-    datetime = _to_timestamp(datetime)
+    datetime = _to_datetime(datetime)
 
     # Select the accurate or fast calculation
     accurate = not fast
@@ -316,7 +317,7 @@ def solar_longitude( datetime, solar_pos=None ):
         degrees of longitude
     '''
     # Convert to pandas Timestamp, if needed
-    datetimeUTC, tz_in = _to_timestamp_utc(datetime)
+    datetimeUTC, tz_in = _to_datetime_utc(datetime)
 
     # Longitude of subsolar point, degrees
     # Equation of time will be added below
@@ -387,7 +388,7 @@ def equation_of_time( datetime, degrees=False, fast=False ):
         equation of time on the specified date, degrees or minutes
     '''
     # Convert to pandas Timestamp, if needed
-    datetime = _to_timestamp(datetime)
+    datetime = _to_datetime(datetime)
 
     # Determine whether to use the fast or accurate calculation
     accurate = not fast
@@ -447,7 +448,7 @@ def solar_position( datetime ):
         Earth-sun distance in AU (1 AU = 1.495978707e11 m)
     '''
     # Ensure time is Timestamp in UTC
-    datetimeUTC, tz_in = _to_timestamp_utc(datetime)
+    datetimeUTC, tz_in = _to_datetime_utc(datetime)
 
     # Raise warning if any dates are outside date range
     # recommended for orbital parameters used here
@@ -569,7 +570,7 @@ def sun_times( lat, lon, datetime, tz_out=None, sza_sunrise=90.833, fast=False )
         time of meridian transit
     '''
     # Convert to pandas Timestamp in UTC, if needed
-    datetimeUTC, tz_in = _to_timestamp_utc(datetime)
+    datetimeUTC, tz_in = _to_datetime_utc(datetime)
 
     # If no output timezone is specified, use the input time zone
     if tz_out is None:
@@ -598,35 +599,50 @@ def sun_times( lat, lon, datetime, tz_out=None, sza_sunrise=90.833, fast=False )
     t_sunrise = solar_noon - 4 * ha_sunrise / 1440
     t_sunset  = solar_noon + 4 * ha_sunrise / 1440
 
-    # Date, ignoring the time
+    # Midnight UTC
     # datetimeUTC is in UTC but time-zone-naive
     try:
         # Series time objects
-        dateUTC = datetimeUTC.dt.tz_localize('UTC').dt.normalize()
+        dateUTC = datetimeUTC.dt.floor('D')
     except AttributeError:
         # Scalar time objects
-        dateUTC = datetimeUTC.tz_localize('UTC').normalize()
+        dateUTC = datetimeUTC.floor('D')
 
     # Convert day fraction -> date time
     solar_noon = dateUTC + solar_noon * pd.Timedelta( 1, 'day' )
     t_sunrise  = dateUTC + t_sunrise  * pd.Timedelta( 1, 'day' )
     t_sunset   = dateUTC + t_sunset   * pd.Timedelta( 1, 'day' )
 
-    # Convert to output timezone
-    # if tz_out is not None:
-    if isinstance(solar_noon,(xr.DataArray,np.ndarray)) or \
-       isinstance(t_sunrise,(xr.DataArray,np.ndarray)):
-        if tz_out is not None:
-            raise ValueError("Time zone conversion not supported 2-D output")
-    else:
-        try:
-            solar_noon = solar_noon.dt.tz_convert(tz_out)
-            t_sunrise  = t_sunrise.dt.tz_convert(tz_out)
-            t_sunset   = t_sunset.dt.tz_convert(tz_out)
-        except AttributeError:
-            solar_noon = solar_noon.tz_convert(tz_out)
-            t_sunrise  = t_sunrise.tz_convert(tz_out)
-            t_sunset   = t_sunset.tz_convert(tz_out)
+    # Convert to output timezone, if any is provided
+    if tz_out is not None:
+        if isinstance(solar_noon,(xr.DataArray,np.ndarray)) or \
+            isinstance(t_sunrise,(xr.DataArray,np.ndarray)):
+            # These types don't localize tz, but we can add offset to the tz-naive time
+            try:
+                # For scalar datetime, there is a single time offset, which we can add
+                utcoffset = np.timedelta64( datetimeUTC.tz_localize(tz_out).utcoffset() )
+                solar_noon += utcoffset
+                t_sunrise  += utcoffset
+                t_sunset   += utcoffset
+            except AttributeError:
+                raise ValueError("Time zone conversion not supported for time as DataArray or ndarray")
+        else:
+            try:
+                # Series time objects
+                solar_noon = solar_noon.dt.tz_localize('UTC')\
+                                    .dt.tz_convert(tz_out)
+                t_sunrise  = t_sunrise.dt.tz_localize('UTC')\
+                                    .dt.tz_convert(tz_out)
+                t_sunset   = t_sunset.dt.tz_localize('UTC')\
+                                    .dt.tz_convert(tz_out)
+            except AttributeError:
+                # Scale time objects
+                solar_noon = solar_noon.tz_localize('UTC')\
+                                    .tz_convert(tz_out)
+                t_sunrise  = t_sunrise.tz_localize('UTC')\
+                                    .tz_convert(tz_out)
+                t_sunset   = t_sunset.tz_localize('UTC')\
+                                    .tz_convert(tz_out)
 
     # Sunlight duration, minutes
     day_length = 8 * ha_sunrise * pd.Timedelta(1, 'minute')
@@ -735,8 +751,8 @@ def refraction_angle( true_elevation_angle, pressure=101325., temperature_celsiu
 
     return refraction_angle
 
-def _to_timestamp(time_in):
-    '''Convert input to Pandas Timestamp or Series of datetime64 
+def _to_datetime(time_in):
+    '''Convert to Timestamp, Series of datetime64, or DataArray of datetime64 
     
     Parameters
     ----------
@@ -745,7 +761,7 @@ def _to_timestamp(time_in):
 
     Returns
     -------
-    time_out : pandas.Timestamp or pandas.Series of datetime64
+    time_out : pandas.Timestamp, pandas.Series of datetime64, DataArray of datetime64
     '''
     if hasattr(time_in,'dt'):
         time_out = time_in
@@ -763,14 +779,27 @@ def _to_timestamp(time_in):
 
     return time_out
 
-def _to_timestamp_utc( datetime_in ):
+def _to_datetime_utc( datetime_in ):
+    '''Convert to Timestamp, Series of datetime64, or DataArray of datetime64 and in UTC
+    
+    Parameters
+    ----------
+    datetime_in : datetime-like
+        date and time to be converted
+        
+    Returns
+    -------
+    datetimeUTC : Timestamp, Series, or DataArray
+        date and time in UTC but tz-naive
+    tz_in : datetime.timezone
+        timezone of datetime_in
+    '''
 
     if isinstance(datetime_in,xr.DataArray):
-        # raise ValueError('xarray.DataArray time variables are not supported')
         warnings.warn('Time variables in xarray.DataArray must be in UTC')
 
     # Ensure input is a timestamp
-    datetime_in = _to_timestamp( datetime_in )
+    datetime_in = _to_datetime( datetime_in )
 
     # Convert to UTC, then strip timezone
     try:

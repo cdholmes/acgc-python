@@ -105,6 +105,8 @@ def test_sun_times():
 
     result = solar.sun_times(lat_brw,lon_brw,time)
     resultAK = solar.sun_times(lat_brw,lon_brw,time,'US/Alaska')
+    resultAK2 = solar.sun_times(lat_brw,lon_brw,time.tz_localize('UTC'),'US/Alaska')
+    resultAK3 = solar.sun_times(lat_brw,lon_brw,time.tz_localize('UTC').tz_convert('US/Eastern'),'US/Alaska')
 
     # Expected answer
     ans = (pd.Timestamp('2010-03-25 16:02:08.205409628'),
@@ -123,6 +125,10 @@ def test_sun_times():
         'Sun times do not equal expected values'
     assert resultAK == pytest.approx(ansAK), \
         'Sun times incorrect with time zone'
+    assert resultAK2 == pytest.approx(ansAK), \
+        'Result incorrect with input timezone'
+    assert resultAK3 == pytest.approx(ansAK), \
+        'Result incorrect with input timezone'
 
     assert solar.sunrise_time(lat_brw,lon_brw,time) \
         == pytest.approx(ans[0]), 'Sunrise time error'
