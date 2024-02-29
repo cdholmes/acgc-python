@@ -2,10 +2,10 @@
 '''Module for calculating solar position and TOA insolation
 
 The functions here are are vectorized and generally broadcast over xarray dimensions,
-making this program faster than PySolar. Calculations here assume spherical Earth
-and use orbital parameters suitable for 1900-2100. Errors should be <0.1° within
-this time period. The maximum difference between geocentric and geodetic latitude
-is 0.2° at about 45° latitude. The "fast" calculations have lower accuracy orbital prameters 
+making this program faster than PySolar and pvlib. Calculations here use orbital parameters
+suitable for 1900-2100. Maximum difference from the NREL SPA algorithm are 0.02 degree
+for solar zenith angle over these centuries, despite calculations here assuming spherical Earth. 
+The "fast" calculations have lower accuracy orbital prameters 
 (e.g. neglecting leap years) and errors ~0.2°. Other modules (e.g. pvlib) should
 be used for high-precision calculations before 1900 or after 2100.
 
