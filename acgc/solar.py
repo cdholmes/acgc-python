@@ -635,6 +635,9 @@ def sun_times( lat, lon, datetime, tz_out=None, sza_sunrise=90.833, fast=False )
                     t_sunrise  += utcoffset
                     t_sunset   += utcoffset
                 else:
+                    # We might be able to handle multiple offsets if we can
+                    # determine which dimension of `solar_noon` and `t_sunrise`
+                    # is the time dimension.
                     raise ValueError('Multiple timezone offsets not supported. '
                                      +'Request output in UTC or reduce number of input times.')
         else:
@@ -811,11 +814,11 @@ def _to_datetime_utc( datetime_in ):
 
     # Convert to UTC, then strip timezone
     try:
-        try:
+        if hasattr(datetime_in,'dt'):
             # Pandas Series objects
             tz_in = datetime_in.dt.tz
             datetimeUTC = datetime_in.dt.tz_convert('UTC').dt.tz_localize(None)
-        except AttributeError:
+        else:
             # Scalar time objects
             tz_in = datetime_in.tzinfo
             datetimeUTC = datetime_in.tz_convert('UTC').tz_localize(None)

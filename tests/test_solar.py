@@ -2,6 +2,7 @@ import datetime
 import warnings
 import numpy as np
 import pandas as pd
+import xarray as xr
 import pytest
 from acgc import solar
 
@@ -12,66 +13,59 @@ timeAK = timeUTC.tz_convert('US/Alaska')
 lat_brw = 71.323
 lon_brw = -156.611
 
-def test_time_types():
-    '''Run calculations with all expected input types for time variable'''
+xlat = xr.DataArray([lat_brw,lat_brw+1],dims=['lat'],coords={'lat':('lat',[0,1])})
+xlon = xr.DataArray([lon_brw,lon_brw+1],dims=['lon'],coords={'lon':('lon',[0,1])})
+xtime = xr.DataArray([time,time+pd.Timedelta('1h')],dims=['time'],coords={'time':('time',[0,1])})
+
+def test_param_types():
+    '''Run calculations with all expected input types'''
 
     # Ignore expected warnings about time not including timezone
     warnings.simplefilter('ignore',RuntimeWarning)
 
+    solar.horizon_zenith_angle(0)
+    solar.refraction_angle(0)
+
     for t in [ # Scalar type types, including time zones
-              time,
-              timeStr,
-              timeUTC,
-              np.datetime64(time),
-              time.to_pydatetime(),
-              # Array time types
-              [time,time],
-              pd.DatetimeIndex([time,time]),
-              pd.Series([time,time]),
-              # Arrays with time zone
-              pd.DatetimeIndex([time,time]).tz_localize('US/Eastern'),
-              pd.Series([time,time]).dt.tz_localize('US/Eastern')
-              ]:
-        solar.insolation_toa(lat_brw,lon_brw,t)
-        solar.solar_azimuth_angle(lat_brw,lon_brw,t)
-        solar.solar_zenith_angle(lat_brw,lon_brw,t)
-        solar.solar_elevation_angle(lat_brw,lon_brw,t)
+            time,
+            timeStr,
+            timeUTC,
+            np.datetime64(time),
+            time.to_pydatetime(),
+            # Array time types
+            [time,time],
+            pd.DatetimeIndex([time,time]),
+            pd.Series([time,time]),
+            # Arrays with time zone
+            pd.DatetimeIndex([time,time]).tz_localize('US/Eastern'),
+            pd.Series([time,time]).dt.tz_localize('US/Eastern')]:
+
+        # Functions of time only
         solar.solar_declination(t)
         solar.solar_latitude(t)
         solar.solar_longitude(t)
-        solar.solar_hour_angle(lon_brw,t)
         solar.equation_of_time(t)
         solar.solar_position(t)
-        solar.horizon_zenith_angle(0)
-        solar.refraction_angle(0)
-        for tz_out in [None,'UTC','US/Eastern']:
-            solar.sun_times(lat_brw,lon_brw,t,tz_out)
-            solar.sunrise_time(lat_brw,lon_brw,t,tz_out)
-            solar.sunset_time(lat_brw,lon_brw,t,tz_out)
-            solar.solar_noon(lat_brw,lon_brw,t,tz_out)
-            solar.day_length(lat_brw,lon_brw,t,tz_out)
 
-def test_lat_lon_types():
-    '''Run calculations with all expected input types for lat, lon variables'''
+        for lat in [lat_brw,
+                    np.array([lat_brw,lat_brw+1])]:
+            for lon in [lon_brw,
+                        np.array([lon_brw,lon_brw+1])]:
 
-    # Ignore expected warnings about time not including timezone
-    warnings.simplefilter('ignore',RuntimeWarning)
+                # Functions of lat, lon, time
+                solar.insolation_toa(lat,lon,t)
+                solar.solar_azimuth_angle(lat,lon,t)
+                solar.solar_zenith_angle(lat,lon,t)
+                solar.solar_elevation_angle(lat,lon,t)
+                solar.solar_hour_angle(lon,t)
 
-    for lat in [lat_brw,
-                np.array([lat_brw,lat_brw+1])]:
-        for lon in [lon_brw,
-                    np.array([lon_brw,lon_brw+1])]:
-            solar.insolation_toa(lat,lon,time)
-            solar.solar_azimuth_angle(lat,lon,time)
-            solar.solar_zenith_angle(lat,lon,time)
-            solar.solar_elevation_angle(lat,lon,time)
-            solar.sunrise_time(lat,lon,time)
-            solar.sunset_time(lat,lon,time)
-            solar.solar_noon(lat,lon,time)
-            solar.day_length(lat,lon,time)
-            solar.solar_hour_angle(lon,time)
-            solar.sun_times(lat,lon,time)
-
+                # Functions with time zone
+                for tz_out in [None,'UTC','US/Eastern']:
+                    solar.sun_times(lat,lon,t,tz_out)
+                    solar.sunrise_time(lat,lon,t,tz_out)
+                    solar.sunset_time(lat,lon,t,tz_out)
+                    solar.solar_noon(lat,lon,t,tz_out)
+                    solar.day_length(lat,lon,t,tz_out)
 
 def test_solar_position():
     '''Check values for solar_position'''
