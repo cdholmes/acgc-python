@@ -3,12 +3,20 @@
 
 The functions here are are vectorized and generally broadcast over xarray dimensions,
 making this program faster than PySolar and pvlib. Calculations here use orbital parameters
-suitable for 1900-2100. Maximum difference from the NREL SPA algorithm are 0.02 degree
-for solar zenith angle over these centuries, despite calculations here assuming spherical Earth. 
-The "fast" calculations have lower accuracy orbital prameters 
-(e.g. neglecting leap years) and errors ~0.2°. Other modules (e.g. pvlib) should
-be used for high-precision calculations before 1900 or after 2100.
+suitable for 1900-2100, unless the "fast" keyword is used. The "fast" calculations have
+lower accuracy orbital parameters and coarser approximation for the equation of time.
+All calculations here use geocentric solar position, neglecting the parallax effect
+of viewing the sun from different points on Earth (i.e. topocentric vs. geocentric in 
+SPA algorithm).
 
+Accuracy:
+The NREL SPA algorithm in pvlib is used as an accurate reference.
+The maximum error in solar zenith angle computed here is 0.02° over 1900-2100.
+The maximum error in overall solar angular position is 0.022°.
+Large apparent differences in azimuth alone can occur when the sun is near zenith or nadir,
+where a small angular displacement results in a large azimuthal change.
+
+The "fast" calculations have typical errors of ~0.2°.
 '''
 
 from collections import namedtuple
@@ -237,9 +245,7 @@ def solar_constant( datetime, solar_pos=None ):
 
 def solar_declination( datetime, fast=False ):
     '''Calculate solar declination (degrees) for specified date
-    
-    Implements Eq. 9.68-9.72 from M.Z. Jacobson, Fundamentals of Atmospheric Modeling
-    
+        
     Parameters
     ----------
     datetime : datetime-like or str
@@ -264,6 +270,9 @@ def solar_declination( datetime, fast=False ):
         dec, junk, junk, junk, junk = solar_position( datetime )
 
     else:
+        # The fast method implements
+        # Eq. 9.68-9.72 from M.Z. Jacobson, Fundamentals of Atmospheric Modeling
+
         # Number of days since beginning of 2000
         NJD = datetime - np.datetime64('2000-01-01')
         try:
@@ -401,7 +410,7 @@ def equation_of_time( datetime, degrees=False, fast=False ):
     else:
         # Implements the "alternative equation" from Wikipedia, derived from
         # https://web.archive.org/web/20120323231813/http://www.green-life-innovators.org/tiki-index.php?page=The%2BLatitude%2Band%2BLongitude%2Bof%2Bthe%2BSun%2Bby%2BDavid%2BWilliams
-        # Results checked against NOAA solar calculator and agree within 10 seconds.
+        # When compared to the NREL SPA algorithm, differences reach are up to about 0.5 minute.
         # Note: Leap years are not accounted for.
 
         # Equation of time, accounts for the solar day differing slightly from 24 hr
