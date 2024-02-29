@@ -3,11 +3,12 @@
 
 The functions here are are vectorized and generally broadcast over xarray dimensions,
 making this program faster than PySolar and pvlib. Calculations here use orbital parameters
-suitable for 1900-2100, unless the "fast" keyword is used. The "fast" calculations have
-lower accuracy orbital parameters and coarser approximation for the equation of time.
-All calculations here use geocentric solar position, neglecting the parallax effect
-of viewing the sun from different points on Earth (i.e. topocentric vs. geocentric in 
-SPA algorithm).
+from the NOAA Solar Position Calculator, following Jean Meeus Astronomical Algorithms, unless
+the "fast" keyword is used. These accurate calculations are suitable for years -2000 to +3000.
+The "fast" calculations have lower accuracy orbital parameters and coarser approximation 
+for the equation of time. All calculations here use geocentric solar position, neglecting the 
+parallax effect of viewing the sun from different points on Earth (i.e. topocentric vs. 
+geocentric in NREL SPA algorithm).
 
 Accuracy:
 The NREL SPA algorithm in pvlib is used as an accurate reference.
@@ -17,6 +18,9 @@ Large apparent differences in azimuth alone can occur when the sun is near zenit
 where a small angular displacement results in a large azimuthal change.
 
 The "fast" calculations have typical errors of ~0.2°.
+
+NOAA Solar Calculator
+https://gml.noaa.gov/grad/solcalc/calcdetails.html
 '''
 
 from collections import namedtuple
