@@ -50,6 +50,11 @@ dependencies = [
     #"rpy2",
 ]
 
+[project.optional-dependencies]
+test = [
+    "xarray"
+    ]
+
 [project.urls]
 Homepage = "https://github.com/cdholmes/acgc-python"
 Documentation = "https://cdholmes.github.io/acgc-python"
