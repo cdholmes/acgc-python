@@ -40,7 +40,7 @@ def insolation_toa( lat, lon, datetime, solar_pos=None, **kwargs ):
         longitudes in degrees
     datetime : datetime-like or str
         date and time. Include time zone or UTC will be assumed
-    solar_pos : `solar_position_tuple`, optional
+    solar_pos : `SolarPositionResults`, optional
         solar position parameters from a prior call to `solar_position`
     **kwargs passed to `solar_zenith_angle`
     
@@ -71,7 +71,7 @@ def solar_azimuth_angle( lat, lon, datetime, solar_pos=None ):
         longitudes in degrees
     datetime : datetime-like or str
         date and time. Include time zone or UTC will be assumed
-    solar_pos : `solar_position_tuple`, optional
+    solar_pos : `SolarPositionResults`, optional
         solar position parameters from a prior call to `solar_position`
 
     Returns
@@ -128,7 +128,7 @@ def solar_elevation_angle( lat, lon, datetime, alt=0,
         surface atmospheric temperature (Celsius), only used for refraction calculation
     pressure : float or ndarray (default=101325)
         surface atmospheric pressure (Pa), only used for refraction calculation
-    solar_pos : `solar_position_tuple`, optional
+    solar_pos : `SolarPositionResults`, optional
         solar position parameters from a prior call to `solar_position`
     
     Returns
@@ -178,7 +178,7 @@ def solar_zenith_angle( lat, lon, datetime,
         surface atmospheric temperature (Celsius), only used for refraction calculation
     pressure : float or ndarray (default=101325)
         surface atmospheric pressure (Pa), only used for refraction calculation
-    solar_pos : `solar_position_tuple`, optional
+    solar_pos : `SolarPositionResults`, optional
         solar position parameters from a prior call to `solar_position`
     
     Returns
@@ -248,7 +248,7 @@ def solar_constant( datetime, solar_pos=None ):
     Parameters
     ----------
     datetime : datetime-like
-    solar_pos : `solar_position_tuple`, optional
+    solar_pos : `SolarPositionResults`, optional
         solar position parameters from a prior call to `solar_position`
 
     Returns
@@ -271,7 +271,7 @@ def solar_declination( datetime, fast=False, solar_pos=None ):
         date and time. Include time zone or UTC will be assumed
     fast : bool (default=False)
         Specifies using a faster but less accurate calculation
-    solar_pos : `solar_position_tuple`, optional
+    solar_pos : `SolarPositionResults`, optional
         solar position parameters from a prior call to `solar_position`
 
     Returns
@@ -329,7 +329,7 @@ def solar_latitude( *args, **kwargs ):
         date and time. Include time zone or UTC will be assumed
     fast : bool
         see `solar_declination`
-    solar_pos : `solar_position_tuple`, optional
+    solar_pos : `SolarPositionResults`, optional
         solar position parameters from a prior call to `solar_position`
         
     Returns
@@ -346,7 +346,7 @@ def solar_longitude( datetime, solar_pos=None ):
     ----------
     datetimeUTC : datetime-like or str
         date and time. Include time zone or UTC will be assumed
-    solar_pos : `solar_position_tuple`, optional
+    solar_pos : `SolarPositionResults`, optional
         solar position parameters from a prior call to `solar_position`
     
     Returns
@@ -390,7 +390,7 @@ def solar_hour_angle( lon, datetime, solar_pos=None ):
         longitude in degrees east
     datetimeUTC : datetime-like or str
         date and time. Include time zone or UTC will be assumed
-    solar_pos : `solar_position_tuple`, optional
+    solar_pos : `SolarPositionResults`, optional
         solar position parameters from a prior call to `solar_position`
     
     Returns
@@ -476,7 +476,7 @@ def solar_position( datetime ):
     
     Returns
     -------
-    result : `solar_position_tuple`
+    result : `SolarPositionResults`
         declination, right ascension, equation of time, Earth-sun distance, datetime
     '''
     # Ensure time is Timestamp in UTC
@@ -557,7 +557,7 @@ def solar_position( datetime ):
     eot = eot * 4 / pi180
 
     # Bundle results
-    result = solar_position_tuple(declination,
+    result = SolarPositionResults(declination,
                                   right_ascension,
                                   eot,
                                   distance,
@@ -592,12 +592,12 @@ def sun_times( lat, lon, datetime, tz_out=None, sza_sunrise=90.833,
         Solar zenith angle at which sunrise and sunset are calculated, degrees
     fast : bool (default=False)
         Select a faster but less accurate calculation
-    solar_pos : `solar_position_tuple`, optional
+    solar_pos : `SolarPositionResults`, optional
         solar position parameters from a prior call to `solar_position`
 
     Returns
     -------
-    result : `sun_times_tuple`
+    result : `SunTimesResults`
         times of sunrise, sunset, solar noon, and day length
     '''
     # Convert to pandas Timestamp in UTC, if needed
@@ -696,7 +696,7 @@ def sun_times( lat, lon, datetime, tz_out=None, sza_sunrise=90.833,
     # Sunlight duration, minutes
     day_length = 8 * ha_sunrise * pd.Timedelta(1, 'minute')
 
-    result = sun_times_tuple(t_sunrise, t_sunset, day_length, solar_noon, datetimeUTC)
+    result = SunTimesResults(t_sunrise, t_sunset, day_length, solar_noon, datetimeUTC)
 
     return result
 
@@ -863,7 +863,7 @@ def _to_datetime_utc( datetime_in ):
 
     return datetimeUTC, tz_in
 
-solar_position_tuple = namedtuple('SolarPosition',
+SolarPositionResults = namedtuple('SolarPositionResults',
                     'declination right_ascension equation_of_time distance datetimeUTC')
 '''Namedtuple containing results of `solar_position`
 
@@ -882,23 +882,25 @@ equation_of_time : float
 distance : float
     Earth-sun distance in AU (1 AU = 1.495978707e11 m)
 datetimeUTC : Timestamp, Series, or DataArray of numpy.datetime64
-    date and time used in calculations
+    date and time input for calculations, UTC
 '''
 
-sun_times_tuple = namedtuple('SunTimes',
+SunTimesResults = namedtuple('SunTimesResults',
                     'sunrise sunset day_length solar_noon datetimeUTC')
 '''Namedtuple containing results of `sun_times`
 
 Attributes
 ----------
 sunrise : pandas.DatetimeIndex
-    sunrise time
+    sunrise time, UTC if not specified otherwise
 sunset : pandas.DatetimeIndex
-    sunset time
+    sunset time, UTC if not specified otherwise
 day_length : pandas.Timedelta
     duration of daylight
 solar_noon : pandas.DatetimeIndex
-    time of meridian transit
+    time of meridian transit, UTC if not specified otherwise
+datetimeUTC : Timestamp, Series, or DataArray of numpy.datetime64
+    date and time input for calculations, UTC
 '''
 
 pi180 = np.pi / 180
