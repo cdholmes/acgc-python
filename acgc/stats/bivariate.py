@@ -142,7 +142,9 @@ def _texify_name(name):
     -------
     pretty_name : str
     '''
-    if name=='R2':
+    if name.lower()=='n':
+        pretty_name = r'$n$'
+    elif name=='R2':
         pretty_name = f'$R^2$'
     elif name=='r2':
         pretty_name = f'$r^2$'
@@ -163,6 +165,8 @@ class BivariateStatistics:
     
     Attributes
     ----------
+    count, n : int
+        number of valid (not NaN) data value pairs
     xmean, ymean : float
         mean of x and y variables
     xmedian, ymedian :float
@@ -262,6 +266,7 @@ class BivariateStatistics:
             y = y[~isna]
             w = w[~isna]
 
+        # Differences and ratios used repeatedly
         diff = y - x
         absdiff = np.abs( y - x )
         # Ignore divide by zero and 0/0 while dividing
@@ -269,6 +274,9 @@ class BivariateStatistics:
         ratio = y/x
         log10ratio = np.log10(ratio)
         np.seterr(**old_settings)
+
+        # Number of data points
+        self.count = self.n = len(x)
 
         # Means, medians, and standard deviations
         self.xmean = np.mean(x)
@@ -465,12 +473,14 @@ class BivariateStatistics:
             variables='common'
         if variables=='all':
             variables=['MD','MAD','RMD','RMAD','MRD','SMD','SMAD',
+                       'MLR','MALR',
                        'MedD','MedAD','RMedD','RMedAD','MedRD',
-                       'NMBF','NMAEF','RMSD',
+                       'MedLR','MedALR',
+                       'NMBF','NMAEF','RMSD','cov',
                        'R','R2','spearmanr','slope','intercept',
-                       'fitline']
+                       'fitline','n']
         elif variables=='common':
-            variables=['MD','MAD','RMD','RMAD','MRD','R2','slope']
+            variables=['MD','MAD','RMD','RMAD','MRD','R2','slope','n']
         if not isinstance(variables,list):
             raise ValueError(
                 'variables must be a list, None, or one of these strings: "all","common"')
@@ -527,6 +537,7 @@ class BivariateStatistics:
 
     def summary(self, variables=None, fitline_kw=None,
                 floatformat='{:.4f}', floatformat_fiteqn=None,
+                intformat='{:d}',
                 stringlength=None ):
         '''Summarize bivariate statistics
 
@@ -542,6 +553,8 @@ class BivariateStatistics:
             format specifier for floating point values
         floatformat_fiteqn : str, default=floatformat
             format specifier for slope and intercept (a,b) in y = a x + b
+        intformat : str, default='{:d}'
+            format specifier for integer values
         stringlength : int, default=None
             length of the variables on output
             default (None) is to use the length of the longest variable name
@@ -575,6 +588,8 @@ class BivariateStatistics:
         for k,v in summarydict.items():
             if isinstance(v,str):
                 summarytext += (stringformat+' = {:s}\n').format(k,v)
+            elif isinstance(v,(int,np.integer)):
+                summarytext += (stringformat+' = '+intformat+'\n').format(k,v)
             else:
                 summarytext += (stringformat+' = '+floatformat+'\n').format(k,v)
 
@@ -582,6 +597,7 @@ class BivariateStatistics:
 
     def summary_fig_inset(self, ax, variables=None, fitline_kw=None,
                           floatformat='{:.3f}', floatformat_fiteqn=None,
+                          intformat='{:d}',
                           loc=None, loc_units='axes',
                           **kwargs):
         '''Display bivariate statistics as a table inset on a plot axis
@@ -602,6 +618,8 @@ class BivariateStatistics:
             format specifier for floating point values
         floatformat_fiteqn : str, default=floatformat
             format specifier for slope and intercept (a,b) in y = a x + b
+        intformat : str, default='{:d}'
+            format specifier for integer values
         loc : tuple (x0,y0), default=(0.85, 0.05)
             location on the axis where the table will be drawn
             can be in data units or axes units [0-1]
@@ -637,7 +655,9 @@ class BivariateStatistics:
         # Column of label text
         label_text = '\n'.join([_texify_name(key) for key in summarydict])
         # Column of value text
-        value_text = '\n'.join([value if isinstance(value,str) else floatformat.format(value)
+        value_text = '\n'.join([value if isinstance(value,str)
+                                else intformat.format(value) if isinstance(value,(int,np.integer))
+                                else floatformat.format(value)
                                 for value in summarydict.values()])
 
         # Check if horizontal alignment keyword is used
