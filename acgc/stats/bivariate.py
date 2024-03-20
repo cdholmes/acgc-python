@@ -134,8 +134,8 @@ def nmaef( x0, x1 ):
 def _texify_name(name):
     '''Return a LaTex formatted string for some variables
     
-    Parameter
-    ---------
+    Parameters
+    ----------
     name : str
     
     Returns
@@ -157,6 +157,32 @@ def _texify_name(name):
     else:
         pretty_name = name
     return pretty_name
+
+def _number2str(value,
+                intformat='{:d}',
+                floatformat='{:.4f}'):
+    '''Format number as string using integer and float format specifiers
+    
+    Parameters
+    ----------
+    value : numeric, str
+        value to be converted
+    intformat : str, default='{:d}'
+        format specifier for integer types
+    floatformat : str, default='{:.4f}'
+        format specifier for float types
+
+    Returns
+    -------
+    str
+    '''
+    if isinstance(value,str):
+        pass
+    elif isinstance(value,(int,np.integer)):
+        value = intformat.format(value)
+    else:
+        value = floatformat.format(value)
+    return value
 
 class BivariateStatistics:
     '''A suite of common statistics to quantify bivariate relationships
@@ -487,9 +513,7 @@ class BivariateStatistics:
 
         return variables
 
-    def summary_dict(self, variables=None,
-                     fitline_kw=None,
-                     floatformat_fiteqn='{:.3f}' ):
+    def summary_dict(self, variables=None, fitline_kw=None, floatformat_fiteqn='{:.3f}'):
         '''Summarize bivariate statistics into a dict
 
         Parameters
@@ -500,8 +524,10 @@ class BivariateStatistics:
             The following strings are also accepted in place of a list 
                 "all" (displays all variables)
                 "common" (displays all measures of mean difference)
-        fitline_kw : dict, default=None)
-            keywords passed to self.fitline()
+        fitline_kw : dict, default=None
+            keywords passed to `fitline`
+        floatformat_fiteqn : str, default=floatformat
+            format specifier for slope and intercept (a,b) in y = a x + b
         
         Returns
         -------
@@ -536,8 +562,7 @@ class BivariateStatistics:
         return summary
 
     def summary(self, variables=None, fitline_kw=None,
-                floatformat='{:.4f}', floatformat_fiteqn=None,
-                intformat='{:d}',
+                intformat='{:d}', floatformat='{:.4f}', floatformat_fiteqn=None,
                 stringlength=None ):
         '''Summarize bivariate statistics
 
@@ -549,17 +574,17 @@ class BivariateStatistics:
             The following strings are also accepted in place of a list 
                 "all" (displays all variables)
                 "common" (displays all measures of mean difference)
+        fitline_kw : dict, default=None
+            keywords passed to `fitline`
+        intformat : str, default='{:d}'
+            format specifier for integer values
         floatformat : str, default='{:.4f}'
             format specifier for floating point values
         floatformat_fiteqn : str, default=floatformat
             format specifier for slope and intercept (a,b) in y = a x + b
-        intformat : str, default='{:d}'
-            format specifier for integer values
         stringlength : int, default=None
             length of the variables on output
             default (None) is to use the length of the longest variable name
-        fitline_kw : dict, default=None
-            keywords passed to `fitline`
         
         Returns
         -------
@@ -586,18 +611,13 @@ class BivariateStatistics:
         # summary = (stringformat+'{:>10s}').format('Variable','Value')
         summarytext = ''
         for k,v in summarydict.items():
-            if isinstance(v,str):
-                summarytext += (stringformat+' = {:s}\n').format(k,v)
-            elif isinstance(v,(int,np.integer)):
-                summarytext += (stringformat+' = '+intformat+'\n').format(k,v)
-            else:
-                summarytext += (stringformat+' = '+floatformat+'\n').format(k,v)
+            vstr = _number2str(v,intformat,floatformat)
+            summarytext += (stringformat+' = {:s}\n').format(k,vstr)
 
         return summarytext
 
     def summary_fig_inset(self, ax, variables=None, fitline_kw=None,
-                          floatformat='{:.3f}', floatformat_fiteqn=None,
-                          intformat='{:d}',
+                          intformat='{:d}', floatformat='{:.3f}', floatformat_fiteqn=None,
                           loc=None, loc_units='axes',
                           **kwargs):
         '''Display bivariate statistics as a table inset on a plot axis
@@ -614,12 +634,12 @@ class BivariateStatistics:
                 "common" (displays all measures of mean difference)
         fitline_kw : dict, default=None
             keywords passed to `fitline`
+        intformat : str, default='{:d}'
+            format specifier for integer values
         floatformat : str, default='{:.3f}'
             format specifier for floating point values
         floatformat_fiteqn : str, default=floatformat
             format specifier for slope and intercept (a,b) in y = a x + b
-        intformat : str, default='{:d}'
-            format specifier for integer values
         loc : tuple (x0,y0), default=(0.85, 0.05)
             location on the axis where the table will be drawn
             can be in data units or axes units [0-1]
@@ -653,12 +673,11 @@ class BivariateStatistics:
         summarydict = self.summary_dict( variables, fitline_kw, floatformat_fiteqn )
 
         # Column of label text
-        label_text = '\n'.join([_texify_name(key) for key in summarydict])
+        label_text = '\n'.join([_texify_name(key)
+                                for key in summarydict])
         # Column of value text
-        value_text = '\n'.join([value if isinstance(value,str)
-                                else intformat.format(value) if isinstance(value,(int,np.integer))
-                                else floatformat.format(value)
-                                for value in summarydict.values()])
+        value_text = '\n'.join([_number2str(v,intformat,floatformat)
+                                for v in summarydict.values()])
 
         # Check if horizontal alignment keyword is used
         ha=''
