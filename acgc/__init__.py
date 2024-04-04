@@ -23,25 +23,30 @@ github source repository (e.g. `git pull`).
 Submodules within `acgc` contain all the capabilities of the package.
 Submodules are imported via `import acgc.<submodule>` or `from acgc import <submodule>`. 
 
-## Better looking figures ([example](https://github.com/cdholmes/acgc-python/blob/main/demo/demo_figstyle.ipynb))
-
+## Better looking figures 
 
 The default appearance of figures from Matplotlib doesn't meet the standards of most 
 scientific journals (high-resolution, Helvetica-like font). With the `acgc.figstyle` module,
 figures meet these criteria. Simply use `from acgc import figstyle` before creating your figures.
 
-## Bivariate statistics ([example](https://github.com/cdholmes/acgc-python/blob/main/demo/demo_stats.ipynb))
+[Example using acgc.figstyle](https://github.com/cdholmes/acgc-python/blob/main/demo/demo_figstyle.ipynb)
+
+## Bivariate statistics 
 
 The `BivariateStatistics` class makes it easy to compute and display a large number of
 bivariate statistics, including line fitting and weighted statistics. 
 Results can be easily formatted into tables or inset in figures. Use `from acgc.stats import BivariateStatistics`
 See `acgc.stats.bivariate.BivariateStatistics` for documentation.
 
-## Standard major axis (SMA) line fitting ([example](https://github.com/cdholmes/acgc-python/blob/main/demo/demo_sma.ipynb))
+[Example using BivariateStatistics](https://github.com/cdholmes/acgc-python/blob/main/demo/demo_stats.ipynb)
+
+## Standard major axis (SMA) line fitting
 
 SMA line fitting (also called reduced major axis or RMA) quantifies the linear relationship 
 between variables in which neither one depends on the other.
 It is available via `from acgc.stats import sma`. 
+
+[Example using SMA](https://github.com/cdholmes/acgc-python/blob/main/demo/demo_sma.ipynb)
 
 <!-- ----------------------- SECTION BREAK ----------------------- -->
 
