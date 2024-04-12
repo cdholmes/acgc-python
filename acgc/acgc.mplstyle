@@ -8,6 +8,14 @@ font.sans-serif : TeX Gyre Heros, Arial, Helvetica, DejaVu Sans, Bitstream Vera 
 font.cursive    : TeX Gyre Chorus, Apple Chancery, Textile, Zapf Chancery, Sand, Script MT, Felipa, Comic Neue, Comic Sans MS, cursive
 font.fantasy    : TeX Gyre Adventor, Chicago, Charcoal, Impact, Western, Humor Sans, xkcd, fantasy
 font.monospace  : DejaVu Sans Mono, TeX Gyre Cursor, Bitstream Vera Sans Mono, Computer Modern Typewriter, Andale Mono, Nimbus Mono L, Courier New, Courier, Fixed, Terminal, monospace
+mathtext.fontset: custom
+mathtext.bf     : TeX Gyre Heros:bold
+mathtext.bfit   : TeX Gyre Heros:italic:bold
+mathtext.it     : TeX Gyre Heros:italic
+mathtext.rm     : TeX Gyre Heros
+mathtext.sf     : TeX Gyre Heros
+mathtext.cal    : TeX Gyre Chorus
+mathtext.tt     : TeX Gyre Cursor
 
 
 ## Figure display

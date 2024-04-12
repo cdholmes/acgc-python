@@ -30,6 +30,8 @@ def funcerror_uncorr(func,x0,xerr,h=None,**kwargs):
         uncertainty in parameter values x0
     h    : float, default=1e-3
         fractional perturbation to x0 used to estimate slope of func via finite difference 
+    **kwargs : (optional)
+        kwargs will be passed to func without error
     
     Returns
     -------
@@ -38,11 +40,11 @@ def funcerror_uncorr(func,x0,xerr,h=None,**kwargs):
     '''
 
     # Increment size for finite difference
-    # Numerical Methods in C recommends h * x, where x is the variable and 
-    # h = sqrt(machine precision). For a 64-bit (double) float, that implies 
+    # Numerical Methods in C recommends h * x, where x is the variable and
+    # h = sqrt(machine precision). For a 64-bit (double) float, that implies
     # h = 2e-8. For a 32-bit (single) float, that implies h = 3e-4.
-    # We choose a larger value to reduce roundoff error. Note 
-    # that very large h causes formula error where secant line is not parallel 
+    # We choose a larger value to reduce roundoff error. Note
+    # that very large h causes formula error where secant line is not parallel
     # to instantaneous slope.
     if h is None:
         h = 1e-7
