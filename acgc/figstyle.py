@@ -25,7 +25,7 @@ if 'inline' in mpl.get_backend():
 # Path to this module
 _PATH = os.path.dirname(__file__)
 
-def activate_style(grid=True,gridaxis='both'):
+def activate_style(grid=True,gridaxis='both',mathfont='regular'):
     '''Activate style sheet 
     
     Parameters
@@ -34,8 +34,15 @@ def activate_style(grid=True,gridaxis='both'):
         turn grid lines on (True) or off (False)
     gridaxis : str, default='both'
         specifies which axes should have grid lines
+    mathfont : str, default='regular'
+        sets font used in mathtext, 'regular' uses same font as regular text.
+        see `set_mathfont` for all options
     '''
+    # Load settings from style file
     mstyle.use(os.path.join(_PATH,'acgc.mplstyle'))
+
+    # Set mathtext font
+    set_mathfont(mathfont)
 
     # Turn grid on or off
     if grid:
@@ -46,6 +53,55 @@ def activate_style(grid=True,gridaxis='both'):
     if 'inline' in mpl.get_backend():
         matplotlib_inline.backend_inline.set_matplotlib_formats('retina')
 
+def deactivate_style():
+    '''Restore rcParams prior to importing figstyle'''
+    mpl.rcParams = rcParams_old
+
+def set_mathfont(fontname=None):
+    '''Set the font used for typsetting math in Matplotlib
+
+    Parameters
+    ----------
+    fontname : str, default=None
+        None         : Restore mathtext font to settings before importing figstyle
+        'regular'    : Use same font as regular text in math expressions (default).
+                       Same as using \mathregular or \mathdefault in math expressions.
+                       Best for mixing regular and math text for superscripts and subscripts.
+                       May lack or have poor positioning of some math symbols (e.g. integrals).
+                       This will overwrite mathtext.bf, .bfit, .it, .rm in rcParams.
+        'custom'     : Uses custom settings from rcParams (mathtext.bf, .bfit, .it, .rm)
+        'cm'         : Computer Modern (i.e. LaTeX default)
+        'stix'       : STIX serif
+        'stixsans'   : STIX sans-serif; best for sans-serif math
+        'dejavuserif': DejaVu Serif (not recommended)
+        'dejavusans' : DejaVu Sans (not recommended)
+    '''
+
+    # Check that input has an allowed value
+    allowedvalues = ['None','regular','custom','cm','stix','stixsans','dejavusans','dejavuserif']
+    if (fontname not in allowedvalues) and (fontname is not None):
+        raise ValueError('Font name should be one of the allowed values: '+','.join(allowedvalues))
+
+    if fontname is None:
+        # Restore old mathtext settings
+        mpl.rcParams.update( {key:rcParams_old[key] for key in
+                              ['mathtext.fontset','mathtext.bf','mathtext.bfit',
+                               'mathtext.it','mathtext.rm']})
+
+    elif fontname == 'regular':
+        # Set the math font to the font used for regular text
+
+        # Name of the text font
+        textfont = mpl.rcParams[f'font.{mpl.rcParams["font.family"][0]:s}'][0]
+        # Use the same font for math
+        mpl.rcParams.update({'mathtext.fontset': 'custom',
+                            'mathtext.bf'   : f'{textfont}:bold',
+                            'mathtext.bfit' : f'{textfont}:italic:bold',
+                            'mathtext.it'   : f'{textfont}:italic',
+                            'mathtext.rm'   : f'{textfont}'})
+    else:
+        # Set the math font to the value provided
+        mpl.rcParams['mathtext.fontset'] = fontname
 
 def grid_off():
     '''Turn off grid lines'''
@@ -76,10 +132,10 @@ def load_fonts():
     rebuild = False
     for font in fonts_pylib:
         if font not in fonts_cached_paths:
-            if rebuild == False:
+            if rebuild is False:
                 # Issue warning, first time only
                 warnings.warn('Rebuilding font cache. This can take time.')
-            rebuild = True    
+            rebuild = True
             mfonts.fontManager.addfont(font)
 
     # Save font cache
@@ -91,5 +147,6 @@ def load_fonts():
         mfonts.json_dump(mfonts.fontManager, cache)
 
 ###
+rcParams_old = mpl.rcParams.copy()
 load_fonts()
 activate_style()

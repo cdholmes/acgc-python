@@ -1,22 +1,17 @@
 ### Style inspired by the Proplot package
 
+# For settings documentation, see https://matplotlib.org/stable/users/explain/customizing.html#customizing-with-matplotlibrc-files
+
 ## Font
 font.size       : 10.0
 font.family     : sans-serif
-font.serif      : TeX Gyre Pagella, TeX Gyre Termes, DejaVu Serif, Bitstream Vera Serif, Computer Modern Roman, New Century Schoolbook, Century Schoolbook L, Utopia, ITC Bookman, Bookman, Nimbus Roman No9 L, Times New Roman, Times, Palatino, Charter, serif
+font.serif      : TeX Gyre Pagella, TeX Gyre Termes, TeX Gyre Schola, DejaVu Serif, Bitstream Vera Serif, Computer Modern Roman, New Century Schoolbook, Century Schoolbook L, Utopia, ITC Bookman, Bookman, Nimbus Roman No9 L, Times New Roman, Times, Palatino, Charter, serif
 font.sans-serif : TeX Gyre Heros, Arial, Helvetica, DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid, Avant Garde, sans-serif
 font.cursive    : TeX Gyre Chorus, Apple Chancery, Textile, Zapf Chancery, Sand, Script MT, Felipa, Comic Neue, Comic Sans MS, cursive
 font.fantasy    : TeX Gyre Adventor, Chicago, Charcoal, Impact, Western, Humor Sans, xkcd, fantasy
 font.monospace  : DejaVu Sans Mono, TeX Gyre Cursor, Bitstream Vera Sans Mono, Computer Modern Typewriter, Andale Mono, Nimbus Mono L, Courier New, Courier, Fixed, Terminal, monospace
-mathtext.fontset: custom
-mathtext.bf     : TeX Gyre Heros:bold
-mathtext.bfit   : TeX Gyre Heros:italic:bold
-mathtext.it     : TeX Gyre Heros:italic
-mathtext.rm     : TeX Gyre Heros
-mathtext.sf     : TeX Gyre Heros
-mathtext.cal    : TeX Gyre Chorus
-mathtext.tt     : TeX Gyre Cursor
-
+mathtext.fontset: stixsans      # stixsans, stix and cm typically produce best results
+mathtext.fallback: stixsans
 
 ## Figure display
 figure.figsize      : 4.0, 3.3
@@ -73,4 +68,8 @@ ytick.minor.size    : 2.0
 ytick.minor.width   : 0.5
 ytick.minor.visible : True
 
-# See https://matplotlib.org/stable/users/explain/customizing.html#customizing-with-matplotlibrc-files for more documentation
+## Histogram plots
+hist.bins  : 20
+
+## Boxplots
+boxplot.showcaps       : False
