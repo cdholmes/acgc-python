@@ -201,6 +201,8 @@ class BivariateStatistics:
         standard deviation of x and y variables
     mean_difference, md : float
         ymean - xmean
+    std_difference, stdd : float
+        std( y - x )
     mean_absolute_difference, mad : float
         mean( |y-x| )
     relative_mean_difference, rmd : float
@@ -215,6 +217,8 @@ class BivariateStatistics:
         mean(y/x) - 1
     mean_log10_ratio, mlr : float
         mean( log10(y/x) )
+    std_log10_ratio, stdlr : float
+        std( log10(y/x) )
     mean_absolute_log10_ratio, malr : float
         mean( abs( log10(y/x) ) )
     median_difference, medd : float
@@ -237,6 +241,8 @@ class BivariateStatistics:
         see `nmaef`
     root_mean_square_difference, rmsd : float
         $\\sqrt{ \\langle (y - x)^2 \\rangle }$
+    root_mean_square_log10_ratio, rmslr : float
+        $\\sqrt{ \\langle log10(y/x)^2 \\rangle }$
     covariance : float
         cov(x,y)
     correlation_pearson, correlation, pearsonr, R, r : float
@@ -320,6 +326,7 @@ class BivariateStatistics:
         # Mean and mean absolute differences
         self.mean_difference            = self.md   = self.ymean - self.xmean
         self.mean_absolute_difference   = self.mad  = np.mean( absdiff )
+        self.std_difference             = self.stdd = np.std( diff )
 
         # Relative and standardized differences
         self.relative_mean_difference           = self.rmd  = self.mean_difference / self.xmean
@@ -345,13 +352,16 @@ class BivariateStatistics:
         # Mean and mean absolute log ratio
         self.mean_log10_ratio          = self.mlr  = np.mean( log10ratio )
         self.mean_absolute_log10_ratio = self.malr = np.mean( np.abs( log10ratio ) )
-        
+        self.std_log10_ratio           = self.stdlr= np.std( log10ratio )
+
         # Median and median absolute log ratio
         self.median_log10_ratio          = self.medlr  = np.median( log10ratio )
         self.median_absolute_log10_ratio = self.medalr = np.median( np.abs( log10ratio ) )
-        
+
         # RMS difference
-        self.root_mean_square_difference    = self.rmsd     = np.sqrt( np.mean( np.power( diff, 2) ) )
+        self.root_mean_square_difference = self.rmsd   = np.sqrt( np.mean( np.power( diff, 2) ) )
+        # RMS log ratio
+        self.root_mean_square_log10_ratio = self.rmslr = np.sqrt( np.mean( np.power( log10ratio, 2 )))
 
         # Covariance, correlation
         self.covariance = np.cov(x,y)[0][1]
