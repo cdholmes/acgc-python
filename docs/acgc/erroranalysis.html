@@ -111,40 +111,42 @@
 </span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a><span class="sd">        uncertainty in parameter values x0</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a><span class="sd">    h    : float, default=1e-3</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="sd">        fractional perturbation to x0 used to estimate slope of func via finite difference </span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="sd">    </span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a><span class="sd">    Returns</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a><span class="sd">    -------</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="sd">    ferr : float</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="sd">        the uncertainty in `f(x0)` given `xerr` uncertainty in `x0`</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>    <span class="c1"># Increment size for finite difference</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>    <span class="c1"># Numerical Methods in C recommends h * x, where x is the variable and </span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>    <span class="c1"># h = sqrt(machine precision). For a 64-bit (double) float, that implies </span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>    <span class="c1"># h = 2e-8. For a 32-bit (single) float, that implies h = 3e-4.</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>    <span class="c1"># We choose a larger value to reduce roundoff error. Note </span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>    <span class="c1"># that very large h causes formula error where secant line is not parallel </span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>    <span class="c1"># to instantaneous slope.</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>    <span class="k">if</span> <span class="n">h</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>        <span class="n">h</span> <span class="o">=</span> <span class="mf">1e-7</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>        <span class="n">h</span> <span class="o">=</span> <span class="mf">1e-3</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>
-</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>    <span class="n">ferr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="sd">    **kwargs : (optional)</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a><span class="sd">        kwargs will be passed to func without error</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a><span class="sd">    </span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="sd">    Returns</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="sd">    -------</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="sd">    ferr : float</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="sd">        the uncertainty in `f(x0)` given `xerr` uncertainty in `x0`</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>    <span class="c1"># Increment size for finite difference</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>    <span class="c1"># Numerical Methods in C recommends h * x, where x is the variable and</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>    <span class="c1"># h = sqrt(machine precision). For a 64-bit (double) float, that implies</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>    <span class="c1"># h = 2e-8. For a 32-bit (single) float, that implies h = 3e-4.</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>    <span class="c1"># We choose a larger value to reduce roundoff error. Note</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>    <span class="c1"># that very large h causes formula error where secant line is not parallel</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>    <span class="c1"># to instantaneous slope.</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>    <span class="k">if</span> <span class="n">h</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>        <span class="n">h</span> <span class="o">=</span> <span class="mf">1e-7</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>        <span class="n">h</span> <span class="o">=</span> <span class="mf">1e-3</span>
 </span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>
-</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">xi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x0</span><span class="p">):</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>        <span class="n">xplus</span>     <span class="o">=</span> <span class="n">x0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>        <span class="n">xminus</span>    <span class="o">=</span> <span class="n">x0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>        <span class="n">xplus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="o">=</span> <span class="n">xplus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="o">+</span> <span class="n">h</span><span class="o">*</span><span class="n">xi</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>        <span class="n">xminus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">xminus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">h</span><span class="o">*</span><span class="n">xi</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>
-</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>        <span class="c1"># Centered finite difference estimate of derivative</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>        <span class="n">dfdx</span> <span class="o">=</span> <span class="p">(</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">xplus</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">xminus</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">xplus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">xminus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>
-</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>        <span class="n">ferr</span> <span class="o">+=</span> <span class="n">dfdx</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">xerr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>    <span class="n">ferr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">xi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x0</span><span class="p">):</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>        <span class="n">xplus</span>     <span class="o">=</span> <span class="n">x0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>        <span class="n">xminus</span>    <span class="o">=</span> <span class="n">x0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>        <span class="n">xplus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="o">=</span> <span class="n">xplus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="o">+</span> <span class="n">h</span><span class="o">*</span><span class="n">xi</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>        <span class="n">xminus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">xminus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">h</span><span class="o">*</span><span class="n">xi</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>
+</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>        <span class="c1"># Centered finite difference estimate of derivative</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>        <span class="n">dfdx</span> <span class="o">=</span> <span class="p">(</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">xplus</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">xminus</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">xplus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">xminus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
 </span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>
-</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>    <span class="n">ferr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ferr</span><span class="p">)</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>        <span class="n">ferr</span> <span class="o">+=</span> <span class="n">dfdx</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">xerr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
 </span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>
-</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>    <span class="k">return</span> <span class="n">ferr</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>    <span class="n">ferr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ferr</span><span class="p">)</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a>
+</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a>    <span class="k">return</span> <span class="n">ferr</span>
 </span></pre></div>
 
 
@@ -186,40 +188,42 @@
 </span><span id="funcerror_uncorr-31"><a href="#funcerror_uncorr-31"><span class="linenos">31</span></a><span class="sd">        uncertainty in parameter values x0</span>
 </span><span id="funcerror_uncorr-32"><a href="#funcerror_uncorr-32"><span class="linenos">32</span></a><span class="sd">    h    : float, default=1e-3</span>
 </span><span id="funcerror_uncorr-33"><a href="#funcerror_uncorr-33"><span class="linenos">33</span></a><span class="sd">        fractional perturbation to x0 used to estimate slope of func via finite difference </span>
-</span><span id="funcerror_uncorr-34"><a href="#funcerror_uncorr-34"><span class="linenos">34</span></a><span class="sd">    </span>
-</span><span id="funcerror_uncorr-35"><a href="#funcerror_uncorr-35"><span class="linenos">35</span></a><span class="sd">    Returns</span>
-</span><span id="funcerror_uncorr-36"><a href="#funcerror_uncorr-36"><span class="linenos">36</span></a><span class="sd">    -------</span>
-</span><span id="funcerror_uncorr-37"><a href="#funcerror_uncorr-37"><span class="linenos">37</span></a><span class="sd">    ferr : float</span>
-</span><span id="funcerror_uncorr-38"><a href="#funcerror_uncorr-38"><span class="linenos">38</span></a><span class="sd">        the uncertainty in `f(x0)` given `xerr` uncertainty in `x0`</span>
-</span><span id="funcerror_uncorr-39"><a href="#funcerror_uncorr-39"><span class="linenos">39</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="funcerror_uncorr-40"><a href="#funcerror_uncorr-40"><span class="linenos">40</span></a>
-</span><span id="funcerror_uncorr-41"><a href="#funcerror_uncorr-41"><span class="linenos">41</span></a>    <span class="c1"># Increment size for finite difference</span>
-</span><span id="funcerror_uncorr-42"><a href="#funcerror_uncorr-42"><span class="linenos">42</span></a>    <span class="c1"># Numerical Methods in C recommends h * x, where x is the variable and </span>
-</span><span id="funcerror_uncorr-43"><a href="#funcerror_uncorr-43"><span class="linenos">43</span></a>    <span class="c1"># h = sqrt(machine precision). For a 64-bit (double) float, that implies </span>
-</span><span id="funcerror_uncorr-44"><a href="#funcerror_uncorr-44"><span class="linenos">44</span></a>    <span class="c1"># h = 2e-8. For a 32-bit (single) float, that implies h = 3e-4.</span>
-</span><span id="funcerror_uncorr-45"><a href="#funcerror_uncorr-45"><span class="linenos">45</span></a>    <span class="c1"># We choose a larger value to reduce roundoff error. Note </span>
-</span><span id="funcerror_uncorr-46"><a href="#funcerror_uncorr-46"><span class="linenos">46</span></a>    <span class="c1"># that very large h causes formula error where secant line is not parallel </span>
-</span><span id="funcerror_uncorr-47"><a href="#funcerror_uncorr-47"><span class="linenos">47</span></a>    <span class="c1"># to instantaneous slope.</span>
-</span><span id="funcerror_uncorr-48"><a href="#funcerror_uncorr-48"><span class="linenos">48</span></a>    <span class="k">if</span> <span class="n">h</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="funcerror_uncorr-49"><a href="#funcerror_uncorr-49"><span class="linenos">49</span></a>        <span class="n">h</span> <span class="o">=</span> <span class="mf">1e-7</span>
-</span><span id="funcerror_uncorr-50"><a href="#funcerror_uncorr-50"><span class="linenos">50</span></a>        <span class="n">h</span> <span class="o">=</span> <span class="mf">1e-3</span>
-</span><span id="funcerror_uncorr-51"><a href="#funcerror_uncorr-51"><span class="linenos">51</span></a>
-</span><span id="funcerror_uncorr-52"><a href="#funcerror_uncorr-52"><span class="linenos">52</span></a>    <span class="n">ferr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span id="funcerror_uncorr-34"><a href="#funcerror_uncorr-34"><span class="linenos">34</span></a><span class="sd">    **kwargs : (optional)</span>
+</span><span id="funcerror_uncorr-35"><a href="#funcerror_uncorr-35"><span class="linenos">35</span></a><span class="sd">        kwargs will be passed to func without error</span>
+</span><span id="funcerror_uncorr-36"><a href="#funcerror_uncorr-36"><span class="linenos">36</span></a><span class="sd">    </span>
+</span><span id="funcerror_uncorr-37"><a href="#funcerror_uncorr-37"><span class="linenos">37</span></a><span class="sd">    Returns</span>
+</span><span id="funcerror_uncorr-38"><a href="#funcerror_uncorr-38"><span class="linenos">38</span></a><span class="sd">    -------</span>
+</span><span id="funcerror_uncorr-39"><a href="#funcerror_uncorr-39"><span class="linenos">39</span></a><span class="sd">    ferr : float</span>
+</span><span id="funcerror_uncorr-40"><a href="#funcerror_uncorr-40"><span class="linenos">40</span></a><span class="sd">        the uncertainty in `f(x0)` given `xerr` uncertainty in `x0`</span>
+</span><span id="funcerror_uncorr-41"><a href="#funcerror_uncorr-41"><span class="linenos">41</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="funcerror_uncorr-42"><a href="#funcerror_uncorr-42"><span class="linenos">42</span></a>
+</span><span id="funcerror_uncorr-43"><a href="#funcerror_uncorr-43"><span class="linenos">43</span></a>    <span class="c1"># Increment size for finite difference</span>
+</span><span id="funcerror_uncorr-44"><a href="#funcerror_uncorr-44"><span class="linenos">44</span></a>    <span class="c1"># Numerical Methods in C recommends h * x, where x is the variable and</span>
+</span><span id="funcerror_uncorr-45"><a href="#funcerror_uncorr-45"><span class="linenos">45</span></a>    <span class="c1"># h = sqrt(machine precision). For a 64-bit (double) float, that implies</span>
+</span><span id="funcerror_uncorr-46"><a href="#funcerror_uncorr-46"><span class="linenos">46</span></a>    <span class="c1"># h = 2e-8. For a 32-bit (single) float, that implies h = 3e-4.</span>
+</span><span id="funcerror_uncorr-47"><a href="#funcerror_uncorr-47"><span class="linenos">47</span></a>    <span class="c1"># We choose a larger value to reduce roundoff error. Note</span>
+</span><span id="funcerror_uncorr-48"><a href="#funcerror_uncorr-48"><span class="linenos">48</span></a>    <span class="c1"># that very large h causes formula error where secant line is not parallel</span>
+</span><span id="funcerror_uncorr-49"><a href="#funcerror_uncorr-49"><span class="linenos">49</span></a>    <span class="c1"># to instantaneous slope.</span>
+</span><span id="funcerror_uncorr-50"><a href="#funcerror_uncorr-50"><span class="linenos">50</span></a>    <span class="k">if</span> <span class="n">h</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="funcerror_uncorr-51"><a href="#funcerror_uncorr-51"><span class="linenos">51</span></a>        <span class="n">h</span> <span class="o">=</span> <span class="mf">1e-7</span>
+</span><span id="funcerror_uncorr-52"><a href="#funcerror_uncorr-52"><span class="linenos">52</span></a>        <span class="n">h</span> <span class="o">=</span> <span class="mf">1e-3</span>
 </span><span id="funcerror_uncorr-53"><a href="#funcerror_uncorr-53"><span class="linenos">53</span></a>
-</span><span id="funcerror_uncorr-54"><a href="#funcerror_uncorr-54"><span class="linenos">54</span></a>    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">xi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x0</span><span class="p">):</span>
-</span><span id="funcerror_uncorr-55"><a href="#funcerror_uncorr-55"><span class="linenos">55</span></a>        <span class="n">xplus</span>     <span class="o">=</span> <span class="n">x0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-</span><span id="funcerror_uncorr-56"><a href="#funcerror_uncorr-56"><span class="linenos">56</span></a>        <span class="n">xminus</span>    <span class="o">=</span> <span class="n">x0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-</span><span id="funcerror_uncorr-57"><a href="#funcerror_uncorr-57"><span class="linenos">57</span></a>        <span class="n">xplus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="o">=</span> <span class="n">xplus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="o">+</span> <span class="n">h</span><span class="o">*</span><span class="n">xi</span>
-</span><span id="funcerror_uncorr-58"><a href="#funcerror_uncorr-58"><span class="linenos">58</span></a>        <span class="n">xminus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">xminus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">h</span><span class="o">*</span><span class="n">xi</span>
-</span><span id="funcerror_uncorr-59"><a href="#funcerror_uncorr-59"><span class="linenos">59</span></a>
-</span><span id="funcerror_uncorr-60"><a href="#funcerror_uncorr-60"><span class="linenos">60</span></a>        <span class="c1"># Centered finite difference estimate of derivative</span>
-</span><span id="funcerror_uncorr-61"><a href="#funcerror_uncorr-61"><span class="linenos">61</span></a>        <span class="n">dfdx</span> <span class="o">=</span> <span class="p">(</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">xplus</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">xminus</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">xplus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">xminus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
-</span><span id="funcerror_uncorr-62"><a href="#funcerror_uncorr-62"><span class="linenos">62</span></a>
-</span><span id="funcerror_uncorr-63"><a href="#funcerror_uncorr-63"><span class="linenos">63</span></a>        <span class="n">ferr</span> <span class="o">+=</span> <span class="n">dfdx</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">xerr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+</span><span id="funcerror_uncorr-54"><a href="#funcerror_uncorr-54"><span class="linenos">54</span></a>    <span class="n">ferr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span id="funcerror_uncorr-55"><a href="#funcerror_uncorr-55"><span class="linenos">55</span></a>
+</span><span id="funcerror_uncorr-56"><a href="#funcerror_uncorr-56"><span class="linenos">56</span></a>    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">xi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x0</span><span class="p">):</span>
+</span><span id="funcerror_uncorr-57"><a href="#funcerror_uncorr-57"><span class="linenos">57</span></a>        <span class="n">xplus</span>     <span class="o">=</span> <span class="n">x0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="funcerror_uncorr-58"><a href="#funcerror_uncorr-58"><span class="linenos">58</span></a>        <span class="n">xminus</span>    <span class="o">=</span> <span class="n">x0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="funcerror_uncorr-59"><a href="#funcerror_uncorr-59"><span class="linenos">59</span></a>        <span class="n">xplus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="o">=</span> <span class="n">xplus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="o">+</span> <span class="n">h</span><span class="o">*</span><span class="n">xi</span>
+</span><span id="funcerror_uncorr-60"><a href="#funcerror_uncorr-60"><span class="linenos">60</span></a>        <span class="n">xminus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">xminus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">h</span><span class="o">*</span><span class="n">xi</span>
+</span><span id="funcerror_uncorr-61"><a href="#funcerror_uncorr-61"><span class="linenos">61</span></a>
+</span><span id="funcerror_uncorr-62"><a href="#funcerror_uncorr-62"><span class="linenos">62</span></a>        <span class="c1"># Centered finite difference estimate of derivative</span>
+</span><span id="funcerror_uncorr-63"><a href="#funcerror_uncorr-63"><span class="linenos">63</span></a>        <span class="n">dfdx</span> <span class="o">=</span> <span class="p">(</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">xplus</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">xminus</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">xplus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">xminus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
 </span><span id="funcerror_uncorr-64"><a href="#funcerror_uncorr-64"><span class="linenos">64</span></a>
-</span><span id="funcerror_uncorr-65"><a href="#funcerror_uncorr-65"><span class="linenos">65</span></a>    <span class="n">ferr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ferr</span><span class="p">)</span>
+</span><span id="funcerror_uncorr-65"><a href="#funcerror_uncorr-65"><span class="linenos">65</span></a>        <span class="n">ferr</span> <span class="o">+=</span> <span class="n">dfdx</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">xerr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
 </span><span id="funcerror_uncorr-66"><a href="#funcerror_uncorr-66"><span class="linenos">66</span></a>
-</span><span id="funcerror_uncorr-67"><a href="#funcerror_uncorr-67"><span class="linenos">67</span></a>    <span class="k">return</span> <span class="n">ferr</span>
+</span><span id="funcerror_uncorr-67"><a href="#funcerror_uncorr-67"><span class="linenos">67</span></a>    <span class="n">ferr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ferr</span><span class="p">)</span>
+</span><span id="funcerror_uncorr-68"><a href="#funcerror_uncorr-68"><span class="linenos">68</span></a>
+</span><span id="funcerror_uncorr-69"><a href="#funcerror_uncorr-69"><span class="linenos">69</span></a>    <span class="k">return</span> <span class="n">ferr</span>
 </span></pre></div>
 
 
@@ -249,6 +253,8 @@ parameter values for func</li>
 uncertainty in parameter values x0</li>
 <li><strong>h</strong> (float, default=1e-3):
 fractional perturbation to x0 used to estimate slope of func via finite difference</li>
+<li><strong>**kwargs</strong> ((optional)):
+kwargs will be passed to func without error</li>
 </ul>
 
 <h6 id="returns">Returns</h6>
