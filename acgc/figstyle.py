@@ -55,7 +55,7 @@ def activate_style(grid=True,gridaxis='both',mathfont='regular'):
 
 def deactivate_style():
     '''Restore rcParams prior to importing figstyle'''
-    mpl.rcParams = rcParams_old
+    mpl.rcParams = _rcParams_old
 
 def set_mathfont(fontname=None):
     '''Set the font used for typsetting math in Matplotlib
@@ -63,18 +63,20 @@ def set_mathfont(fontname=None):
     Parameters
     ----------
     fontname : str, default=None
-        None         : Restore mathtext font to settings before importing figstyle
-        'regular'    : Use same font as regular text in math expressions (default).
-                       Same as using \mathregular or \mathdefault in math expressions.
+        Should be one of
+        - None         : Restore mathtext font to settings before importing figstyle
+        - 'regular'    : Use same font as regular text in math expressions (default).
+                       Same as using \\mathregular or \\mathdefault in math expressions.
                        Best for mixing regular and math text for superscripts and subscripts.
                        May lack or have poor positioning of some math symbols (e.g. integrals).
-                       This will overwrite mathtext.bf, .bfit, .it, .rm in rcParams.
-        'custom'     : Uses custom settings from rcParams (mathtext.bf, .bfit, .it, .rm)
-        'cm'         : Computer Modern (i.e. LaTeX default)
-        'stix'       : STIX serif
-        'stixsans'   : STIX sans-serif; best for sans-serif math
-        'dejavuserif': DejaVu Serif (not recommended)
-        'dejavusans' : DejaVu Sans (not recommended)
+                       This will overwrite mathtext.bf, mathtext.bfit, mathtext.it, 
+                       mathtext.rm in rcParams.
+        - 'custom'     : Uses custom settings from rcParams (mathtext.bf, .bfit, .it, .rm)
+        - 'cm'         : Computer Modern (i.e. LaTeX default)
+        - 'stix'       : STIX serif
+        - 'stixsans'   : STIX sans-serif; best for sans-serif math
+        - 'dejavuserif': DejaVu Serif (not recommended)
+        - 'dejavusans' : DejaVu Sans (not recommended)
     '''
 
     # Check that input has an allowed value
@@ -84,7 +86,7 @@ def set_mathfont(fontname=None):
 
     if fontname is None:
         # Restore old mathtext settings
-        mpl.rcParams.update( {key:rcParams_old[key] for key in
+        mpl.rcParams.update( {key:_rcParams_old[key] for key in
                               ['mathtext.fontset','mathtext.bf','mathtext.bfit',
                                'mathtext.it','mathtext.rm']})
 
@@ -147,6 +149,6 @@ def load_fonts():
         mfonts.json_dump(mfonts.fontManager, cache)
 
 ###
-rcParams_old = mpl.rcParams.copy()
+_rcParams_old = mpl.rcParams.copy()
 load_fonts()
 activate_style()

@@ -71,9 +71,6 @@
             <li>
                     <a class="function" href="#load_fonts">load_fonts</a>
             </li>
-            <li>
-                    <a class="variable" href="#rcParams_old">rcParams_old</a>
-            </li>
     </ul>
 
 
@@ -166,7 +163,7 @@ Turn these off and on with <code><a href="#grid_off">grid_off</a></code> and <co
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>
 </span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="k">def</span> <span class="nf">deactivate_style</span><span class="p">():</span>
 </span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Restore rcParams prior to importing figstyle&#39;&#39;&#39;</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span> <span class="o">=</span> <span class="n">rcParams_old</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span> <span class="o">=</span> <span class="n">_rcParams_old</span>
 </span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>
 </span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="k">def</span> <span class="nf">set_mathfont</span><span class="p">(</span><span class="n">fontname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Set the font used for typsetting math in Matplotlib</span>
@@ -174,93 +171,95 @@ Turn these off and on with <code><a href="#grid_off">grid_off</a></code> and <co
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">    Parameters</span>
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="sd">    ----------</span>
 </span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">    fontname : str, default=None</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">        None         : Restore mathtext font to settings before importing figstyle</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd">        &#39;regular&#39;    : Use same font as regular text in math expressions (default).</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd">                       Same as using \mathregular or \mathdefault in math expressions.</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">                       Best for mixing regular and math text for superscripts and subscripts.</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="sd">                       May lack or have poor positioning of some math symbols (e.g. integrals).</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">                       This will overwrite mathtext.bf, .bfit, .it, .rm in rcParams.</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="sd">        &#39;custom&#39;     : Uses custom settings from rcParams (mathtext.bf, .bfit, .it, .rm)</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">        &#39;cm&#39;         : Computer Modern (i.e. LaTeX default)</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="sd">        &#39;stix&#39;       : STIX serif</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">        &#39;stixsans&#39;   : STIX sans-serif; best for sans-serif math</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">        &#39;dejavuserif&#39;: DejaVu Serif (not recommended)</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd">        &#39;dejavusans&#39; : DejaVu Sans (not recommended)</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>    <span class="c1"># Check that input has an allowed value</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>    <span class="n">allowedvalues</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;None&#39;</span><span class="p">,</span><span class="s1">&#39;regular&#39;</span><span class="p">,</span><span class="s1">&#39;custom&#39;</span><span class="p">,</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span><span class="s1">&#39;stix&#39;</span><span class="p">,</span><span class="s1">&#39;stixsans&#39;</span><span class="p">,</span><span class="s1">&#39;dejavusans&#39;</span><span class="p">,</span><span class="s1">&#39;dejavuserif&#39;</span><span class="p">]</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>    <span class="k">if</span> <span class="p">(</span><span class="n">fontname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowedvalues</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fontname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Font name should be one of the allowed values: &#39;</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">allowedvalues</span><span class="p">))</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>    <span class="k">if</span> <span class="n">fontname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>        <span class="c1"># Restore old mathtext settings</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>        <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span><span class="n">rcParams_old</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>                              <span class="p">[</span><span class="s1">&#39;mathtext.fontset&#39;</span><span class="p">,</span><span class="s1">&#39;mathtext.bf&#39;</span><span class="p">,</span><span class="s1">&#39;mathtext.bfit&#39;</span><span class="p">,</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>                               <span class="s1">&#39;mathtext.it&#39;</span><span class="p">,</span><span class="s1">&#39;mathtext.rm&#39;</span><span class="p">]})</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>    <span class="k">elif</span> <span class="n">fontname</span> <span class="o">==</span> <span class="s1">&#39;regular&#39;</span><span class="p">:</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>        <span class="c1"># Set the math font to the font used for regular text</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>        <span class="c1"># Name of the text font</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>        <span class="n">textfont</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;font.</span><span class="si">{</span><span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;font.family&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">s</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>        <span class="c1"># Use the same font for math</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>        <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;mathtext.fontset&#39;</span><span class="p">:</span> <span class="s1">&#39;custom&#39;</span><span class="p">,</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>                            <span class="s1">&#39;mathtext.bf&#39;</span>   <span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">textfont</span><span class="si">}</span><span class="s1">:bold&#39;</span><span class="p">,</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>                            <span class="s1">&#39;mathtext.bfit&#39;</span> <span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">textfont</span><span class="si">}</span><span class="s1">:italic:bold&#39;</span><span class="p">,</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>                            <span class="s1">&#39;mathtext.it&#39;</span>   <span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">textfont</span><span class="si">}</span><span class="s1">:italic&#39;</span><span class="p">,</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>                            <span class="s1">&#39;mathtext.rm&#39;</span>   <span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">textfont</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">})</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>        <span class="c1"># Set the math font to the value provided</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>        <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;mathtext.fontset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fontname</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="k">def</span> <span class="nf">grid_off</span><span class="p">():</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Turn off grid lines&#39;&#39;&#39;</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="k">def</span> <span class="nf">grid_on</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">):</span>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Turn on grid lines</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="sd">    </span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a><span class="sd">    Parameters</span>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="sd">    ----------</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="sd">    axis : {&#39;both&#39;, &#39;x&#39;, &#39;y&#39;}</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="sd">        specifies which axes should have grid lines </span>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.grid.axis&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">axis</span>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="k">def</span> <span class="nf">load_fonts</span><span class="p">():</span>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Load fonts contained in the acgc/fonts subdirectory&#39;&#39;&#39;</span>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>
-</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>    <span class="c1"># User fonts</span>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>    <span class="n">fonts_pylib</span> <span class="o">=</span> <span class="n">mfonts</span><span class="o">.</span><span class="n">findSystemFonts</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_PATH</span><span class="p">,</span><span class="s1">&#39;fonts&#39;</span><span class="p">))</span>
-</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>    <span class="c1"># Cached fonts</span>
-</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>    <span class="n">fonts_cached</span> <span class="o">=</span> <span class="n">mfonts</span><span class="o">.</span><span class="n">fontManager</span><span class="o">.</span><span class="n">ttflist</span>
-</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>    <span class="n">fonts_cached_paths</span> <span class="o">=</span> <span class="p">[</span> <span class="n">font</span><span class="o">.</span><span class="n">fname</span> <span class="k">for</span> <span class="n">font</span> <span class="ow">in</span> <span class="n">fonts_cached</span> <span class="p">]</span>
-</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>
-</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>    <span class="c1"># Add fonts that aren&#39;t already installed</span>
-</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>    <span class="n">rebuild</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>    <span class="k">for</span> <span class="n">font</span> <span class="ow">in</span> <span class="n">fonts_pylib</span><span class="p">:</span>
-</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>        <span class="k">if</span> <span class="n">font</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fonts_cached_paths</span><span class="p">:</span>
-</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>            <span class="k">if</span> <span class="n">rebuild</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>                <span class="c1"># Issue warning, first time only</span>
-</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Rebuilding font cache. This can take time.&#39;</span><span class="p">)</span>
-</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>            <span class="n">rebuild</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>            <span class="n">mfonts</span><span class="o">.</span><span class="n">fontManager</span><span class="o">.</span><span class="n">addfont</span><span class="p">(</span><span class="n">font</span><span class="p">)</span>
-</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>
-</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>    <span class="c1"># Save font cache</span>
-</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>    <span class="k">if</span> <span class="n">rebuild</span><span class="p">:</span>
-</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>        <span class="n">cache</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>                        <span class="n">mpl</span><span class="o">.</span><span class="n">get_cachedir</span><span class="p">(),</span>
-</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>                        <span class="sa">f</span><span class="s1">&#39;fontlist-v</span><span class="si">{</span><span class="n">mfonts</span><span class="o">.</span><span class="n">FontManager</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s1">.json&#39;</span>
-</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>                    <span class="p">)</span>
-</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>        <span class="n">mfonts</span><span class="o">.</span><span class="n">json_dump</span><span class="p">(</span><span class="n">mfonts</span><span class="o">.</span><span class="n">fontManager</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span>
-</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>
-</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a><span class="c1">###</span>
-</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a><span class="n">rcParams_old</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a><span class="n">load_fonts</span><span class="p">()</span>
-</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a><span class="n">activate_style</span><span class="p">()</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">        Should be one of</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd">        - None         : Restore mathtext font to settings before importing figstyle</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd">        - &#39;regular&#39;    : Use same font as regular text in math expressions (default).</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">                       Same as using \\mathregular or \\mathdefault in math expressions.</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="sd">                       Best for mixing regular and math text for superscripts and subscripts.</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">                       May lack or have poor positioning of some math symbols (e.g. integrals).</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="sd">                       This will overwrite mathtext.bf, mathtext.bfit, mathtext.it, </span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">                       mathtext.rm in rcParams.</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="sd">        - &#39;custom&#39;     : Uses custom settings from rcParams (mathtext.bf, .bfit, .it, .rm)</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">        - &#39;cm&#39;         : Computer Modern (i.e. LaTeX default)</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">        - &#39;stix&#39;       : STIX serif</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd">        - &#39;stixsans&#39;   : STIX sans-serif; best for sans-serif math</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="sd">        - &#39;dejavuserif&#39;: DejaVu Serif (not recommended)</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="sd">        - &#39;dejavusans&#39; : DejaVu Sans (not recommended)</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>    <span class="c1"># Check that input has an allowed value</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>    <span class="n">allowedvalues</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;None&#39;</span><span class="p">,</span><span class="s1">&#39;regular&#39;</span><span class="p">,</span><span class="s1">&#39;custom&#39;</span><span class="p">,</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span><span class="s1">&#39;stix&#39;</span><span class="p">,</span><span class="s1">&#39;stixsans&#39;</span><span class="p">,</span><span class="s1">&#39;dejavusans&#39;</span><span class="p">,</span><span class="s1">&#39;dejavuserif&#39;</span><span class="p">]</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>    <span class="k">if</span> <span class="p">(</span><span class="n">fontname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowedvalues</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fontname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Font name should be one of the allowed values: &#39;</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">allowedvalues</span><span class="p">))</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>    <span class="k">if</span> <span class="n">fontname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>        <span class="c1"># Restore old mathtext settings</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>        <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span><span class="n">_rcParams_old</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>                              <span class="p">[</span><span class="s1">&#39;mathtext.fontset&#39;</span><span class="p">,</span><span class="s1">&#39;mathtext.bf&#39;</span><span class="p">,</span><span class="s1">&#39;mathtext.bfit&#39;</span><span class="p">,</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>                               <span class="s1">&#39;mathtext.it&#39;</span><span class="p">,</span><span class="s1">&#39;mathtext.rm&#39;</span><span class="p">]})</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>    <span class="k">elif</span> <span class="n">fontname</span> <span class="o">==</span> <span class="s1">&#39;regular&#39;</span><span class="p">:</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>        <span class="c1"># Set the math font to the font used for regular text</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>        <span class="c1"># Name of the text font</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>        <span class="n">textfont</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;font.</span><span class="si">{</span><span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;font.family&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">s</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>        <span class="c1"># Use the same font for math</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>        <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;mathtext.fontset&#39;</span><span class="p">:</span> <span class="s1">&#39;custom&#39;</span><span class="p">,</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>                            <span class="s1">&#39;mathtext.bf&#39;</span>   <span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">textfont</span><span class="si">}</span><span class="s1">:bold&#39;</span><span class="p">,</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>                            <span class="s1">&#39;mathtext.bfit&#39;</span> <span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">textfont</span><span class="si">}</span><span class="s1">:italic:bold&#39;</span><span class="p">,</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>                            <span class="s1">&#39;mathtext.it&#39;</span>   <span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">textfont</span><span class="si">}</span><span class="s1">:italic&#39;</span><span class="p">,</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>                            <span class="s1">&#39;mathtext.rm&#39;</span>   <span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">textfont</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">})</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>        <span class="c1"># Set the math font to the value provided</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>        <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;mathtext.fontset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fontname</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="k">def</span> <span class="nf">grid_off</span><span class="p">():</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Turn off grid lines&#39;&#39;&#39;</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="k">def</span> <span class="nf">grid_on</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">):</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Turn on grid lines</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="sd">    </span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="sd">    Parameters</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="sd">    ----------</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">    axis : {&#39;both&#39;, &#39;x&#39;, &#39;y&#39;}</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="sd">        specifies which axes should have grid lines </span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.grid.axis&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">axis</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="k">def</span> <span class="nf">load_fonts</span><span class="p">():</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Load fonts contained in the acgc/fonts subdirectory&#39;&#39;&#39;</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>    <span class="c1"># User fonts</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>    <span class="n">fonts_pylib</span> <span class="o">=</span> <span class="n">mfonts</span><span class="o">.</span><span class="n">findSystemFonts</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_PATH</span><span class="p">,</span><span class="s1">&#39;fonts&#39;</span><span class="p">))</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>    <span class="c1"># Cached fonts</span>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>    <span class="n">fonts_cached</span> <span class="o">=</span> <span class="n">mfonts</span><span class="o">.</span><span class="n">fontManager</span><span class="o">.</span><span class="n">ttflist</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>    <span class="n">fonts_cached_paths</span> <span class="o">=</span> <span class="p">[</span> <span class="n">font</span><span class="o">.</span><span class="n">fname</span> <span class="k">for</span> <span class="n">font</span> <span class="ow">in</span> <span class="n">fonts_cached</span> <span class="p">]</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>    <span class="c1"># Add fonts that aren&#39;t already installed</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>    <span class="n">rebuild</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>    <span class="k">for</span> <span class="n">font</span> <span class="ow">in</span> <span class="n">fonts_pylib</span><span class="p">:</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>        <span class="k">if</span> <span class="n">font</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fonts_cached_paths</span><span class="p">:</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>            <span class="k">if</span> <span class="n">rebuild</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>                <span class="c1"># Issue warning, first time only</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Rebuilding font cache. This can take time.&#39;</span><span class="p">)</span>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>            <span class="n">rebuild</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>            <span class="n">mfonts</span><span class="o">.</span><span class="n">fontManager</span><span class="o">.</span><span class="n">addfont</span><span class="p">(</span><span class="n">font</span><span class="p">)</span>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>    <span class="c1"># Save font cache</span>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>    <span class="k">if</span> <span class="n">rebuild</span><span class="p">:</span>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>        <span class="n">cache</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>                        <span class="n">mpl</span><span class="o">.</span><span class="n">get_cachedir</span><span class="p">(),</span>
+</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>                        <span class="sa">f</span><span class="s1">&#39;fontlist-v</span><span class="si">{</span><span class="n">mfonts</span><span class="o">.</span><span class="n">FontManager</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s1">.json&#39;</span>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>                    <span class="p">)</span>
+</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>        <span class="n">mfonts</span><span class="o">.</span><span class="n">json_dump</span><span class="p">(</span><span class="n">mfonts</span><span class="o">.</span><span class="n">fontManager</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span>
+</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>
+</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a><span class="c1">###</span>
+</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a><span class="n">_rcParams_old</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a><span class="n">load_fonts</span><span class="p">()</span>
+</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a><span class="n">activate_style</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -336,7 +335,7 @@ see <code><a href="#set_mathfont">set_mathfont</a></code> for all options</li>
     <a class="headerlink" href="#deactivate_style"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="deactivate_style-57"><a href="#deactivate_style-57"><span class="linenos">57</span></a><span class="k">def</span> <span class="nf">deactivate_style</span><span class="p">():</span>
 </span><span id="deactivate_style-58"><a href="#deactivate_style-58"><span class="linenos">58</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Restore rcParams prior to importing figstyle&#39;&#39;&#39;</span>
-</span><span id="deactivate_style-59"><a href="#deactivate_style-59"><span class="linenos">59</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span> <span class="o">=</span> <span class="n">rcParams_old</span>
+</span><span id="deactivate_style-59"><a href="#deactivate_style-59"><span class="linenos">59</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span> <span class="o">=</span> <span class="n">_rcParams_old</span>
 </span></pre></div>
 
 
@@ -362,45 +361,47 @@ see <code><a href="#set_mathfont">set_mathfont</a></code> for all options</li>
 </span><span id="set_mathfont-64"><a href="#set_mathfont-64"><span class="linenos"> 64</span></a><span class="sd">    Parameters</span>
 </span><span id="set_mathfont-65"><a href="#set_mathfont-65"><span class="linenos"> 65</span></a><span class="sd">    ----------</span>
 </span><span id="set_mathfont-66"><a href="#set_mathfont-66"><span class="linenos"> 66</span></a><span class="sd">    fontname : str, default=None</span>
-</span><span id="set_mathfont-67"><a href="#set_mathfont-67"><span class="linenos"> 67</span></a><span class="sd">        None         : Restore mathtext font to settings before importing figstyle</span>
-</span><span id="set_mathfont-68"><a href="#set_mathfont-68"><span class="linenos"> 68</span></a><span class="sd">        &#39;regular&#39;    : Use same font as regular text in math expressions (default).</span>
-</span><span id="set_mathfont-69"><a href="#set_mathfont-69"><span class="linenos"> 69</span></a><span class="sd">                       Same as using \mathregular or \mathdefault in math expressions.</span>
-</span><span id="set_mathfont-70"><a href="#set_mathfont-70"><span class="linenos"> 70</span></a><span class="sd">                       Best for mixing regular and math text for superscripts and subscripts.</span>
-</span><span id="set_mathfont-71"><a href="#set_mathfont-71"><span class="linenos"> 71</span></a><span class="sd">                       May lack or have poor positioning of some math symbols (e.g. integrals).</span>
-</span><span id="set_mathfont-72"><a href="#set_mathfont-72"><span class="linenos"> 72</span></a><span class="sd">                       This will overwrite mathtext.bf, .bfit, .it, .rm in rcParams.</span>
-</span><span id="set_mathfont-73"><a href="#set_mathfont-73"><span class="linenos"> 73</span></a><span class="sd">        &#39;custom&#39;     : Uses custom settings from rcParams (mathtext.bf, .bfit, .it, .rm)</span>
-</span><span id="set_mathfont-74"><a href="#set_mathfont-74"><span class="linenos"> 74</span></a><span class="sd">        &#39;cm&#39;         : Computer Modern (i.e. LaTeX default)</span>
-</span><span id="set_mathfont-75"><a href="#set_mathfont-75"><span class="linenos"> 75</span></a><span class="sd">        &#39;stix&#39;       : STIX serif</span>
-</span><span id="set_mathfont-76"><a href="#set_mathfont-76"><span class="linenos"> 76</span></a><span class="sd">        &#39;stixsans&#39;   : STIX sans-serif; best for sans-serif math</span>
-</span><span id="set_mathfont-77"><a href="#set_mathfont-77"><span class="linenos"> 77</span></a><span class="sd">        &#39;dejavuserif&#39;: DejaVu Serif (not recommended)</span>
-</span><span id="set_mathfont-78"><a href="#set_mathfont-78"><span class="linenos"> 78</span></a><span class="sd">        &#39;dejavusans&#39; : DejaVu Sans (not recommended)</span>
-</span><span id="set_mathfont-79"><a href="#set_mathfont-79"><span class="linenos"> 79</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="set_mathfont-80"><a href="#set_mathfont-80"><span class="linenos"> 80</span></a>
-</span><span id="set_mathfont-81"><a href="#set_mathfont-81"><span class="linenos"> 81</span></a>    <span class="c1"># Check that input has an allowed value</span>
-</span><span id="set_mathfont-82"><a href="#set_mathfont-82"><span class="linenos"> 82</span></a>    <span class="n">allowedvalues</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;None&#39;</span><span class="p">,</span><span class="s1">&#39;regular&#39;</span><span class="p">,</span><span class="s1">&#39;custom&#39;</span><span class="p">,</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span><span class="s1">&#39;stix&#39;</span><span class="p">,</span><span class="s1">&#39;stixsans&#39;</span><span class="p">,</span><span class="s1">&#39;dejavusans&#39;</span><span class="p">,</span><span class="s1">&#39;dejavuserif&#39;</span><span class="p">]</span>
-</span><span id="set_mathfont-83"><a href="#set_mathfont-83"><span class="linenos"> 83</span></a>    <span class="k">if</span> <span class="p">(</span><span class="n">fontname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowedvalues</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fontname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="set_mathfont-84"><a href="#set_mathfont-84"><span class="linenos"> 84</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Font name should be one of the allowed values: &#39;</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">allowedvalues</span><span class="p">))</span>
-</span><span id="set_mathfont-85"><a href="#set_mathfont-85"><span class="linenos"> 85</span></a>
-</span><span id="set_mathfont-86"><a href="#set_mathfont-86"><span class="linenos"> 86</span></a>    <span class="k">if</span> <span class="n">fontname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="set_mathfont-87"><a href="#set_mathfont-87"><span class="linenos"> 87</span></a>        <span class="c1"># Restore old mathtext settings</span>
-</span><span id="set_mathfont-88"><a href="#set_mathfont-88"><span class="linenos"> 88</span></a>        <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span><span class="n">rcParams_old</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span>
-</span><span id="set_mathfont-89"><a href="#set_mathfont-89"><span class="linenos"> 89</span></a>                              <span class="p">[</span><span class="s1">&#39;mathtext.fontset&#39;</span><span class="p">,</span><span class="s1">&#39;mathtext.bf&#39;</span><span class="p">,</span><span class="s1">&#39;mathtext.bfit&#39;</span><span class="p">,</span>
-</span><span id="set_mathfont-90"><a href="#set_mathfont-90"><span class="linenos"> 90</span></a>                               <span class="s1">&#39;mathtext.it&#39;</span><span class="p">,</span><span class="s1">&#39;mathtext.rm&#39;</span><span class="p">]})</span>
-</span><span id="set_mathfont-91"><a href="#set_mathfont-91"><span class="linenos"> 91</span></a>
-</span><span id="set_mathfont-92"><a href="#set_mathfont-92"><span class="linenos"> 92</span></a>    <span class="k">elif</span> <span class="n">fontname</span> <span class="o">==</span> <span class="s1">&#39;regular&#39;</span><span class="p">:</span>
-</span><span id="set_mathfont-93"><a href="#set_mathfont-93"><span class="linenos"> 93</span></a>        <span class="c1"># Set the math font to the font used for regular text</span>
-</span><span id="set_mathfont-94"><a href="#set_mathfont-94"><span class="linenos"> 94</span></a>
-</span><span id="set_mathfont-95"><a href="#set_mathfont-95"><span class="linenos"> 95</span></a>        <span class="c1"># Name of the text font</span>
-</span><span id="set_mathfont-96"><a href="#set_mathfont-96"><span class="linenos"> 96</span></a>        <span class="n">textfont</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;font.</span><span class="si">{</span><span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;font.family&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">s</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="set_mathfont-97"><a href="#set_mathfont-97"><span class="linenos"> 97</span></a>        <span class="c1"># Use the same font for math</span>
-</span><span id="set_mathfont-98"><a href="#set_mathfont-98"><span class="linenos"> 98</span></a>        <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;mathtext.fontset&#39;</span><span class="p">:</span> <span class="s1">&#39;custom&#39;</span><span class="p">,</span>
-</span><span id="set_mathfont-99"><a href="#set_mathfont-99"><span class="linenos"> 99</span></a>                            <span class="s1">&#39;mathtext.bf&#39;</span>   <span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">textfont</span><span class="si">}</span><span class="s1">:bold&#39;</span><span class="p">,</span>
-</span><span id="set_mathfont-100"><a href="#set_mathfont-100"><span class="linenos">100</span></a>                            <span class="s1">&#39;mathtext.bfit&#39;</span> <span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">textfont</span><span class="si">}</span><span class="s1">:italic:bold&#39;</span><span class="p">,</span>
-</span><span id="set_mathfont-101"><a href="#set_mathfont-101"><span class="linenos">101</span></a>                            <span class="s1">&#39;mathtext.it&#39;</span>   <span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">textfont</span><span class="si">}</span><span class="s1">:italic&#39;</span><span class="p">,</span>
-</span><span id="set_mathfont-102"><a href="#set_mathfont-102"><span class="linenos">102</span></a>                            <span class="s1">&#39;mathtext.rm&#39;</span>   <span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">textfont</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">})</span>
-</span><span id="set_mathfont-103"><a href="#set_mathfont-103"><span class="linenos">103</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="set_mathfont-104"><a href="#set_mathfont-104"><span class="linenos">104</span></a>        <span class="c1"># Set the math font to the value provided</span>
-</span><span id="set_mathfont-105"><a href="#set_mathfont-105"><span class="linenos">105</span></a>        <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;mathtext.fontset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fontname</span>
+</span><span id="set_mathfont-67"><a href="#set_mathfont-67"><span class="linenos"> 67</span></a><span class="sd">        Should be one of</span>
+</span><span id="set_mathfont-68"><a href="#set_mathfont-68"><span class="linenos"> 68</span></a><span class="sd">        - None         : Restore mathtext font to settings before importing figstyle</span>
+</span><span id="set_mathfont-69"><a href="#set_mathfont-69"><span class="linenos"> 69</span></a><span class="sd">        - &#39;regular&#39;    : Use same font as regular text in math expressions (default).</span>
+</span><span id="set_mathfont-70"><a href="#set_mathfont-70"><span class="linenos"> 70</span></a><span class="sd">                       Same as using \\mathregular or \\mathdefault in math expressions.</span>
+</span><span id="set_mathfont-71"><a href="#set_mathfont-71"><span class="linenos"> 71</span></a><span class="sd">                       Best for mixing regular and math text for superscripts and subscripts.</span>
+</span><span id="set_mathfont-72"><a href="#set_mathfont-72"><span class="linenos"> 72</span></a><span class="sd">                       May lack or have poor positioning of some math symbols (e.g. integrals).</span>
+</span><span id="set_mathfont-73"><a href="#set_mathfont-73"><span class="linenos"> 73</span></a><span class="sd">                       This will overwrite mathtext.bf, mathtext.bfit, mathtext.it, </span>
+</span><span id="set_mathfont-74"><a href="#set_mathfont-74"><span class="linenos"> 74</span></a><span class="sd">                       mathtext.rm in rcParams.</span>
+</span><span id="set_mathfont-75"><a href="#set_mathfont-75"><span class="linenos"> 75</span></a><span class="sd">        - &#39;custom&#39;     : Uses custom settings from rcParams (mathtext.bf, .bfit, .it, .rm)</span>
+</span><span id="set_mathfont-76"><a href="#set_mathfont-76"><span class="linenos"> 76</span></a><span class="sd">        - &#39;cm&#39;         : Computer Modern (i.e. LaTeX default)</span>
+</span><span id="set_mathfont-77"><a href="#set_mathfont-77"><span class="linenos"> 77</span></a><span class="sd">        - &#39;stix&#39;       : STIX serif</span>
+</span><span id="set_mathfont-78"><a href="#set_mathfont-78"><span class="linenos"> 78</span></a><span class="sd">        - &#39;stixsans&#39;   : STIX sans-serif; best for sans-serif math</span>
+</span><span id="set_mathfont-79"><a href="#set_mathfont-79"><span class="linenos"> 79</span></a><span class="sd">        - &#39;dejavuserif&#39;: DejaVu Serif (not recommended)</span>
+</span><span id="set_mathfont-80"><a href="#set_mathfont-80"><span class="linenos"> 80</span></a><span class="sd">        - &#39;dejavusans&#39; : DejaVu Sans (not recommended)</span>
+</span><span id="set_mathfont-81"><a href="#set_mathfont-81"><span class="linenos"> 81</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="set_mathfont-82"><a href="#set_mathfont-82"><span class="linenos"> 82</span></a>
+</span><span id="set_mathfont-83"><a href="#set_mathfont-83"><span class="linenos"> 83</span></a>    <span class="c1"># Check that input has an allowed value</span>
+</span><span id="set_mathfont-84"><a href="#set_mathfont-84"><span class="linenos"> 84</span></a>    <span class="n">allowedvalues</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;None&#39;</span><span class="p">,</span><span class="s1">&#39;regular&#39;</span><span class="p">,</span><span class="s1">&#39;custom&#39;</span><span class="p">,</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span><span class="s1">&#39;stix&#39;</span><span class="p">,</span><span class="s1">&#39;stixsans&#39;</span><span class="p">,</span><span class="s1">&#39;dejavusans&#39;</span><span class="p">,</span><span class="s1">&#39;dejavuserif&#39;</span><span class="p">]</span>
+</span><span id="set_mathfont-85"><a href="#set_mathfont-85"><span class="linenos"> 85</span></a>    <span class="k">if</span> <span class="p">(</span><span class="n">fontname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowedvalues</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fontname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="set_mathfont-86"><a href="#set_mathfont-86"><span class="linenos"> 86</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Font name should be one of the allowed values: &#39;</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">allowedvalues</span><span class="p">))</span>
+</span><span id="set_mathfont-87"><a href="#set_mathfont-87"><span class="linenos"> 87</span></a>
+</span><span id="set_mathfont-88"><a href="#set_mathfont-88"><span class="linenos"> 88</span></a>    <span class="k">if</span> <span class="n">fontname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="set_mathfont-89"><a href="#set_mathfont-89"><span class="linenos"> 89</span></a>        <span class="c1"># Restore old mathtext settings</span>
+</span><span id="set_mathfont-90"><a href="#set_mathfont-90"><span class="linenos"> 90</span></a>        <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span><span class="n">_rcParams_old</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span>
+</span><span id="set_mathfont-91"><a href="#set_mathfont-91"><span class="linenos"> 91</span></a>                              <span class="p">[</span><span class="s1">&#39;mathtext.fontset&#39;</span><span class="p">,</span><span class="s1">&#39;mathtext.bf&#39;</span><span class="p">,</span><span class="s1">&#39;mathtext.bfit&#39;</span><span class="p">,</span>
+</span><span id="set_mathfont-92"><a href="#set_mathfont-92"><span class="linenos"> 92</span></a>                               <span class="s1">&#39;mathtext.it&#39;</span><span class="p">,</span><span class="s1">&#39;mathtext.rm&#39;</span><span class="p">]})</span>
+</span><span id="set_mathfont-93"><a href="#set_mathfont-93"><span class="linenos"> 93</span></a>
+</span><span id="set_mathfont-94"><a href="#set_mathfont-94"><span class="linenos"> 94</span></a>    <span class="k">elif</span> <span class="n">fontname</span> <span class="o">==</span> <span class="s1">&#39;regular&#39;</span><span class="p">:</span>
+</span><span id="set_mathfont-95"><a href="#set_mathfont-95"><span class="linenos"> 95</span></a>        <span class="c1"># Set the math font to the font used for regular text</span>
+</span><span id="set_mathfont-96"><a href="#set_mathfont-96"><span class="linenos"> 96</span></a>
+</span><span id="set_mathfont-97"><a href="#set_mathfont-97"><span class="linenos"> 97</span></a>        <span class="c1"># Name of the text font</span>
+</span><span id="set_mathfont-98"><a href="#set_mathfont-98"><span class="linenos"> 98</span></a>        <span class="n">textfont</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;font.</span><span class="si">{</span><span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;font.family&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">s</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="set_mathfont-99"><a href="#set_mathfont-99"><span class="linenos"> 99</span></a>        <span class="c1"># Use the same font for math</span>
+</span><span id="set_mathfont-100"><a href="#set_mathfont-100"><span class="linenos">100</span></a>        <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;mathtext.fontset&#39;</span><span class="p">:</span> <span class="s1">&#39;custom&#39;</span><span class="p">,</span>
+</span><span id="set_mathfont-101"><a href="#set_mathfont-101"><span class="linenos">101</span></a>                            <span class="s1">&#39;mathtext.bf&#39;</span>   <span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">textfont</span><span class="si">}</span><span class="s1">:bold&#39;</span><span class="p">,</span>
+</span><span id="set_mathfont-102"><a href="#set_mathfont-102"><span class="linenos">102</span></a>                            <span class="s1">&#39;mathtext.bfit&#39;</span> <span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">textfont</span><span class="si">}</span><span class="s1">:italic:bold&#39;</span><span class="p">,</span>
+</span><span id="set_mathfont-103"><a href="#set_mathfont-103"><span class="linenos">103</span></a>                            <span class="s1">&#39;mathtext.it&#39;</span>   <span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">textfont</span><span class="si">}</span><span class="s1">:italic&#39;</span><span class="p">,</span>
+</span><span id="set_mathfont-104"><a href="#set_mathfont-104"><span class="linenos">104</span></a>                            <span class="s1">&#39;mathtext.rm&#39;</span>   <span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">textfont</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">})</span>
+</span><span id="set_mathfont-105"><a href="#set_mathfont-105"><span class="linenos">105</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="set_mathfont-106"><a href="#set_mathfont-106"><span class="linenos">106</span></a>        <span class="c1"># Set the math font to the value provided</span>
+</span><span id="set_mathfont-107"><a href="#set_mathfont-107"><span class="linenos">107</span></a>        <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;mathtext.fontset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fontname</span>
 </span></pre></div>
 
 
@@ -410,18 +411,22 @@ see <code><a href="#set_mathfont">set_mathfont</a></code> for all options</li>
 
 <ul>
 <li><strong>fontname</strong> (str, default=None):
-None         : Restore mathtext font to settings before importing figstyle
-'regular'    : Use same font as regular text in math expressions (default).
-               Same as using \mathregular or \mathdefault in math expressions.
-               Best for mixing regular and math text for superscripts and subscripts.
-               May lack or have poor positioning of some math symbols (e.g. integrals).
-               This will overwrite mathtext.bf, .bfit, .it, .rm in rcParams.
-'custom'     : Uses custom settings from rcParams (mathtext.bf, .bfit, .it, .rm)
-'cm'         : Computer Modern (i.e. LaTeX default)
-'stix'       : STIX serif
-'stixsans'   : STIX sans-serif; best for sans-serif math
-'dejavuserif': DejaVu Serif (not recommended)
-'dejavusans' : DejaVu Sans (not recommended)</li>
+Should be one of
+<ul>
+<li>None         : Restore mathtext font to settings before importing figstyle</li>
+<li>'regular'    : Use same font as regular text in math expressions (default).
+Same as using \mathregular or \mathdefault in math expressions.
+Best for mixing regular and math text for superscripts and subscripts.
+May lack or have poor positioning of some math symbols (e.g. integrals).
+This will overwrite mathtext.bf, mathtext.bfit, mathtext.it, 
+mathtext.rm in rcParams.</li>
+<li>'custom'     : Uses custom settings from rcParams (mathtext.bf, .bfit, .it, .rm)</li>
+<li>'cm'         : Computer Modern (i.e. LaTeX default)</li>
+<li>'stix'       : STIX serif</li>
+<li>'stixsans'   : STIX sans-serif; best for sans-serif math</li>
+<li>'dejavuserif': DejaVu Serif (not recommended)</li>
+<li>'dejavusans' : DejaVu Sans (not recommended)</li>
+</ul></li>
 </ul>
 </div>
 
@@ -438,9 +443,9 @@ None         : Restore mathtext font to settings before importing figstyle
 
     </div>
     <a class="headerlink" href="#grid_off"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="grid_off-107"><a href="#grid_off-107"><span class="linenos">107</span></a><span class="k">def</span> <span class="nf">grid_off</span><span class="p">():</span>
-</span><span id="grid_off-108"><a href="#grid_off-108"><span class="linenos">108</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Turn off grid lines&#39;&#39;&#39;</span>
-</span><span id="grid_off-109"><a href="#grid_off-109"><span class="linenos">109</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="grid_off-109"><a href="#grid_off-109"><span class="linenos">109</span></a><span class="k">def</span> <span class="nf">grid_off</span><span class="p">():</span>
+</span><span id="grid_off-110"><a href="#grid_off-110"><span class="linenos">110</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Turn off grid lines&#39;&#39;&#39;</span>
+</span><span id="grid_off-111"><a href="#grid_off-111"><span class="linenos">111</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 </span></pre></div>
 
 
@@ -460,16 +465,16 @@ None         : Restore mathtext font to settings before importing figstyle
 
     </div>
     <a class="headerlink" href="#grid_on"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="grid_on-111"><a href="#grid_on-111"><span class="linenos">111</span></a><span class="k">def</span> <span class="nf">grid_on</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">):</span>
-</span><span id="grid_on-112"><a href="#grid_on-112"><span class="linenos">112</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Turn on grid lines</span>
-</span><span id="grid_on-113"><a href="#grid_on-113"><span class="linenos">113</span></a><span class="sd">    </span>
-</span><span id="grid_on-114"><a href="#grid_on-114"><span class="linenos">114</span></a><span class="sd">    Parameters</span>
-</span><span id="grid_on-115"><a href="#grid_on-115"><span class="linenos">115</span></a><span class="sd">    ----------</span>
-</span><span id="grid_on-116"><a href="#grid_on-116"><span class="linenos">116</span></a><span class="sd">    axis : {&#39;both&#39;, &#39;x&#39;, &#39;y&#39;}</span>
-</span><span id="grid_on-117"><a href="#grid_on-117"><span class="linenos">117</span></a><span class="sd">        specifies which axes should have grid lines </span>
-</span><span id="grid_on-118"><a href="#grid_on-118"><span class="linenos">118</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="grid_on-119"><a href="#grid_on-119"><span class="linenos">119</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="grid_on-120"><a href="#grid_on-120"><span class="linenos">120</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.grid.axis&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">axis</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="grid_on-113"><a href="#grid_on-113"><span class="linenos">113</span></a><span class="k">def</span> <span class="nf">grid_on</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">):</span>
+</span><span id="grid_on-114"><a href="#grid_on-114"><span class="linenos">114</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Turn on grid lines</span>
+</span><span id="grid_on-115"><a href="#grid_on-115"><span class="linenos">115</span></a><span class="sd">    </span>
+</span><span id="grid_on-116"><a href="#grid_on-116"><span class="linenos">116</span></a><span class="sd">    Parameters</span>
+</span><span id="grid_on-117"><a href="#grid_on-117"><span class="linenos">117</span></a><span class="sd">    ----------</span>
+</span><span id="grid_on-118"><a href="#grid_on-118"><span class="linenos">118</span></a><span class="sd">    axis : {&#39;both&#39;, &#39;x&#39;, &#39;y&#39;}</span>
+</span><span id="grid_on-119"><a href="#grid_on-119"><span class="linenos">119</span></a><span class="sd">        specifies which axes should have grid lines </span>
+</span><span id="grid_on-120"><a href="#grid_on-120"><span class="linenos">120</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="grid_on-121"><a href="#grid_on-121"><span class="linenos">121</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="grid_on-122"><a href="#grid_on-122"><span class="linenos">122</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.grid.axis&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">axis</span>
 </span></pre></div>
 
 
@@ -496,412 +501,39 @@ specifies which axes should have grid lines</li>
 
     </div>
     <a class="headerlink" href="#load_fonts"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="load_fonts-122"><a href="#load_fonts-122"><span class="linenos">122</span></a><span class="k">def</span> <span class="nf">load_fonts</span><span class="p">():</span>
-</span><span id="load_fonts-123"><a href="#load_fonts-123"><span class="linenos">123</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Load fonts contained in the acgc/fonts subdirectory&#39;&#39;&#39;</span>
-</span><span id="load_fonts-124"><a href="#load_fonts-124"><span class="linenos">124</span></a>
-</span><span id="load_fonts-125"><a href="#load_fonts-125"><span class="linenos">125</span></a>    <span class="c1"># User fonts</span>
-</span><span id="load_fonts-126"><a href="#load_fonts-126"><span class="linenos">126</span></a>    <span class="n">fonts_pylib</span> <span class="o">=</span> <span class="n">mfonts</span><span class="o">.</span><span class="n">findSystemFonts</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_PATH</span><span class="p">,</span><span class="s1">&#39;fonts&#39;</span><span class="p">))</span>
-</span><span id="load_fonts-127"><a href="#load_fonts-127"><span class="linenos">127</span></a>
-</span><span id="load_fonts-128"><a href="#load_fonts-128"><span class="linenos">128</span></a>    <span class="c1"># Cached fonts</span>
-</span><span id="load_fonts-129"><a href="#load_fonts-129"><span class="linenos">129</span></a>    <span class="n">fonts_cached</span> <span class="o">=</span> <span class="n">mfonts</span><span class="o">.</span><span class="n">fontManager</span><span class="o">.</span><span class="n">ttflist</span>
-</span><span id="load_fonts-130"><a href="#load_fonts-130"><span class="linenos">130</span></a>    <span class="n">fonts_cached_paths</span> <span class="o">=</span> <span class="p">[</span> <span class="n">font</span><span class="o">.</span><span class="n">fname</span> <span class="k">for</span> <span class="n">font</span> <span class="ow">in</span> <span class="n">fonts_cached</span> <span class="p">]</span>
-</span><span id="load_fonts-131"><a href="#load_fonts-131"><span class="linenos">131</span></a>
-</span><span id="load_fonts-132"><a href="#load_fonts-132"><span class="linenos">132</span></a>    <span class="c1"># Add fonts that aren&#39;t already installed</span>
-</span><span id="load_fonts-133"><a href="#load_fonts-133"><span class="linenos">133</span></a>    <span class="n">rebuild</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="load_fonts-134"><a href="#load_fonts-134"><span class="linenos">134</span></a>    <span class="k">for</span> <span class="n">font</span> <span class="ow">in</span> <span class="n">fonts_pylib</span><span class="p">:</span>
-</span><span id="load_fonts-135"><a href="#load_fonts-135"><span class="linenos">135</span></a>        <span class="k">if</span> <span class="n">font</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fonts_cached_paths</span><span class="p">:</span>
-</span><span id="load_fonts-136"><a href="#load_fonts-136"><span class="linenos">136</span></a>            <span class="k">if</span> <span class="n">rebuild</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-</span><span id="load_fonts-137"><a href="#load_fonts-137"><span class="linenos">137</span></a>                <span class="c1"># Issue warning, first time only</span>
-</span><span id="load_fonts-138"><a href="#load_fonts-138"><span class="linenos">138</span></a>                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Rebuilding font cache. This can take time.&#39;</span><span class="p">)</span>
-</span><span id="load_fonts-139"><a href="#load_fonts-139"><span class="linenos">139</span></a>            <span class="n">rebuild</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="load_fonts-140"><a href="#load_fonts-140"><span class="linenos">140</span></a>            <span class="n">mfonts</span><span class="o">.</span><span class="n">fontManager</span><span class="o">.</span><span class="n">addfont</span><span class="p">(</span><span class="n">font</span><span class="p">)</span>
-</span><span id="load_fonts-141"><a href="#load_fonts-141"><span class="linenos">141</span></a>
-</span><span id="load_fonts-142"><a href="#load_fonts-142"><span class="linenos">142</span></a>    <span class="c1"># Save font cache</span>
-</span><span id="load_fonts-143"><a href="#load_fonts-143"><span class="linenos">143</span></a>    <span class="k">if</span> <span class="n">rebuild</span><span class="p">:</span>
-</span><span id="load_fonts-144"><a href="#load_fonts-144"><span class="linenos">144</span></a>        <span class="n">cache</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-</span><span id="load_fonts-145"><a href="#load_fonts-145"><span class="linenos">145</span></a>                        <span class="n">mpl</span><span class="o">.</span><span class="n">get_cachedir</span><span class="p">(),</span>
-</span><span id="load_fonts-146"><a href="#load_fonts-146"><span class="linenos">146</span></a>                        <span class="sa">f</span><span class="s1">&#39;fontlist-v</span><span class="si">{</span><span class="n">mfonts</span><span class="o">.</span><span class="n">FontManager</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s1">.json&#39;</span>
-</span><span id="load_fonts-147"><a href="#load_fonts-147"><span class="linenos">147</span></a>                    <span class="p">)</span>
-</span><span id="load_fonts-148"><a href="#load_fonts-148"><span class="linenos">148</span></a>        <span class="n">mfonts</span><span class="o">.</span><span class="n">json_dump</span><span class="p">(</span><span class="n">mfonts</span><span class="o">.</span><span class="n">fontManager</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="load_fonts-124"><a href="#load_fonts-124"><span class="linenos">124</span></a><span class="k">def</span> <span class="nf">load_fonts</span><span class="p">():</span>
+</span><span id="load_fonts-125"><a href="#load_fonts-125"><span class="linenos">125</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Load fonts contained in the acgc/fonts subdirectory&#39;&#39;&#39;</span>
+</span><span id="load_fonts-126"><a href="#load_fonts-126"><span class="linenos">126</span></a>
+</span><span id="load_fonts-127"><a href="#load_fonts-127"><span class="linenos">127</span></a>    <span class="c1"># User fonts</span>
+</span><span id="load_fonts-128"><a href="#load_fonts-128"><span class="linenos">128</span></a>    <span class="n">fonts_pylib</span> <span class="o">=</span> <span class="n">mfonts</span><span class="o">.</span><span class="n">findSystemFonts</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_PATH</span><span class="p">,</span><span class="s1">&#39;fonts&#39;</span><span class="p">))</span>
+</span><span id="load_fonts-129"><a href="#load_fonts-129"><span class="linenos">129</span></a>
+</span><span id="load_fonts-130"><a href="#load_fonts-130"><span class="linenos">130</span></a>    <span class="c1"># Cached fonts</span>
+</span><span id="load_fonts-131"><a href="#load_fonts-131"><span class="linenos">131</span></a>    <span class="n">fonts_cached</span> <span class="o">=</span> <span class="n">mfonts</span><span class="o">.</span><span class="n">fontManager</span><span class="o">.</span><span class="n">ttflist</span>
+</span><span id="load_fonts-132"><a href="#load_fonts-132"><span class="linenos">132</span></a>    <span class="n">fonts_cached_paths</span> <span class="o">=</span> <span class="p">[</span> <span class="n">font</span><span class="o">.</span><span class="n">fname</span> <span class="k">for</span> <span class="n">font</span> <span class="ow">in</span> <span class="n">fonts_cached</span> <span class="p">]</span>
+</span><span id="load_fonts-133"><a href="#load_fonts-133"><span class="linenos">133</span></a>
+</span><span id="load_fonts-134"><a href="#load_fonts-134"><span class="linenos">134</span></a>    <span class="c1"># Add fonts that aren&#39;t already installed</span>
+</span><span id="load_fonts-135"><a href="#load_fonts-135"><span class="linenos">135</span></a>    <span class="n">rebuild</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="load_fonts-136"><a href="#load_fonts-136"><span class="linenos">136</span></a>    <span class="k">for</span> <span class="n">font</span> <span class="ow">in</span> <span class="n">fonts_pylib</span><span class="p">:</span>
+</span><span id="load_fonts-137"><a href="#load_fonts-137"><span class="linenos">137</span></a>        <span class="k">if</span> <span class="n">font</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fonts_cached_paths</span><span class="p">:</span>
+</span><span id="load_fonts-138"><a href="#load_fonts-138"><span class="linenos">138</span></a>            <span class="k">if</span> <span class="n">rebuild</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+</span><span id="load_fonts-139"><a href="#load_fonts-139"><span class="linenos">139</span></a>                <span class="c1"># Issue warning, first time only</span>
+</span><span id="load_fonts-140"><a href="#load_fonts-140"><span class="linenos">140</span></a>                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Rebuilding font cache. This can take time.&#39;</span><span class="p">)</span>
+</span><span id="load_fonts-141"><a href="#load_fonts-141"><span class="linenos">141</span></a>            <span class="n">rebuild</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="load_fonts-142"><a href="#load_fonts-142"><span class="linenos">142</span></a>            <span class="n">mfonts</span><span class="o">.</span><span class="n">fontManager</span><span class="o">.</span><span class="n">addfont</span><span class="p">(</span><span class="n">font</span><span class="p">)</span>
+</span><span id="load_fonts-143"><a href="#load_fonts-143"><span class="linenos">143</span></a>
+</span><span id="load_fonts-144"><a href="#load_fonts-144"><span class="linenos">144</span></a>    <span class="c1"># Save font cache</span>
+</span><span id="load_fonts-145"><a href="#load_fonts-145"><span class="linenos">145</span></a>    <span class="k">if</span> <span class="n">rebuild</span><span class="p">:</span>
+</span><span id="load_fonts-146"><a href="#load_fonts-146"><span class="linenos">146</span></a>        <span class="n">cache</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+</span><span id="load_fonts-147"><a href="#load_fonts-147"><span class="linenos">147</span></a>                        <span class="n">mpl</span><span class="o">.</span><span class="n">get_cachedir</span><span class="p">(),</span>
+</span><span id="load_fonts-148"><a href="#load_fonts-148"><span class="linenos">148</span></a>                        <span class="sa">f</span><span class="s1">&#39;fontlist-v</span><span class="si">{</span><span class="n">mfonts</span><span class="o">.</span><span class="n">FontManager</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s1">.json&#39;</span>
+</span><span id="load_fonts-149"><a href="#load_fonts-149"><span class="linenos">149</span></a>                    <span class="p">)</span>
+</span><span id="load_fonts-150"><a href="#load_fonts-150"><span class="linenos">150</span></a>        <span class="n">mfonts</span><span class="o">.</span><span class="n">json_dump</span><span class="p">(</span><span class="n">mfonts</span><span class="o">.</span><span class="n">fontManager</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span>
 </span></pre></div>
 
 
             <div class="docstring"><p>Load fonts contained in the acgc/fonts subdirectory</p>
 </div>
 
-
-                </section>
-                <section id="rcParams_old">
-                    <div class="attr variable">
-            <span class="name">rcParams_old</span>        =
-<input id="rcParams_old-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-            <label class="view-value-button pdoc-button" for="rcParams_old-view-value"></label><span class="default_value">RcParams({&#39;_internal.classic_mode&#39;: False,
-          &#39;agg.path.chunksize&#39;: 0,
-          &#39;animation.bitrate&#39;: -1,
-          &#39;animation.codec&#39;: &#39;h264&#39;,
-          &#39;animation.convert_args&#39;: [&#39;-layers&#39;, &#39;OptimizePlus&#39;],
-          &#39;animation.convert_path&#39;: &#39;convert&#39;,
-          &#39;animation.embed_limit&#39;: 20.0,
-          &#39;animation.ffmpeg_args&#39;: [],
-          &#39;animation.ffmpeg_path&#39;: &#39;ffmpeg&#39;,
-          &#39;animation.frame_format&#39;: &#39;png&#39;,
-          &#39;animation.html&#39;: &#39;none&#39;,
-          &#39;animation.writer&#39;: &#39;ffmpeg&#39;,
-          &#39;axes.autolimit_mode&#39;: &#39;data&#39;,
-          &#39;axes.axisbelow&#39;: &#39;line&#39;,
-          &#39;axes.edgecolor&#39;: &#39;black&#39;,
-          &#39;axes.facecolor&#39;: &#39;white&#39;,
-          &#39;axes.formatter.limits&#39;: [-5, 6],
-          &#39;axes.formatter.min_exponent&#39;: 0,
-          &#39;axes.formatter.offset_threshold&#39;: 4,
-          &#39;axes.formatter.use_locale&#39;: False,
-          &#39;axes.formatter.use_mathtext&#39;: False,
-          &#39;axes.formatter.useoffset&#39;: True,
-          &#39;axes.grid&#39;: False,
-          &#39;axes.grid.axis&#39;: &#39;both&#39;,
-          &#39;axes.grid.which&#39;: &#39;major&#39;,
-          &#39;axes.labelcolor&#39;: &#39;black&#39;,
-          &#39;axes.labelpad&#39;: 4.0,
-          &#39;axes.labelsize&#39;: &#39;medium&#39;,
-          &#39;axes.labelweight&#39;: &#39;normal&#39;,
-          &#39;axes.linewidth&#39;: 0.8,
-          &#39;axes.prop_cycle&#39;: cycler(&#39;color&#39;, [&#39;#1f77b4&#39;, &#39;#ff7f0e&#39;, &#39;#2ca02c&#39;, &#39;#d62728&#39;, &#39;#9467bd&#39;, &#39;#8c564b&#39;, &#39;#e377c2&#39;, &#39;#7f7f7f&#39;, &#39;#bcbd22&#39;, &#39;#17becf&#39;]),
-          &#39;axes.spines.bottom&#39;: True,
-          &#39;axes.spines.left&#39;: True,
-          &#39;axes.spines.right&#39;: True,
-          &#39;axes.spines.top&#39;: True,
-          &#39;axes.titlecolor&#39;: &#39;auto&#39;,
-          &#39;axes.titlelocation&#39;: &#39;center&#39;,
-          &#39;axes.titlepad&#39;: 6.0,
-          &#39;axes.titlesize&#39;: &#39;large&#39;,
-          &#39;axes.titleweight&#39;: &#39;normal&#39;,
-          &#39;axes.titley&#39;: None,
-          &#39;axes.unicode_minus&#39;: True,
-          &#39;axes.xmargin&#39;: 0.05,
-          &#39;axes.ymargin&#39;: 0.05,
-          &#39;axes.zmargin&#39;: 0.05,
-          &#39;axes3d.grid&#39;: True,
-          &#39;axes3d.xaxis.panecolor&#39;: (0.95, 0.95, 0.95, 0.5),
-          &#39;axes3d.yaxis.panecolor&#39;: (0.9, 0.9, 0.9, 0.5),
-          &#39;axes3d.zaxis.panecolor&#39;: (0.925, 0.925, 0.925, 0.5),
-          &#39;backend&#39;: &#39;MacOSX&#39;,
-          &#39;backend_fallback&#39;: True,
-          &#39;boxplot.bootstrap&#39;: None,
-          &#39;boxplot.boxprops.color&#39;: &#39;black&#39;,
-          &#39;boxplot.boxprops.linestyle&#39;: &#39;-&#39;,
-          &#39;boxplot.boxprops.linewidth&#39;: 1.0,
-          &#39;boxplot.capprops.color&#39;: &#39;black&#39;,
-          &#39;boxplot.capprops.linestyle&#39;: &#39;-&#39;,
-          &#39;boxplot.capprops.linewidth&#39;: 1.0,
-          &#39;boxplot.flierprops.color&#39;: &#39;black&#39;,
-          &#39;boxplot.flierprops.linestyle&#39;: &#39;none&#39;,
-          &#39;boxplot.flierprops.linewidth&#39;: 1.0,
-          &#39;boxplot.flierprops.marker&#39;: &#39;o&#39;,
-          &#39;boxplot.flierprops.markeredgecolor&#39;: &#39;black&#39;,
-          &#39;boxplot.flierprops.markeredgewidth&#39;: 1.0,
-          &#39;boxplot.flierprops.markerfacecolor&#39;: &#39;none&#39;,
-          &#39;boxplot.flierprops.markersize&#39;: 6.0,
-          &#39;boxplot.meanline&#39;: False,
-          &#39;boxplot.meanprops.color&#39;: &#39;C2&#39;,
-          &#39;boxplot.meanprops.linestyle&#39;: &#39;--&#39;,
-          &#39;boxplot.meanprops.linewidth&#39;: 1.0,
-          &#39;boxplot.meanprops.marker&#39;: &#39;^&#39;,
-          &#39;boxplot.meanprops.markeredgecolor&#39;: &#39;C2&#39;,
-          &#39;boxplot.meanprops.markerfacecolor&#39;: &#39;C2&#39;,
-          &#39;boxplot.meanprops.markersize&#39;: 6.0,
-          &#39;boxplot.medianprops.color&#39;: &#39;C1&#39;,
-          &#39;boxplot.medianprops.linestyle&#39;: &#39;-&#39;,
-          &#39;boxplot.medianprops.linewidth&#39;: 1.0,
-          &#39;boxplot.notch&#39;: False,
-          &#39;boxplot.patchartist&#39;: False,
-          &#39;boxplot.showbox&#39;: True,
-          &#39;boxplot.showcaps&#39;: True,
-          &#39;boxplot.showfliers&#39;: True,
-          &#39;boxplot.showmeans&#39;: False,
-          &#39;boxplot.vertical&#39;: True,
-          &#39;boxplot.whiskerprops.color&#39;: &#39;black&#39;,
-          &#39;boxplot.whiskerprops.linestyle&#39;: &#39;-&#39;,
-          &#39;boxplot.whiskerprops.linewidth&#39;: 1.0,
-          &#39;boxplot.whiskers&#39;: 1.5,
-          &#39;contour.algorithm&#39;: &#39;mpl2014&#39;,
-          &#39;contour.corner_mask&#39;: True,
-          &#39;contour.linewidth&#39;: None,
-          &#39;contour.negative_linestyle&#39;: &#39;dashed&#39;,
-          &#39;date.autoformatter.day&#39;: &#39;%Y-%m-%d&#39;,
-          &#39;date.autoformatter.hour&#39;: &#39;%m-%d %H&#39;,
-          &#39;date.autoformatter.microsecond&#39;: &#39;%M:%S.%f&#39;,
-          &#39;date.autoformatter.minute&#39;: &#39;%d %H:%M&#39;,
-          &#39;date.autoformatter.month&#39;: &#39;%Y-%m&#39;,
-          &#39;date.autoformatter.second&#39;: &#39;%H:%M:%S&#39;,
-          &#39;date.autoformatter.year&#39;: &#39;%Y&#39;,
-          &#39;date.converter&#39;: &#39;auto&#39;,
-          &#39;date.epoch&#39;: &#39;1970-01-01T00:00:00&#39;,
-          &#39;date.interval_multiples&#39;: True,
-          &#39;docstring.hardcopy&#39;: False,
-          &#39;errorbar.capsize&#39;: 0.0,
-          &#39;figure.autolayout&#39;: False,
-          &#39;figure.constrained_layout.h_pad&#39;: 0.04167,
-          &#39;figure.constrained_layout.hspace&#39;: 0.02,
-          &#39;figure.constrained_layout.use&#39;: False,
-          &#39;figure.constrained_layout.w_pad&#39;: 0.04167,
-          &#39;figure.constrained_layout.wspace&#39;: 0.02,
-          &#39;figure.dpi&#39;: 100.0,
-          &#39;figure.edgecolor&#39;: &#39;white&#39;,
-          &#39;figure.facecolor&#39;: &#39;white&#39;,
-          &#39;figure.figsize&#39;: [6.4, 4.8],
-          &#39;figure.frameon&#39;: True,
-          &#39;figure.hooks&#39;: [],
-          &#39;figure.labelsize&#39;: &#39;large&#39;,
-          &#39;figure.labelweight&#39;: &#39;normal&#39;,
-          &#39;figure.max_open_warning&#39;: 20,
-          &#39;figure.raise_window&#39;: True,
-          &#39;figure.subplot.bottom&#39;: 0.11,
-          &#39;figure.subplot.hspace&#39;: 0.2,
-          &#39;figure.subplot.left&#39;: 0.125,
-          &#39;figure.subplot.right&#39;: 0.9,
-          &#39;figure.subplot.top&#39;: 0.88,
-          &#39;figure.subplot.wspace&#39;: 0.2,
-          &#39;figure.titlesize&#39;: &#39;large&#39;,
-          &#39;figure.titleweight&#39;: &#39;normal&#39;,
-          &#39;font.cursive&#39;: [&#39;Apple Chancery&#39;,
-                           &#39;Textile&#39;,
-                           &#39;Zapf Chancery&#39;,
-                           &#39;Sand&#39;,
-                           &#39;Script MT&#39;,
-                           &#39;Felipa&#39;,
-                           &#39;Comic Neue&#39;,
-                           &#39;Comic Sans MS&#39;,
-                           &#39;cursive&#39;],
-          &#39;font.family&#39;: [&#39;sans-serif&#39;],
-          &#39;font.fantasy&#39;: [&#39;Chicago&#39;,
-                           &#39;Charcoal&#39;,
-                           &#39;Impact&#39;,
-                           &#39;Western&#39;,
-                           &#39;xkcd script&#39;,
-                           &#39;fantasy&#39;],
-          &#39;font.monospace&#39;: [&#39;DejaVu Sans Mono&#39;,
-                             &#39;Bitstream Vera Sans Mono&#39;,
-                             &#39;Computer Modern Typewriter&#39;,
-                             &#39;Andale Mono&#39;,
-                             &#39;Nimbus Mono L&#39;,
-                             &#39;Courier New&#39;,
-                             &#39;Courier&#39;,
-                             &#39;Fixed&#39;,
-                             &#39;Terminal&#39;,
-                             &#39;monospace&#39;],
-          &#39;font.sans-serif&#39;: [&#39;DejaVu Sans&#39;,
-                              &#39;Bitstream Vera Sans&#39;,
-                              &#39;Computer Modern Sans Serif&#39;,
-                              &#39;Lucida Grande&#39;,
-                              &#39;Verdana&#39;,
-                              &#39;Geneva&#39;,
-                              &#39;Lucid&#39;,
-                              &#39;Arial&#39;,
-                              &#39;Helvetica&#39;,
-                              &#39;Avant Garde&#39;,
-                              &#39;sans-serif&#39;],
-          &#39;font.serif&#39;: [&#39;DejaVu Serif&#39;,
-                         &#39;Bitstream Vera Serif&#39;,
-                         &#39;Computer Modern Roman&#39;,
-                         &#39;New Century Schoolbook&#39;,
-                         &#39;Century Schoolbook L&#39;,
-                         &#39;Utopia&#39;,
-                         &#39;ITC Bookman&#39;,
-                         &#39;Bookman&#39;,
-                         &#39;Nimbus Roman No9 L&#39;,
-                         &#39;Times New Roman&#39;,
-                         &#39;Times&#39;,
-                         &#39;Palatino&#39;,
-                         &#39;Charter&#39;,
-                         &#39;serif&#39;],
-          &#39;font.size&#39;: 10.0,
-          &#39;font.stretch&#39;: &#39;normal&#39;,
-          &#39;font.style&#39;: &#39;normal&#39;,
-          &#39;font.variant&#39;: &#39;normal&#39;,
-          &#39;font.weight&#39;: &#39;normal&#39;,
-          &#39;grid.alpha&#39;: 1.0,
-          &#39;grid.color&#39;: &#39;#b0b0b0&#39;,
-          &#39;grid.linestyle&#39;: &#39;-&#39;,
-          &#39;grid.linewidth&#39;: 0.8,
-          &#39;hatch.color&#39;: &#39;black&#39;,
-          &#39;hatch.linewidth&#39;: 1.0,
-          &#39;hist.bins&#39;: 10,
-          &#39;image.aspect&#39;: &#39;equal&#39;,
-          &#39;image.cmap&#39;: &#39;viridis&#39;,
-          &#39;image.composite_image&#39;: True,
-          &#39;image.interpolation&#39;: &#39;antialiased&#39;,
-          &#39;image.lut&#39;: 256,
-          &#39;image.origin&#39;: &#39;upper&#39;,
-          &#39;image.resample&#39;: True,
-          &#39;interactive&#39;: False,
-          &#39;keymap.back&#39;: [&#39;left&#39;, &#39;c&#39;, &#39;backspace&#39;, &#39;MouseButton.BACK&#39;],
-          &#39;keymap.copy&#39;: [&#39;ctrl+c&#39;, &#39;cmd+c&#39;],
-          &#39;keymap.forward&#39;: [&#39;right&#39;, &#39;v&#39;, &#39;MouseButton.FORWARD&#39;],
-          &#39;keymap.fullscreen&#39;: [&#39;f&#39;, &#39;ctrl+f&#39;],
-          &#39;keymap.grid&#39;: [&#39;g&#39;],
-          &#39;keymap.grid_minor&#39;: [&#39;G&#39;],
-          &#39;keymap.help&#39;: [&#39;f1&#39;],
-          &#39;keymap.home&#39;: [&#39;h&#39;, &#39;r&#39;, &#39;home&#39;],
-          &#39;keymap.pan&#39;: [&#39;p&#39;],
-          &#39;keymap.quit&#39;: [&#39;ctrl+w&#39;, &#39;cmd+w&#39;, &#39;q&#39;],
-          &#39;keymap.quit_all&#39;: [],
-          &#39;keymap.save&#39;: [&#39;s&#39;, &#39;ctrl+s&#39;],
-          &#39;keymap.xscale&#39;: [&#39;k&#39;, &#39;L&#39;],
-          &#39;keymap.yscale&#39;: [&#39;l&#39;],
-          &#39;keymap.zoom&#39;: [&#39;o&#39;],
-          &#39;legend.borderaxespad&#39;: 0.5,
-          &#39;legend.borderpad&#39;: 0.4,
-          &#39;legend.columnspacing&#39;: 2.0,
-          &#39;legend.edgecolor&#39;: &#39;0.8&#39;,
-          &#39;legend.facecolor&#39;: &#39;inherit&#39;,
-          &#39;legend.fancybox&#39;: True,
-          &#39;legend.fontsize&#39;: &#39;medium&#39;,
-          &#39;legend.framealpha&#39;: 0.8,
-          &#39;legend.frameon&#39;: True,
-          &#39;legend.handleheight&#39;: 0.7,
-          &#39;legend.handlelength&#39;: 2.0,
-          &#39;legend.handletextpad&#39;: 0.8,
-          &#39;legend.labelcolor&#39;: &#39;None&#39;,
-          &#39;legend.labelspacing&#39;: 0.5,
-          &#39;legend.loc&#39;: &#39;best&#39;,
-          &#39;legend.markerscale&#39;: 1.0,
-          &#39;legend.numpoints&#39;: 1,
-          &#39;legend.scatterpoints&#39;: 1,
-          &#39;legend.shadow&#39;: False,
-          &#39;legend.title_fontsize&#39;: None,
-          &#39;lines.antialiased&#39;: True,
-          &#39;lines.color&#39;: &#39;C0&#39;,
-          &#39;lines.dash_capstyle&#39;: &lt;CapStyle.butt: &#39;butt&#39;&gt;,
-          &#39;lines.dash_joinstyle&#39;: &lt;JoinStyle.round: &#39;round&#39;&gt;,
-          &#39;lines.dashdot_pattern&#39;: [6.4, 1.6, 1.0, 1.6],
-          &#39;lines.dashed_pattern&#39;: [3.7, 1.6],
-          &#39;lines.dotted_pattern&#39;: [1.0, 1.65],
-          &#39;lines.linestyle&#39;: &#39;-&#39;,
-          &#39;lines.linewidth&#39;: 1.5,
-          &#39;lines.marker&#39;: &#39;None&#39;,
-          &#39;lines.markeredgecolor&#39;: &#39;auto&#39;,
-          &#39;lines.markeredgewidth&#39;: 1.0,
-          &#39;lines.markerfacecolor&#39;: &#39;auto&#39;,
-          &#39;lines.markersize&#39;: 6.0,
-          &#39;lines.scale_dashes&#39;: True,
-          &#39;lines.solid_capstyle&#39;: &lt;CapStyle.projecting: &#39;projecting&#39;&gt;,
-          &#39;lines.solid_joinstyle&#39;: &lt;JoinStyle.round: &#39;round&#39;&gt;,
-          &#39;macosx.window_mode&#39;: &#39;system&#39;,
-          &#39;markers.fillstyle&#39;: &#39;full&#39;,
-          &#39;mathtext.bf&#39;: &#39;sans:bold&#39;,
-          &#39;mathtext.bfit&#39;: &#39;sans:italic:bold&#39;,
-          &#39;mathtext.cal&#39;: &#39;cursive&#39;,
-          &#39;mathtext.default&#39;: &#39;it&#39;,
-          &#39;mathtext.fallback&#39;: &#39;cm&#39;,
-          &#39;mathtext.fontset&#39;: &#39;dejavusans&#39;,
-          &#39;mathtext.it&#39;: &#39;sans:italic&#39;,
-          &#39;mathtext.rm&#39;: &#39;sans&#39;,
-          &#39;mathtext.sf&#39;: &#39;sans&#39;,
-          &#39;mathtext.tt&#39;: &#39;monospace&#39;,
-          &#39;patch.antialiased&#39;: True,
-          &#39;patch.edgecolor&#39;: &#39;black&#39;,
-          &#39;patch.facecolor&#39;: &#39;C0&#39;,
-          &#39;patch.force_edgecolor&#39;: False,
-          &#39;patch.linewidth&#39;: 1.0,
-          &#39;path.effects&#39;: [],
-          &#39;path.simplify&#39;: True,
-          &#39;path.simplify_threshold&#39;: 0.111111111111,
-          &#39;path.sketch&#39;: None,
-          &#39;path.snap&#39;: True,
-          &#39;pcolor.shading&#39;: &#39;auto&#39;,
-          &#39;pcolormesh.snap&#39;: True,
-          &#39;pdf.compression&#39;: 6,
-          &#39;pdf.fonttype&#39;: 3,
-          &#39;pdf.inheritcolor&#39;: False,
-          &#39;pdf.use14corefonts&#39;: False,
-          &#39;pgf.preamble&#39;: &#39;&#39;,
-          &#39;pgf.rcfonts&#39;: True,
-          &#39;pgf.texsystem&#39;: &#39;xelatex&#39;,
-          &#39;polaraxes.grid&#39;: True,
-          &#39;ps.distiller.res&#39;: 6000,
-          &#39;ps.fonttype&#39;: 3,
-          &#39;ps.papersize&#39;: &#39;letter&#39;,
-          &#39;ps.useafm&#39;: False,
-          &#39;ps.usedistiller&#39;: None,
-          &#39;savefig.bbox&#39;: None,
-          &#39;savefig.directory&#39;: &#39;~&#39;,
-          &#39;savefig.dpi&#39;: &#39;figure&#39;,
-          &#39;savefig.edgecolor&#39;: &#39;auto&#39;,
-          &#39;savefig.facecolor&#39;: &#39;auto&#39;,
-          &#39;savefig.format&#39;: &#39;png&#39;,
-          &#39;savefig.orientation&#39;: &#39;portrait&#39;,
-          &#39;savefig.pad_inches&#39;: 0.1,
-          &#39;savefig.transparent&#39;: False,
-          &#39;scatter.edgecolors&#39;: &#39;face&#39;,
-          &#39;scatter.marker&#39;: &#39;o&#39;,
-          &#39;svg.fonttype&#39;: &#39;path&#39;,
-          &#39;svg.hashsalt&#39;: None,
-          &#39;svg.image_inline&#39;: True,
-          &#39;text.antialiased&#39;: True,
-          &#39;text.color&#39;: &#39;black&#39;,
-          &#39;text.hinting&#39;: &#39;force_autohint&#39;,
-          &#39;text.hinting_factor&#39;: 8,
-          &#39;text.kerning_factor&#39;: 0,
-          &#39;text.latex.preamble&#39;: &#39;&#39;,
-          &#39;text.parse_math&#39;: True,
-          &#39;text.usetex&#39;: False,
-          &#39;timezone&#39;: &#39;UTC&#39;,
-          &#39;tk.window_focus&#39;: False,
-          &#39;toolbar&#39;: &#39;toolbar2&#39;,
-          &#39;webagg.address&#39;: &#39;127.0.0.1&#39;,
-          &#39;webagg.open_in_browser&#39;: True,
-          &#39;webagg.port&#39;: 8988,
-          &#39;webagg.port_retries&#39;: 50,
-          &#39;xaxis.labellocation&#39;: &#39;center&#39;,
-          &#39;xtick.alignment&#39;: &#39;center&#39;,
-          &#39;xtick.bottom&#39;: True,
-          &#39;xtick.color&#39;: &#39;black&#39;,
-          &#39;xtick.direction&#39;: &#39;out&#39;,
-          &#39;xtick.labelbottom&#39;: True,
-          &#39;xtick.labelcolor&#39;: &#39;inherit&#39;,
-          &#39;xtick.labelsize&#39;: &#39;medium&#39;,
-          &#39;xtick.labeltop&#39;: False,
-          &#39;xtick.major.bottom&#39;: True,
-          &#39;xtick.major.pad&#39;: 3.5,
-          &#39;xtick.major.size&#39;: 3.5,
-          &#39;xtick.major.top&#39;: True,
-          &#39;xtick.major.width&#39;: 0.8,
-          &#39;xtick.minor.bottom&#39;: True,
-          &#39;xtick.minor.ndivs&#39;: &#39;auto&#39;,
-          &#39;xtick.minor.pad&#39;: 3.4,
-          &#39;xtick.minor.size&#39;: 2.0,
-          &#39;xtick.minor.top&#39;: True,
-          &#39;xtick.minor.visible&#39;: False,
-          &#39;xtick.minor.width&#39;: 0.6,
-          &#39;xtick.top&#39;: False,
-          &#39;yaxis.labellocation&#39;: &#39;center&#39;,
-          &#39;ytick.alignment&#39;: &#39;center_baseline&#39;,
-          &#39;ytick.color&#39;: &#39;black&#39;,
-          &#39;ytick.direction&#39;: &#39;out&#39;,
-          &#39;ytick.labelcolor&#39;: &#39;inherit&#39;,
-          &#39;ytick.labelleft&#39;: True,
-          &#39;ytick.labelright&#39;: False,
-          &#39;ytick.labelsize&#39;: &#39;medium&#39;,
-          &#39;ytick.left&#39;: True,
-          &#39;ytick.major.left&#39;: True,
-          &#39;ytick.major.pad&#39;: 3.5,
-          &#39;ytick.major.right&#39;: True,
-          &#39;ytick.major.size&#39;: 3.5,
-          &#39;ytick.major.width&#39;: 0.8,
-          &#39;ytick.minor.left&#39;: True,
-          &#39;ytick.minor.ndivs&#39;: &#39;auto&#39;,
-          &#39;ytick.minor.pad&#39;: 3.4,
-          &#39;ytick.minor.right&#39;: True,
-          &#39;ytick.minor.size&#39;: 2.0,
-          &#39;ytick.minor.visible&#39;: False,
-          &#39;ytick.minor.width&#39;: 0.6,
-          &#39;ytick.right&#39;: False})</span>
-
-        
-    </div>
-    <a class="headerlink" href="#rcParams_old"></a>
-    
-    
 
                 </section>
     </main>

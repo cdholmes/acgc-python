@@ -789,9 +789,9 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-570"><a href="#L-570"><span class="linenos">570</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute times of sunrise, sunset, solar noon, and day length</span>
 </span><span id="L-571"><a href="#L-571"><span class="linenos">571</span></a><span class="sd">    </span>
 </span><span id="L-572"><a href="#L-572"><span class="linenos">572</span></a><span class="sd">    Common options for solar zenith angle at sunrise</span>
-</span><span id="L-573"><a href="#L-573"><span class="linenos">573</span></a><span class="sd">    1. 90.833 for first edge of sun rising, typical (0.567°) refraction (default)</span>
-</span><span id="L-574"><a href="#L-574"><span class="linenos">574</span></a><span class="sd">    2. 90.267 for first edge of sun rising, no refraction</span>
-</span><span id="L-575"><a href="#L-575"><span class="linenos">575</span></a><span class="sd">    3. 90 degrees for center of sun rising, no refraction</span>
+</span><span id="L-573"><a href="#L-573"><span class="linenos">573</span></a><span class="sd">    - 90.833 for first edge of sun rising, typical (0.567°) refraction (default)</span>
+</span><span id="L-574"><a href="#L-574"><span class="linenos">574</span></a><span class="sd">    - 90.267 for first edge of sun rising, no refraction</span>
+</span><span id="L-575"><a href="#L-575"><span class="linenos">575</span></a><span class="sd">    - 90 degrees for center of sun rising, no refraction</span>
 </span><span id="L-576"><a href="#L-576"><span class="linenos">576</span></a>
 </span><span id="L-577"><a href="#L-577"><span class="linenos">577</span></a><span class="sd">    Note: horizon_zenith_angle can be used to compute a more accurate horizon location</span>
 </span><span id="L-578"><a href="#L-578"><span class="linenos">578</span></a><span class="sd">    for sites at elevation.</span>
@@ -1123,7 +1123,7 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-904"><a href="#L-904"><span class="linenos">904</span></a><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-905"><a href="#L-905"><span class="linenos">905</span></a>
 </span><span id="L-906"><a href="#L-906"><span class="linenos">906</span></a><span class="n">pi180</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span>
-</span><span id="L-907"><a href="#L-907"><span class="linenos">907</span></a><span class="sd">&#39;&#39;&#39;Constant $\pi/180$&#39;&#39;&#39;</span>
+</span><span id="L-907"><a href="#L-907"><span class="linenos">907</span></a><span class="sd">&#39;&#39;&#39;Constant $\\pi/180$&#39;&#39;&#39;</span>
 </span><span id="L-908"><a href="#L-908"><span class="linenos">908</span></a>
 </span><span id="L-909"><a href="#L-909"><span class="linenos">909</span></a><span class="c1"># Aliases for functions</span>
 </span><span id="L-910"><a href="#L-910"><span class="linenos">910</span></a><span class="n">sza</span> <span class="o">=</span> <span class="n">solar_zenith_angle</span>
@@ -2215,9 +2215,9 @@ declination, right ascension, equation of time, Earth-sun distance, datetime</li
 </span><span id="sun_times-571"><a href="#sun_times-571"><span class="linenos">571</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute times of sunrise, sunset, solar noon, and day length</span>
 </span><span id="sun_times-572"><a href="#sun_times-572"><span class="linenos">572</span></a><span class="sd">    </span>
 </span><span id="sun_times-573"><a href="#sun_times-573"><span class="linenos">573</span></a><span class="sd">    Common options for solar zenith angle at sunrise</span>
-</span><span id="sun_times-574"><a href="#sun_times-574"><span class="linenos">574</span></a><span class="sd">    1. 90.833 for first edge of sun rising, typical (0.567°) refraction (default)</span>
-</span><span id="sun_times-575"><a href="#sun_times-575"><span class="linenos">575</span></a><span class="sd">    2. 90.267 for first edge of sun rising, no refraction</span>
-</span><span id="sun_times-576"><a href="#sun_times-576"><span class="linenos">576</span></a><span class="sd">    3. 90 degrees for center of sun rising, no refraction</span>
+</span><span id="sun_times-574"><a href="#sun_times-574"><span class="linenos">574</span></a><span class="sd">    - 90.833 for first edge of sun rising, typical (0.567°) refraction (default)</span>
+</span><span id="sun_times-575"><a href="#sun_times-575"><span class="linenos">575</span></a><span class="sd">    - 90.267 for first edge of sun rising, no refraction</span>
+</span><span id="sun_times-576"><a href="#sun_times-576"><span class="linenos">576</span></a><span class="sd">    - 90 degrees for center of sun rising, no refraction</span>
 </span><span id="sun_times-577"><a href="#sun_times-577"><span class="linenos">577</span></a>
 </span><span id="sun_times-578"><a href="#sun_times-578"><span class="linenos">578</span></a><span class="sd">    Note: horizon_zenith_angle can be used to compute a more accurate horizon location</span>
 </span><span id="sun_times-579"><a href="#sun_times-579"><span class="linenos">579</span></a><span class="sd">    for sites at elevation.</span>
@@ -2351,11 +2351,11 @@ declination, right ascension, equation of time, Earth-sun distance, datetime</li
 
 <p>Common options for solar zenith angle at sunrise</p>
 
-<ol>
+<ul>
 <li>90.833 for first edge of sun rising, typical (0.567°) refraction (default)</li>
 <li>90.267 for first edge of sun rising, no refraction</li>
 <li>90 degrees for center of sun rising, no refraction</li>
-</ol>
+</ul>
 
 <p>Note: horizon_zenith_angle can be used to compute a more accurate horizon location
 for sites at elevation.</p>

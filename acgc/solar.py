@@ -570,9 +570,9 @@ def sun_times( lat, lon, datetime, tz_out=None, sza_sunrise=90.833,
     '''Compute times of sunrise, sunset, solar noon, and day length
     
     Common options for solar zenith angle at sunrise
-    1. 90.833 for first edge of sun rising, typical (0.567°) refraction (default)
-    2. 90.267 for first edge of sun rising, no refraction
-    3. 90 degrees for center of sun rising, no refraction
+    - 90.833 for first edge of sun rising, typical (0.567°) refraction (default)
+    - 90.267 for first edge of sun rising, no refraction
+    - 90 degrees for center of sun rising, no refraction
 
     Note: horizon_zenith_angle can be used to compute a more accurate horizon location
     for sites at elevation.
@@ -904,7 +904,7 @@ datetimeUTC : Timestamp, Series, or DataArray of numpy.datetime64
 '''
 
 pi180 = np.pi / 180
-'''Constant $\pi/180$'''
+'''Constant $\\pi/180$'''
 
 # Aliases for functions
 sza = solar_zenith_angle
