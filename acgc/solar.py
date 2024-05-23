@@ -41,7 +41,8 @@ def insolation_toa( lat, lon, datetime, solar_pos=None, **kwargs ):
     datetime : datetime-like or str
         date and time. Include time zone or UTC will be assumed
     solar_pos : `SolarPositionResults`, optional
-        solar position parameters from a prior call to `solar_position`
+        solar position parameters from a prior call to `solar_position`.
+        This can shorten runtime when calling multiple functions that use solar_position.
     **kwargs passed to `solar_zenith_angle`
     
     Returns
@@ -72,7 +73,8 @@ def solar_azimuth_angle( lat, lon, datetime, solar_pos=None ):
     datetime : datetime-like or str
         date and time. Include time zone or UTC will be assumed
     solar_pos : `SolarPositionResults`, optional
-        solar position parameters from a prior call to `solar_position`
+        solar position parameters from a prior call to `solar_position`.
+        This can shorten runtime when calling multiple functions that use solar_position.
 
     Returns
     -------
@@ -129,7 +131,8 @@ def solar_elevation_angle( lat, lon, datetime, alt=0,
     pressure : float or ndarray (default=101325)
         surface atmospheric pressure (Pa), only used for refraction calculation
     solar_pos : `SolarPositionResults`, optional
-        solar position parameters from a prior call to `solar_position`
+        solar position parameters from a prior call to `solar_position`.
+        This can shorten runtime when calling multiple functions that use solar_position.
     
     Returns
     -------
@@ -179,7 +182,8 @@ def solar_zenith_angle( lat, lon, datetime,
     pressure : float or ndarray (default=101325)
         surface atmospheric pressure (Pa), only used for refraction calculation
     solar_pos : `SolarPositionResults`, optional
-        solar position parameters from a prior call to `solar_position`
+        solar position parameters from a prior call to `solar_position`.
+        This can shorten runtime when calling multiple functions that use solar_position.
     
     Returns
     -------
@@ -249,7 +253,8 @@ def solar_constant( datetime, solar_pos=None ):
     ----------
     datetime : datetime-like
     solar_pos : `SolarPositionResults`, optional
-        solar position parameters from a prior call to `solar_position`
+        solar position parameters from a prior call to `solar_position`.
+        This can shorten runtime when calling multiple functions that use solar_position.
 
     Returns
     -------
@@ -272,7 +277,8 @@ def solar_declination( datetime, fast=False, solar_pos=None ):
     fast : bool (default=False)
         Specifies using a faster but less accurate calculation
     solar_pos : `SolarPositionResults`, optional
-        solar position parameters from a prior call to `solar_position`
+        solar position parameters from a prior call to `solar_position`.
+        This can shorten runtime when calling multiple functions that use solar_position.
 
     Returns
     -------
@@ -321,7 +327,7 @@ def solar_declination( datetime, fast=False, solar_pos=None ):
     return dec
 
 def solar_latitude( *args, **kwargs ):
-    '''Latitude of the subsolar point
+    '''Latitude of the subsolar point, degrees
     
     Parameters
     ----------
@@ -330,7 +336,8 @@ def solar_latitude( *args, **kwargs ):
     fast : bool
         see `solar_declination`
     solar_pos : `SolarPositionResults`, optional
-        solar position parameters from a prior call to `solar_position`
+        solar position parameters from a prior call to `solar_position`.
+        This can shorten runtime when calling multiple functions that use solar_position.
         
     Returns
     -------
@@ -347,7 +354,8 @@ def solar_longitude( datetime, solar_pos=None ):
     datetimeUTC : datetime-like or str
         date and time. Include time zone or UTC will be assumed
     solar_pos : `SolarPositionResults`, optional
-        solar position parameters from a prior call to `solar_position`
+        solar position parameters from a prior call to `solar_position`.
+        This can shorten runtime when calling multiple functions that use solar_position.
     
     Returns
     -------
@@ -391,7 +399,8 @@ def solar_hour_angle( lon, datetime, solar_pos=None ):
     datetimeUTC : datetime-like or str
         date and time. Include time zone or UTC will be assumed
     solar_pos : `SolarPositionResults`, optional
-        solar position parameters from a prior call to `solar_position`
+        solar position parameters from a prior call to `solar_position`.
+        This can shorten runtime when calling multiple functions that use solar_position.
     
     Returns
     -------
@@ -593,7 +602,8 @@ def sun_times( lat, lon, datetime, tz_out=None, sza_sunrise=90.833,
     fast : bool (default=False)
         Select a faster but less accurate calculation
     solar_pos : `SolarPositionResults`, optional
-        solar position parameters from a prior call to `solar_position`
+        solar position parameters from a prior call to `solar_position`.
+        This can shorten runtime when calling multiple functions that use solar_position.
 
     Returns
     -------
