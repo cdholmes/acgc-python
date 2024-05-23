@@ -34,8 +34,9 @@ def smafit(*args,**kwargs):
 
 def bivariate_line_equation(fitresult,
                     floatformat='{:.3f}',
-                    ystring='include' ):
-    '''Write equation for the fitted line
+                    ystring='include',
+                    include_error=False ):
+    '''Write equation for the fitted line as a string
     
     Parameters
     ----------
@@ -45,11 +46,14 @@ def bivariate_line_equation(fitresult,
         format string for the numerical values (default='{:.3f}')
     ystring : {'include' (default), 'separate', 'none'}
         specifies whether "y =" should be included in result, a separate item in tuple, or none
+    include_error : bool
+        specifies whether uncertainty terms should be included in the equation
     
     Returns
     -------
     fitline_string : str
         equation for the the fitted line, in the form "y = a x + b" or "y = a x"
+        If uncertainty terms are included, then "y = (a ± c) x + (b ± d)" or "y = (a ± c) x"
     '''
 
     # Left-hand side
@@ -57,11 +61,19 @@ def bivariate_line_equation(fitresult,
 
     # Right-hand side
     if fitresult['fitintercept']:
-        rhs = f'{floatformat:s} x + {floatformat:s}'.\
-                format( fitresult['slope'], fitresult['intercept'] )
+        if include_error:
+            rhs = f'({floatformat:s} ± {floatformat:s}) x + ({floatformat:s} ± {floatformat:s})'.\
+                    format( fitresult['slope'], fitresult['slope_ste'], fitresult['intercept'], fitresult['intercept_ste'] )
+        else:
+            rhs = f'{floatformat:s} x + {floatformat:s}'.\
+                    format( fitresult['slope'], fitresult['intercept'] )
     else:
-        rhs = f'{floatformat:s} x'.\
-                format( fitresult['slope'] )
+        if include_error:
+            rhs = f'({floatformat:s} ± {floatformat:s}) x'.\
+                    format( fitresult['slope'], fitresult['slope_ste'] )
+        else:
+            rhs = f'{floatformat:s} x'.\
+                    format( fitresult['slope'] )
 
     # Combine right and left-hand sides
     if ystring=='include':
@@ -153,6 +165,8 @@ def sma(X,Y,W=None,
             array of fitted values
         - resid (ndarray)
             array of residual values
+        - method (str)
+            name of the fit method
     '''
 
     def str2var( v, data ):
@@ -193,21 +207,26 @@ def sma(X,Y,W=None,
     # Number of observations
     N = len(X0)
 
+    include_intercept = intercept
+
     # Degrees of freedom for the model
-    if intercept:
+    if include_intercept:
         dfmod = 2
     else:
         dfmod = 1
 
+    method = 'SMA'
 
     # Choose whether to use methods robust to outliers
     if robust:
+
+        method = 'rSMA'
 
         # Choose the robust method
         if ((robust_method.lower() =='mcd') or (robust_method.lower() == 'fastmcd') ):
             # FAST MCD
 
-            if not intercept:
+            if not include_intercept:
                 # intercept=False could possibly be supported by calculating
                 # using mcd.support_ as weights in an explicit variance/covariance calculation
                 raise NotImplementedError('FastMCD method only supports SMA with intercept')
@@ -253,7 +272,7 @@ def sma(X,Y,W=None,
             Ymean = np.sum( Y0 * rweights ) / rsum
 
             # Force intercept through zero, if requested
-            if not intercept:
+            if not include_intercept:
                 Xmean = 0
                 Ymean = 0
 
@@ -271,7 +290,7 @@ def sma(X,Y,W=None,
                                       format(robust_method))
     else:
 
-        if intercept:
+        if include_intercept:
 
             wsum = np.sum(W)
 
@@ -324,7 +343,7 @@ def sma(X,Y,W=None,
     #############
     # INTERCEPT
 
-    if intercept:
+    if include_intercept:
         Intercept = Ymean - Slope * Xmean
 
         # Standard deviation of residuals
@@ -334,9 +353,9 @@ def sma(X,Y,W=None,
 
         # OLD METHOD
         # Standard deviation of residuals
-        #resid = Y0 - (Intercept + Slope * X0 )    
+        #resid = Y0 - (Intercept + Slope * X0 )
         # Population standard deviation of the residuals
-        #Sr = np.std( resid, ddof=0 )      
+        #Sr = np.std( resid, ddof=0 )
 
         # Standard error of the intercept estimate
         ste_int = np.sqrt( Sr**2/N + Xmean**2 * ste_slope**2  )
@@ -352,7 +371,9 @@ def sma(X,Y,W=None,
         ste_int   = 0
         ci_int    = np.array([0,0])
 
-    result = dict( slope            = Slope,
+    result = dict( method           = method,
+                   fitintercept     = include_intercept,
+                   slope            = Slope,
                    intercept        = Intercept,
                    slope_ste        = ste_slope,
                    intercept_ste    = ste_int,
@@ -491,7 +512,9 @@ def york( x, y, err_x=1, err_y=1, rerr_xy=0 ):
     dfmod = 2
     N = np.sum( ~np.isnan(x) * ~np.isnan(y) )
 
-    result = dict( slope         = b,
+    result = dict( method        = 'York',
+                fitintercept     = True,
+                slope            = b,
                 intercept        = a,
                 slope_ste        = sigb,
                 intercept_ste    = siga,
@@ -560,7 +583,9 @@ def sen( x, y, alpha=0.95, method='separate' ):
     dfmod = 2
     N = np.sum( ~np.isnan(x) * ~np.isnan(y) )
 
-    result = dict( slope         = slope,
+    result = dict( method        = 'Theil-Sen',
+                fitintercept     = True,
+                slope            = slope,
                 intercept        = intercept,
                 slope_ste        = None,
                 intercept_ste    = None,
