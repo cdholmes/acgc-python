@@ -242,7 +242,7 @@ class BivariateStatistics:
     root_mean_square_difference, rmsd : float
         $\\sqrt{ \\langle (y - x)^2 \\rangle }$
     root_mean_square_log10_ratio, rmslr : float
-        $\\sqrt{ \\langle log10(y/x)^2 \\rangle }$
+        $\\sqrt{ \\langle \\log_{10}(y/x)^2 \\rangle }$
     covariance : float
         cov(x,y)
     correlation_pearson, correlation, pearsonr, R, r : float

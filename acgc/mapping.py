@@ -7,14 +7,16 @@ import numpy as np
 import cartopy.crs as ccrs
 import cartopy.geodesic as cgeo
 
-pi180 = np.pi/180
-
 def great_circle(*args,data=None,radius=None,flattening=None):
     '''Great circle distance between two points on Earth
 
-    Usage: 
+    Usage examples: 
+    ```
     distance = great_circle( start_lon, start_lat, end_lon, end_lat )
     distance = great_circle( start_points, end_points )
+    distance = great_circle( 'start_lon', 'start_lat', 'end_lon', 'end_lat', data=data )
+    distance = great_circle( 'start_points', 'end_points', data=data )
+    ```
 
     Parameters
     ----------
@@ -304,3 +306,6 @@ def scale_bar(ax, location, length, metres_per_unit=1000, unit_name='km',
     # 'rotation' keyword argument is in text_kwargs.
     ax.text(*text_location, f"{length} {unit_name}", rotation_mode='anchor',
             transform=ax.transAxes, **text_kwargs)
+
+pi180 = np.pi / 180
+'''Constant $\\pi/180$'''
