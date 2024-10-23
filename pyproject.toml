@@ -45,8 +45,8 @@ dependencies = [
     "pandas",
     "netCDF4",
     "scikit-learn",
-    "statsmodels"
-    "cmcrameri",
+    "statsmodels",
+    "cmcrameri"
     #"numba"
     #"rpy2",
 ]
