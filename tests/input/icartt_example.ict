@@ -1,0 +1,78 @@
+65, 1001
+Wolfe, Glenn
+NASA Goddard Space Flight Center
+GSFC Greenhouse Gas Suite
+BLUEFLUX
+1, 1
+2022, 04, 19, 2022, 12, 02
+1
+Time_Mid, s, seconds since midnight
+31
+1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+-99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999, -99999999
+Leg, none, Leg Index
+Lat, deg, GPS latitude
+Lon, deg, GPS longitude
+Alt, m, GPS altitude
+Dist, m, Distance along leg
+ustar, m/s, friction velocity
+wstar, m/s, convective velocity scale
+H, W/m^2, Sensible heat flux
+LE, W/m^2, Latent heat flux from LGR
+FCO2, umol/m^2/s, CO2 flux
+FCH4, nmol/m^2/s, CH4 flux
+H_RE, W/m^2, flux random error
+LE_RE, W/m^2, flux random error
+FCO2_RE, umol/m^2/s, flux random error
+FCH4_RE, nmol/m^2/s, flux random error
+H_SE, none, flux systematic error fraction
+LE_SE, none, flux systematic error fraction
+FCO2_SE, none, flux systematic error fraction
+FCH4_SE, none, flux systematic error fraction
+H_qflag, none, H quality flag 
+LE_qflag, none, LE quality flag
+FCO2_qflag, none, FCO2 quality flag
+FCH4_qflag, none, FCH4 quality flag 
+u, m/s, Along-vector wind speed
+v, m/s, Cross-vector horizontal wind speed
+WDIR, deg, Calculated horizontal wind direction
+WSPD, deg, Calculated horizontal wind direction
+u_std, m/s, Standard deviation of along-vector wind speed
+v_std, m/s, Standard deviation of cross-vector horizontal wind speed
+w_std, m/s, Standard deviation of vertical wind speed
+Lobukhov, m, Obukhov length
+2
+FLIGHT PATTERN: Swamp Box.
+PBL height(zi) = 1250 m.
+18
+PI_CONTACT_INFO: NASA GSFC, Code 614, Greenbelt, MD 20771; glenn.m.wolfe@nasa.gov; 301-614-6008
+PLATFORM:  Dynamic Aviation King Air (N87Q)
+LOCATION: Homestead, FL, USA, Earth
+ASSOCIATED_DATA: See GHG and WINDS files for mixing ratios and meteorology. Spectra, cospectra, flux footprints, and other supporting data available upon request.
+INSTRUMENT_INFO: See GHG and WINDS files.
+DATA_INFO: Wavelet transforms applied to 10Hz observations over each leg. Scalar time series are detrended with a 40 second (~3 km) running mean. Fluxes include contributions from all frequencies, including those below the cone-of-influence. Raw 10 Hz fluxes are bin-averaged to 1 Hz (~70-80m horizontal resolution). Extrapolation to Earth’s surface requires correction for vertical flux divergence. Surface extrapolation is NOT recommended for any fluxes where a divergence correction is not provided. Divergence corrections are from linear fits to vertical profiles of selected flux legs (see Special Comments). For further details, See Wolfe et al. 2018; https://doi.org/10.5194/amt-11-1757-2018. ustar is filtered for momentum fluxes with the fraction of the cospectral power lying within the cone-of-influence < 0.5. wstar is filtered in the same manner with sensible heat fluxes.
+UNCERTAINTY: Errors in each flux (F) contain random (RE) and systematic (SE) components. Random error is due to turbulence (stochastic noise) and instrument noise. Systematic error is due to turbulence sampling (low frequency, long-wave motions), instrument response time (high frequency), and scalar measurement accuracy. SE and RE are provided independently for each flux. Note that RE is given in flux units, while SE is in fractional units. Total error is E = sqrt(RE^2 + (SE*F)^2). Component error contributions are available upon request. When averaging fluxes, average errors are: SEavg = mean(SE), REavg = sqrt(sum(RE^2))/N, where N is # of points in the average. Divergence uncertainty should be added in fractional quadrature with RE and SE: Esurf = Fsurf*sqrt(F_div_err^2 + (RE/F)^2 + SE^2). Fluxes can become spurious at the beginning/end of a leg due to the cone-of-influence. Quality flags (F_qflag) are provided to filter out suspect fluxes. A qflag of 1 denotes good quality fluxes. By definition, F_qflag is 1 when the fraction of cospectral power above the cone-of-influence is > 0.5.
+ULOD_FLAG: -77777
+ULOD_VALUE: N/A
+LLOD_FLAG: -88888
+LLOD_VALUE: N/A
+DM_CONTACT_INFO: Erin R. Delaria, NASA GSFC; erin.r.delaria@nasa.gov; 301-614-6927
+PROJECT_INFO: BLUEFLUX is a NASA Carbon Monitoring Systems (CMS) project to measure greenhouse gases in Florida mangrove and related ecosystems. More info at https://earth-dev.gsfc.nasa.gov/acd/campaigns/blueflux.
+STIPULATIONS_ON_USE: Please contact PI or DM for proper use. All NASA data use policies apply. As a matter of professional courtesy, consideration for co-authorship is expected for publications utilizing this data.
+OTHER_COMMENTS: Have Fun!
+REVISION:R0
+R0: This is Final Data. Accuracy and uncertainty have been updated from field data following calibration of the 2401m Picarro with a NOAA Calibration standard. Divergence correction factors are estimated as equal to 1 for all fluxes, as the measured flux divergence was not statistically significant at the altitude of flux measurements. Differences between surface fluxes and reported fluxes may be up to 20%. This 20% uncertainty limit in the flux divergence is determined from measured differences in average fluxes between stacked legs and theoretical mass-balance calculations of flux divergence, as in Wolfe et al., 2015; https://doi.org/10.1002/2015GL065839.
+Time_Mid, Leg, Lat, Lon, Alt, Dist, ustar, wstar, H, LE, FCO2, FCH4, H_RE, LE_RE, FCO2_RE, FCH4_RE, H_SE, LE_SE, FCO2_SE, FCH4_SE, H_qflag, LE_qflag, FCO2_qflag, FCH4_qflag, u, v, WDIR, WSPD, u_std, v_std, w_std, Lobukhov
+ 57896, 1, 25.4477, -80.8867,  87,     64,   0.76,   1.19,   47.9,  140.8,   -2.6,   32.5,   19.0,   84.0,    2.0,   20.9, 0.108, 0.113, 0.111, 0.120, 1.00, 0.00, 0.00, 0.00, -3.677, -2.564, 214.888, 4.483, 1.438, 0.265, 1.095, -794.769
+ 57897, 1, 25.4477, -80.8874,  86,    119,   0.80,   1.21,   50.7,  170.0,   -2.9,   41.7,   19.3,   75.7,    2.0,   19.5, 0.108, 0.113, 0.111, 0.120, 1.00, 0.00, 0.00, 0.00, -3.648, -1.685, 204.792, 4.018, 1.385, 0.543, 1.115, -882.323
+ 57898, 1, 25.4477, -80.8880,  87,    185,   0.85,   1.19,   48.4,  201.0,   -3.3,   52.4,   19.3,   76.5,    1.9,   20.5, 0.108, 0.113, 0.111, 0.120, 1.00, 0.00, 0.00, 0.00, -3.052, -0.567, 190.523, 3.105, 1.193, 0.878, 1.127, -1091.649
+ 57899, 1, 25.4476, -80.8887,  88,    251,   0.79,   1.14,   42.9,  205.7,   -4.2,   47.2,   19.1,   76.9,    1.9,   21.0, 0.108, 0.113, 0.111, 0.120, 1.00, 0.00, 0.00, 0.00, -4.086, -1.348, 198.260, 4.302, 1.171, 0.638, 1.056, -988.304
+ 57900, 1, 25.4476, -80.8894,  88,    318,   0.70,   1.12,   40.1,  170.5,   -4.4,   29.9,   18.8,   76.4,    1.8,   20.7, 0.108, 0.113, 0.111, 0.120, 1.00, 0.00, 0.00, 0.00, -4.222, -1.987, 205.206, 4.666, 1.119, 0.453, 0.971, -740.823
+ 57901, 1, 25.4476, -80.8900,  86,    384,   0.63,   1.11,   39.6,  145.0,   -4.3,   22.9,   18.6,   74.8,    1.8,   20.4, 0.108, 0.113, 0.111, 0.120, 1.00, 0.00, 0.00, 0.00, -4.824, -1.512, 197.410, 5.055, 0.979, 0.581, 0.924, -548.841
+ 57902, 1, 25.4476, -80.8907,  84,    450,   0.62,   1.12,   40.8,  133.4,   -4.1,   25.4,   18.6,   74.5,    1.8,   20.4, 0.108, 0.113, 0.111, 0.120, 1.00, 0.00, 0.00, 0.00, -4.069, -1.029, 194.197, 4.198, 0.938, 0.617, 0.914, -506.641
+ 57903, 1, 25.4476, -80.8913,  83,    516,   0.61,   1.13,   41.8,  143.6,   -4.1,   31.0,   18.6,   75.5,    1.7,   21.0, 0.108, 0.113, 0.111, 0.120, 1.00, 0.00, 0.00, 0.00, -3.885, -1.194, 197.082, 4.065, 0.984, 0.543, 0.943, -466.544
+ 57904, 1, 25.4476, -80.8920,  83,    586,   0.57,   1.14,   42.2,  172.0,   -4.1,   42.8,   18.5,   78.1,    1.7,   21.5, 0.108, 0.113, 0.111, 0.120, 1.00, 0.00, 0.00, 0.00, -4.245, -1.923, 204.368, 4.660, 1.037, 0.389, 0.984, -381.288
+ 57905, 1, 25.4476, -80.8927,  82,    649,   0.58,   1.15,   43.1,  217.3,   -4.1,   64.3,   18.2,   81.2,    1.7,   22.3, 0.108, 0.113, 0.111, 0.120, 1.00, 0.00, 0.00, 0.00, -4.204, -1.967, 205.071, 4.641, 1.034, 0.361, 0.947, -385.283
+ 57906, 1, 25.4476, -80.8933,  81,    715,   0.62,   1.17,   45.6,  263.2,   -4.6,   78.1,   18.0,   85.4,    1.8,   23.8, 0.108, 0.113, 0.111, 0.120, 1.00, 0.00, 0.00, 0.00, -4.982, -1.986, 201.739, 5.363, 1.031, 0.427, 0.929, -453.520
+ 57907, 1, 25.4476, -80.8940,  81,    781,   0.64,   1.18,   47.6,  312.4,   -5.3,   89.3,   17.6,   89.2,    1.8,   25.0, 0.108, 0.113, 0.111, 0.120, 1.00, 0.00, 1.00, 0.00, -4.161, -1.628, 201.370, 4.468, 1.060, 0.427, 0.986, -492.058
+ 57908, 1, 25.4476, -80.8946,  82,    846,   0.57,   1.19,   48.2,  319.8,   -4.5,   92.3,   16.9,   88.4,    1.8,   24.4, 0.108, 0.113, 0.111, 0.120, 1.00, 0.00, 1.00, 0.00, -4.299, -2.424, 209.422, 4.936, 1.096, 0.289, 0.990, -339.315

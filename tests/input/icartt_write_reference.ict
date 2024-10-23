@@ -1,0 +1,41 @@
+37, 1001
+Jane Doe
+NASA
+Invented Instrument
+FIREX-AQ
+1, 1
+2020, 01, 30, 2024, 10, 22
+1.0
+Time_Start, seconds, time, measurement time in seconds after takeoff
+2
+1,1
+-9999,-9999
+Alt, m, altitude, altitude above ground level
+Temp, C, temperature, air temperature in Celsius
+2
+Special comments are optional and can be omitted.
+If used, they should be a list of one or more strings
+19
+PI_CONTACT_INFO: jdoe@email.com or postal address
+PLATFORM: NASA DC-8
+LOCATION: Boise, ID, USA
+ASSOCIATED_DATA: N/A
+INSTRUMENT_INFO: N/A
+DATA_INFO: N/A
+UNCERTAINTY: 10% uncertainty in all values
+ULOD_FLAG: -7777
+ULOD_VALUE: N/A
+LLOD_FLAG: -8888
+LLOD_VALUE: N/A
+DM_CONTACT_INFO: Alice, data manager, alice@email.com
+PROJECT_INFO: FIREX-AQ 2019, https://project.com
+STIPULATIONS_ON_USE: FIREX-AQ Data Use Policy
+OTHER_COMMENTS: One line of comments
+REVISION: R1
+R0: Initial data
+R1: One string per revision
+Time_Start, Alt, Temp
+1,0,30
+2,10,29
+3,20,27
+4,30,25
