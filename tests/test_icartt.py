@@ -4,9 +4,10 @@ import warnings
 from pathlib import Path
 
 import pytest
-from acgc import icartt
 import pandas as pd
+from acgc import icartt
 
+# Path to this file
 test_path = os.path.dirname(__file__)
 
 def test_read_icartt():
@@ -58,5 +59,55 @@ def test_write_icartt():
     
     icartt.write_icartt( test_path+'/output/icartt_test_write.ict', df, metadata )
 
-    # Should compare files, but need to exclude line 6, which contains
-    # the date when the file was written
+    # compute differences between files
+    differences = compare_files_excluding_lines(
+        test_path+'/output/icartt_test_write.ict',
+        test_path+'/input/icartt_write_reference.ict',
+    )
+
+    # Check for differences
+    for dline in differences:
+        lnum, v1, v2 = dline
+        if lnum==7:
+            # This line is expected to differ as it contains the current date
+            continue
+        assert v1 == v2, f"Line {lnum} differs: {v1} != {v2}"
+
+
+def compare_files_excluding_lines(file1_path, file2_path, exclude_lines=[None], exclude_line_numbers=[None]):
+    '''Compares two files line by line, excluding specified lines.
+
+    Parameters
+    ----------
+    file1_path : str
+        Path to the first file.
+    file2_path : str
+        Path to the second file.
+    exclude_lines : list
+        List of lines to exclude (e.g., ["line1", "line2"]).
+    exclude_line_numbers : list
+        List of line numbers to exclude (e.g., [1, 2]).
+
+    Returns
+    -------
+    list
+        List of tuples containing differing lines and line numbers.
+    '''
+
+    differences = []
+
+    with open(file1_path, 'r') as file1, open(file2_path, 'r') as file2:
+        line_num = 0
+
+        for line1, line2 in zip(file1, file2):
+            line_num += 1
+
+            if line_num in exclude_line_numbers:
+                continue
+            if line1.strip() in exclude_lines or line2.strip() in exclude_lines:
+                continue
+
+            if line1 != line2:
+                differences.append((line_num, line1.strip(), line2.strip()))
+
+    return differences
