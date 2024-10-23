@@ -54,7 +54,7 @@ def read_icartt( files, usePickle=False, timeIndex=False ):
                 raise FileNotFoundError( file+" doesn't exist" )
 
             # Read the ICARTT file
-            with open( file, 'r', encoding='ascii' ) as f:
+            with open( file, 'r', encoding='utf-8' ) as f:
 
                 # Read the number of header lines
                 nheader, fmt = f.readline().split(',')
@@ -118,8 +118,8 @@ def read_icartt( files, usePickle=False, timeIndex=False ):
                     obs[varnames[i]] *= s
 
             # Add a time variable in datetime format
-            obs['time'] = pd.DatetimeIndex( pd.Timestamp(year=year,month=month,day=day) +
-                                         pd.TimedeltaIndex(obs[tname],tunit) )
+            obs['time'] = pd.DatetimeIndex( pd.Timestamp( year=year, month=month, day=day ) +
+                                            pd.to_timedelta( obs[tname], tunit ) )
 
             # Add flight number
             obs['file'] = n+1
