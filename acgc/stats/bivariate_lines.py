@@ -360,6 +360,12 @@ def sma(X,Y,W=None,
         # Standard error of the intercept estimate
         ste_int = np.sqrt( Sr**2/N + Xmean**2 * ste_slope**2  )
 
+        # If Intercept and ste_int are DataArrays, convert to float
+        if hasattr(Intercept,'values'):
+            Intercept = Intercept.values
+        if hasattr(ste_int,'values'):
+            ste_int = ste_int.values
+
         # Confidence interval for Intercept
         tcrit = stats.t.isf((1-alpha)/2,N-dfmod)
         ci_int = Intercept + ste_int * np.array([-tcrit,tcrit])

@@ -425,8 +425,8 @@ class BivariateStatistics:
             fit = sen( self._x,
                        self._y,
                        **kwargs)
-            slope = fit.slope
-            intercept = fit.intercept
+            slope = fit['slope']
+            intercept = fit['intercept']
 
         elif method.lower()=='siegel':
             fitintercept = True
