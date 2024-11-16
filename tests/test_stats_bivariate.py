@@ -22,6 +22,8 @@ def test_BivariateStatistics():
 
     result.summary()
 
+    result.summary('all')
+
 def test_BivariateStatistics_xarray():
     '''Check BivariateStatistics with xarray inputs'''
 

@@ -336,6 +336,14 @@ def sma(X,Y,W=None,
     # Standard error of slope estimate
     ste_slope = np.sqrt( 1/(N-dfmod) * Sy**2 / Sx**2 * (1-R**2) )
 
+    # If variables are DataArrays, convert to scalar
+    if hasattr(Slope,'values'):
+        Slope = Slope.values
+    if hasattr(R,'values'):
+        R = R.values
+    if hasattr(N,'values'):
+        N = N.values
+
     # Confidence interval for Slope
     B = (1-R**2)/(N-dfmod) * stats.f.isf(1-alpha, 1, N-dfmod)
     ci_grad = Slope * ( np.sqrt( B+1 ) + np.sqrt(B)*np.array([-1,+1]) )

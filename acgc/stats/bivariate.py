@@ -364,7 +364,7 @@ class BivariateStatistics:
         self.root_mean_square_log10_ratio = self.rmslr = np.sqrt( np.mean( np.power( log10ratio, 2 )))
 
         # Covariance, correlation
-        self.covariance = np.cov(x,y)[0][1]
+        self.covariance = self.cov = np.cov(x,y)[0][1]
         self.correlation = self.correlation_pearson = self.R = self.r = self.pearsonr = \
             np.corrcoef(x,y)[0][1]
         self.correlation_spearman = self.spearmanr = stats.spearmanr(x,y).statistic
