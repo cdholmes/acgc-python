@@ -334,7 +334,7 @@ def lon2i(lon,res=4):
                 np.append(np.arange(nlon),0),
                 kind='nearest',
                 fill_value='extrapolate')
-    return f(alon).astype(np.int)
+    return f(alon).astype(np.int32)
 
 def lat2j(lat,res=4):
     '''Find J grid index for latitude
@@ -360,7 +360,7 @@ def lat2j(lat,res=4):
                 np.arange(nlat),
                 kind='nearest',
                 fill_value='extrapolate')
-    return f(alat).astype(np.int)
+    return f(alat).astype(np.int32)
 
 def ll2ij(lon,lat,res=4):
     '''Find (I,J) grid index for longitude, latitude
