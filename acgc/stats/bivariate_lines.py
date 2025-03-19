@@ -399,7 +399,8 @@ def sma(X,Y,W=None,
                    params           = np.array([Slope,Intercept]),
                    nobs             = N,
                    fittedvalues     = Intercept + Slope * X0,
-                   resid            = Intercept + Slope * X0 - Y0 )
+                   resid            = Y0 - ( Intercept + Slope * X0  )
+                )
 
     # return Slope, Intercept, ste_slope, ste_int, ci_grad, ci_int
     return result
@@ -540,7 +541,8 @@ def york( x, y, err_x=1, err_y=1, rerr_xy=0 ):
                 params           = np.array([b,a]),
                 nobs             = N,
                 fittedvalues     = a + b * x,
-                resid            = a + b * x - y )
+                resid            = y - ( a + b * x ) 
+                )
 
     return result
 
@@ -611,7 +613,8 @@ def sen( x, y, alpha=0.95, method='separate' ):
                 params           = np.array([slope,intercept]),
                 nobs             = N,
                 fittedvalues     = intercept + slope * x,
-                resid            = intercept + slope * x - y )
+                resid            = y - ( intercept + slope * x ) 
+                )
 
     return result
 

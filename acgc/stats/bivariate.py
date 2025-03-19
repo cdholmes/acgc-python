@@ -215,6 +215,8 @@ class BivariateStatistics:
         mad /xstd
     mean_relative_difference, mrd : float
         mean(y/x) - 1
+    mean_absolute_relative_difference, mrd : float
+        mean(abs(y/x - 1))
     mean_log10_ratio, mlr : float
         mean( log10(y/x) )
     std_log10_ratio, stdlr : float
@@ -336,7 +338,9 @@ class BivariateStatistics:
 
         # Mean and median relative differences
         self.mean_relative_difference   = self.mrd  = np.mean( ratio - 1 )
+        self.mean_absolute_relative_difference   = self.mard  = np.mean( np.abs( ratio - 1 ) )
         self.median_relative_difference = self.medianrd = self.medrd = np.median( ratio - 1 )
+        self.median_absolute_relative_difference = self.medianard = self.medard = np.median( np.abs( ratio - 1 ) )
 
         # Median and median absolute differences
         self.median_difference          = self.medd  = np.median( diff )
@@ -523,7 +527,7 @@ class BivariateStatistics:
 
         return variables
 
-    def summary_dict(self, variables=None, fitline_kw=None, floatformat_fiteqn='{:.3f}'):
+    def _summary_dict(self, variables=None, fitline_kw=None, floatformat_fiteqn='{:.3f}'):
         '''Summarize bivariate statistics into a dict
 
         Parameters
@@ -611,7 +615,7 @@ class BivariateStatistics:
         stringformat = '{:'+str(stringlength)+'s}'
 
         # Get a dict containing the needed variables
-        summarydict = self.summary_dict( variables, fitline_kw, floatformat_fiteqn )
+        summarydict = self._summary_dict( variables, fitline_kw, floatformat_fiteqn )
 
         # Extract length of the float numbers from floatformat
         # import re
@@ -680,7 +684,7 @@ class BivariateStatistics:
             raise ValueError('Display units should be "Data" or "Axes"')
 
         # Get a dict containing the needed variables
-        summarydict = self.summary_dict( variables, fitline_kw, floatformat_fiteqn )
+        summarydict = self._summary_dict( variables, fitline_kw, floatformat_fiteqn )
 
         # Column of label text
         label_text = '\n'.join([_texify_name(key)
@@ -723,7 +727,7 @@ class BivariateStatistics:
         width = bbox.x1-bbox.x0
 
         # Add second column of text
-        t2 = ax.text(loc[0]+width*sign,loc[1],
+        t2 = ax.text(loc[0]+width*1.05*sign,loc[1],
                      second_text,
                      transform=coord,
                      **kwargs
