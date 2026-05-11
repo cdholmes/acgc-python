@@ -15,8 +15,8 @@ See documentation within submodules.
 
 from .bivariate import *
 from .bivariate_lines import *
-from .boxcar import *
 from .partial_corr import *
+from .timeseries import *
 from .weighted import *
 
 # Other sub-modules that are not imported because of
@@ -27,6 +27,8 @@ try:
     # Requires R and rpy2
     from .loess import loess
 except ModuleNotFoundError:
+    def loess(*args, **kwargs):
+        raise ModuleNotFoundError('loess function requires installation of R and rpy2. See documentation for details.')
     # Skip
     pass
 
