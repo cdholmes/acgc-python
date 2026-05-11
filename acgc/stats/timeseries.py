@@ -13,7 +13,7 @@ __all__ = ['STL_harmonic',
            'boxcar',
            'boxcarpoly']
 
-def STL_smoother( data, period=12, seasonal=7, seasonal_smooth=4, robust=False ):
+def STL_smoother( data, period=None, smooth=4, **kwargs):
     '''STL decomposition of time series into trend, seasonal, and residual components
     with additional smoothing of the seasonal component
     
@@ -21,36 +21,35 @@ def STL_smoother( data, period=12, seasonal=7, seasonal_smooth=4, robust=False )
     ----------
     data : array_like
         time series data to be decomposed
-    period : float, optional
-        number of observations per cycle, e.g. 12 for monthly data with yearly seasonality
-    seasonal : float, optional
-        length of the seasonal smoother, must be odd, default is 7
-    seasonal_smooth : int, optional
-        length of the seasonal smooth smoother, default is 4
-    robust : bool, optional
-        whether to use robust fitting to reduce the influence of outliers, default is False
-
+    period : int
+        The length of the seasonal cycle
+    smooth : int, optional
+        length of the lowess filter applied to the STL seasonal cycle, default is 4
+    **kwargs :
+        Additional keyword arguments to pass to the STL function. 
+        For example, robust=True. See the statsmodels documentation for more details
+        
     Returns
     -------
     result : DecomposeResult
         object containing the original data, seasonal component, trend component, residuals, and weights (if robust=True)
     '''
 
-    result = STL(data, period=period, seasonal=seasonal, robust=robust).fit()
+    result = STL(data, period, **kwargs).fit()
     
     #Additional smoothing of the seasonal component
     seasonal_smooth = lowess(result.seasonal, 
                              result.seasonal.index, 
-                             frac=seasonal_smooth/len(data), 
+                             frac=smooth/len(data), 
                              return_sorted=False)
     seasonal_smooth = pd.Series(seasonal_smooth, 
                                 index=result.seasonal.index,
                                 name='seasonal')
 
+    # Adjust residuals
     resid_adjusted = result.resid + (result.seasonal - seasonal_smooth)
     resid_adjusted = resid_adjusted.rename('resid')
     
-
     return DecomposeResult(data, 
                             seasonal_smooth, 
                             result.trend, 
@@ -86,6 +85,7 @@ def STL_harmonic( y, x=None, data=None,
         If None (default), the index of `y` is used if it has one, otherwise a range from 0 to len(y)-1 is used.
     data : DataFrame, optional
         A DataFrame containing the data. Required if `y` or `x` are strings referring to column names.
+        Not needed if `y` and `x` are array-like.
     period :  float or np.timedelta64 or pd.Timedelta
         The length of the seasonal cycle in the same units as `x`. 
         If `x` is datetime-like, `period` should be a np.timedelta64 or pandas.Timedelta, e.g. `pd.Timedelta(days=365.25)` for annual seasonal cycles.

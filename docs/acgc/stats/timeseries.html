@@ -106,7 +106,7 @@
 </span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>           <span class="s1">&#39;boxcar&#39;</span><span class="p">,</span>
 </span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>           <span class="s1">&#39;boxcarpoly&#39;</span><span class="p">]</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>
-</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="k">def</span><span class="w"> </span><span class="nf">STL_smoother</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">seasonal</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">seasonal_smooth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="k">def</span><span class="w"> </span><span class="nf">STL_smoother</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;STL decomposition of time series into trend, seasonal, and residual components</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="sd">    with additional smoothing of the seasonal component</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="sd">    </span>
@@ -114,71 +114,71 @@
 </span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="sd">    ----------</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="sd">    data : array_like</span>
 </span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="sd">        time series data to be decomposed</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="sd">    period : float, optional</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="sd">        number of observations per cycle, e.g. 12 for monthly data with yearly seasonality</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="sd">    seasonal : float, optional</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="sd">        length of the seasonal smoother, must be odd, default is 7</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="sd">    seasonal_smooth : int, optional</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="sd">        length of the seasonal smooth smoother, default is 4</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="sd">    robust : bool, optional</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="sd">        whether to use robust fitting to reduce the influence of outliers, default is False</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>
-</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="sd">    Returns</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="sd">    -------</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="sd">    result : DecomposeResult</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="sd">        object containing the original data, seasonal component, trend component, residuals, and weights (if robust=True)</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">STL</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span> <span class="n">seasonal</span><span class="o">=</span><span class="n">seasonal</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="n">robust</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>    
-</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>    <span class="c1">#Additional smoothing of the seasonal component</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>    <span class="n">seasonal_smooth</span> <span class="o">=</span> <span class="n">lowess</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">seasonal</span><span class="p">,</span> 
-</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>                             <span class="n">result</span><span class="o">.</span><span class="n">seasonal</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> 
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>                             <span class="n">frac</span><span class="o">=</span><span class="n">seasonal_smooth</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> 
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>                             <span class="n">return_sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>    <span class="n">seasonal_smooth</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">seasonal_smooth</span><span class="p">,</span> 
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>                                <span class="n">index</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">seasonal</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>                                <span class="n">name</span><span class="o">=</span><span class="s1">&#39;seasonal&#39;</span><span class="p">)</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>
+</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="sd">    period : int</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="sd">        The length of the seasonal cycle</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="sd">    smooth : int, optional</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="sd">        length of the lowess filter applied to the STL seasonal cycle, default is 4</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="sd">    **kwargs :</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="sd">        Additional keyword arguments to pass to the STL function. </span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="sd">        For example, robust=True. See the statsmodels documentation for more details</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="sd">        </span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="sd">    Returns</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="sd">    -------</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="sd">    result : DecomposeResult</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="sd">        object containing the original data, seasonal component, trend component, residuals, and weights (if robust=True)</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>
+</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">STL</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>    
+</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>    <span class="c1">#Additional smoothing of the seasonal component</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>    <span class="n">seasonal_smooth</span> <span class="o">=</span> <span class="n">lowess</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">seasonal</span><span class="p">,</span> 
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>                             <span class="n">result</span><span class="o">.</span><span class="n">seasonal</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> 
+</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>                             <span class="n">frac</span><span class="o">=</span><span class="n">smooth</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> 
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>                             <span class="n">return_sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>    <span class="n">seasonal_smooth</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">seasonal_smooth</span><span class="p">,</span> 
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>                                <span class="n">index</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">seasonal</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>                                <span class="n">name</span><span class="o">=</span><span class="s1">&#39;seasonal&#39;</span><span class="p">)</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>    <span class="c1"># Adjust residuals</span>
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>    <span class="n">resid_adjusted</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">resid</span> <span class="o">+</span> <span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">seasonal</span> <span class="o">-</span> <span class="n">seasonal_smooth</span><span class="p">)</span>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>    <span class="n">resid_adjusted</span> <span class="o">=</span> <span class="n">resid_adjusted</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;resid&#39;</span><span class="p">)</span>
 </span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>    
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>    <span class="k">return</span> <span class="n">DecomposeResult</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> 
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>                            <span class="n">seasonal_smooth</span><span class="p">,</span> 
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>                            <span class="n">result</span><span class="o">.</span><span class="n">trend</span><span class="p">,</span> 
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>                            <span class="n">resid_adjusted</span><span class="p">,</span> 
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>                            <span class="n">weights</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="k">def</span><span class="w"> </span><span class="nf">STL_harmonic</span><span class="p">(</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>         <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">trend_ratio</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>         <span class="n">nharmonics</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> 
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>         <span class="n">maxiter</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>         <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Decompose time series into seasonal, trend, and residual components </span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">    using harmonic regression for the seasonal component and lowess smoothing/filtering to separate the trend and residual components.</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd">    </span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd">    This is similar STL decomposition with the following differences:</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">    * The seasonal component is modeled using harmonic regression, which guarantees a smooth seasonal cycle. </span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="sd">    * The seasonal cycle is fixed in this decomposition, while it can vary in STL. </span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">    * STL requires regularly spaced data, while this decomposition can handle irregularly spaced data, </span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="sd">    as long as the time variable `x` is provided. Nevertheless, the quality is likely to be better if the time series has no large gaps.</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="sd">    Like STL, the decomposition is iterative. The seasonal cycle is fitted to detredended data,</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">    then the seasonal cycle is subtracted from the data. Lowess is applied to the deseasonalized data to estimate</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">    the trend. The updated trend is subtracted from the original data and an updated seasonal cycle</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd">    is fitted to the updated detrended data. This process is repeated until the seasonal cycle converges </span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="sd">    or the maximum number of iterations is reached.</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">    Parameters</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">    ----------</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="sd">    y : array-like, pandas.Series or str</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="sd">        The time series to decompose. If a string, it is treated as a column name in `data`.</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="sd">    x : array-like or str, optional</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="sd">        The time variable corresponding to `y`. If a string, it is treated as a column name in `data`. </span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="sd">        If None (default), the index of `y` is used if it has one, otherwise a range from 0 to len(y)-1 is used.</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="sd">    data : DataFrame, optional</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="sd">        A DataFrame containing the data. Required if `y` or `x` are strings referring to column names.</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>    <span class="k">return</span> <span class="n">DecomposeResult</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> 
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>                            <span class="n">seasonal_smooth</span><span class="p">,</span> 
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>                            <span class="n">result</span><span class="o">.</span><span class="n">trend</span><span class="p">,</span> 
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>                            <span class="n">resid_adjusted</span><span class="p">,</span> 
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>                            <span class="n">weights</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="k">def</span><span class="w"> </span><span class="nf">STL_harmonic</span><span class="p">(</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>         <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">trend_ratio</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>         <span class="n">nharmonics</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> 
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>         <span class="n">maxiter</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>         <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Decompose time series into seasonal, trend, and residual components </span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">    using harmonic regression for the seasonal component and lowess smoothing/filtering to separate the trend and residual components.</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">    </span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd">    This is similar STL decomposition with the following differences:</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd">    * The seasonal component is modeled using harmonic regression, which guarantees a smooth seasonal cycle. </span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">    * The seasonal cycle is fixed in this decomposition, while it can vary in STL. </span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="sd">    * STL requires regularly spaced data, while this decomposition can handle irregularly spaced data, </span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">    as long as the time variable `x` is provided. Nevertheless, the quality is likely to be better if the time series has no large gaps.</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">    Like STL, the decomposition is iterative. The seasonal cycle is fitted to detredended data,</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="sd">    then the seasonal cycle is subtracted from the data. Lowess is applied to the deseasonalized data to estimate</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">    the trend. The updated trend is subtracted from the original data and an updated seasonal cycle</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">    is fitted to the updated detrended data. This process is repeated until the seasonal cycle converges </span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd">    or the maximum number of iterations is reached.</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="sd">    Parameters</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">    ----------</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">    y : array-like, pandas.Series or str</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="sd">        The time series to decompose. If a string, it is treated as a column name in `data`.</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="sd">    x : array-like or str, optional</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="sd">        The time variable corresponding to `y`. If a string, it is treated as a column name in `data`. </span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="sd">        If None (default), the index of `y` is used if it has one, otherwise a range from 0 to len(y)-1 is used.</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="sd">    data : DataFrame, optional</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="sd">        A DataFrame containing the data. Required if `y` or `x` are strings referring to column names.</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="sd">        Not needed if `y` and `x` are array-like.</span>
 </span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="sd">    period :  float or np.timedelta64 or pd.Timedelta</span>
 </span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="sd">        The length of the seasonal cycle in the same units as `x`. </span>
 </span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">        If `x` is datetime-like, `period` should be a np.timedelta64 or pandas.Timedelta, e.g. `pd.Timedelta(days=365.25)` for annual seasonal cycles.</span>
@@ -487,35 +487,36 @@
 
     </div>
     <a class="headerlink" href="#STL_harmonic"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="STL_harmonic-61"><a href="#STL_harmonic-61"><span class="linenos"> 61</span></a><span class="k">def</span><span class="w"> </span><span class="nf">STL_harmonic</span><span class="p">(</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-</span><span id="STL_harmonic-62"><a href="#STL_harmonic-62"><span class="linenos"> 62</span></a>         <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">trend_ratio</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
-</span><span id="STL_harmonic-63"><a href="#STL_harmonic-63"><span class="linenos"> 63</span></a>         <span class="n">nharmonics</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> 
-</span><span id="STL_harmonic-64"><a href="#STL_harmonic-64"><span class="linenos"> 64</span></a>         <span class="n">maxiter</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-</span><span id="STL_harmonic-65"><a href="#STL_harmonic-65"><span class="linenos"> 65</span></a>         <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="STL_harmonic-66"><a href="#STL_harmonic-66"><span class="linenos"> 66</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Decompose time series into seasonal, trend, and residual components </span>
-</span><span id="STL_harmonic-67"><a href="#STL_harmonic-67"><span class="linenos"> 67</span></a><span class="sd">    using harmonic regression for the seasonal component and lowess smoothing/filtering to separate the trend and residual components.</span>
-</span><span id="STL_harmonic-68"><a href="#STL_harmonic-68"><span class="linenos"> 68</span></a><span class="sd">    </span>
-</span><span id="STL_harmonic-69"><a href="#STL_harmonic-69"><span class="linenos"> 69</span></a><span class="sd">    This is similar STL decomposition with the following differences:</span>
-</span><span id="STL_harmonic-70"><a href="#STL_harmonic-70"><span class="linenos"> 70</span></a><span class="sd">    * The seasonal component is modeled using harmonic regression, which guarantees a smooth seasonal cycle. </span>
-</span><span id="STL_harmonic-71"><a href="#STL_harmonic-71"><span class="linenos"> 71</span></a><span class="sd">    * The seasonal cycle is fixed in this decomposition, while it can vary in STL. </span>
-</span><span id="STL_harmonic-72"><a href="#STL_harmonic-72"><span class="linenos"> 72</span></a><span class="sd">    * STL requires regularly spaced data, while this decomposition can handle irregularly spaced data, </span>
-</span><span id="STL_harmonic-73"><a href="#STL_harmonic-73"><span class="linenos"> 73</span></a><span class="sd">    as long as the time variable `x` is provided. Nevertheless, the quality is likely to be better if the time series has no large gaps.</span>
-</span><span id="STL_harmonic-74"><a href="#STL_harmonic-74"><span class="linenos"> 74</span></a>
-</span><span id="STL_harmonic-75"><a href="#STL_harmonic-75"><span class="linenos"> 75</span></a><span class="sd">    Like STL, the decomposition is iterative. The seasonal cycle is fitted to detredended data,</span>
-</span><span id="STL_harmonic-76"><a href="#STL_harmonic-76"><span class="linenos"> 76</span></a><span class="sd">    then the seasonal cycle is subtracted from the data. Lowess is applied to the deseasonalized data to estimate</span>
-</span><span id="STL_harmonic-77"><a href="#STL_harmonic-77"><span class="linenos"> 77</span></a><span class="sd">    the trend. The updated trend is subtracted from the original data and an updated seasonal cycle</span>
-</span><span id="STL_harmonic-78"><a href="#STL_harmonic-78"><span class="linenos"> 78</span></a><span class="sd">    is fitted to the updated detrended data. This process is repeated until the seasonal cycle converges </span>
-</span><span id="STL_harmonic-79"><a href="#STL_harmonic-79"><span class="linenos"> 79</span></a><span class="sd">    or the maximum number of iterations is reached.</span>
-</span><span id="STL_harmonic-80"><a href="#STL_harmonic-80"><span class="linenos"> 80</span></a>
-</span><span id="STL_harmonic-81"><a href="#STL_harmonic-81"><span class="linenos"> 81</span></a><span class="sd">    Parameters</span>
-</span><span id="STL_harmonic-82"><a href="#STL_harmonic-82"><span class="linenos"> 82</span></a><span class="sd">    ----------</span>
-</span><span id="STL_harmonic-83"><a href="#STL_harmonic-83"><span class="linenos"> 83</span></a><span class="sd">    y : array-like, pandas.Series or str</span>
-</span><span id="STL_harmonic-84"><a href="#STL_harmonic-84"><span class="linenos"> 84</span></a><span class="sd">        The time series to decompose. If a string, it is treated as a column name in `data`.</span>
-</span><span id="STL_harmonic-85"><a href="#STL_harmonic-85"><span class="linenos"> 85</span></a><span class="sd">    x : array-like or str, optional</span>
-</span><span id="STL_harmonic-86"><a href="#STL_harmonic-86"><span class="linenos"> 86</span></a><span class="sd">        The time variable corresponding to `y`. If a string, it is treated as a column name in `data`. </span>
-</span><span id="STL_harmonic-87"><a href="#STL_harmonic-87"><span class="linenos"> 87</span></a><span class="sd">        If None (default), the index of `y` is used if it has one, otherwise a range from 0 to len(y)-1 is used.</span>
-</span><span id="STL_harmonic-88"><a href="#STL_harmonic-88"><span class="linenos"> 88</span></a><span class="sd">    data : DataFrame, optional</span>
-</span><span id="STL_harmonic-89"><a href="#STL_harmonic-89"><span class="linenos"> 89</span></a><span class="sd">        A DataFrame containing the data. Required if `y` or `x` are strings referring to column names.</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="STL_harmonic-60"><a href="#STL_harmonic-60"><span class="linenos"> 60</span></a><span class="k">def</span><span class="w"> </span><span class="nf">STL_harmonic</span><span class="p">(</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+</span><span id="STL_harmonic-61"><a href="#STL_harmonic-61"><span class="linenos"> 61</span></a>         <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">trend_ratio</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+</span><span id="STL_harmonic-62"><a href="#STL_harmonic-62"><span class="linenos"> 62</span></a>         <span class="n">nharmonics</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> 
+</span><span id="STL_harmonic-63"><a href="#STL_harmonic-63"><span class="linenos"> 63</span></a>         <span class="n">maxiter</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="STL_harmonic-64"><a href="#STL_harmonic-64"><span class="linenos"> 64</span></a>         <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="STL_harmonic-65"><a href="#STL_harmonic-65"><span class="linenos"> 65</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Decompose time series into seasonal, trend, and residual components </span>
+</span><span id="STL_harmonic-66"><a href="#STL_harmonic-66"><span class="linenos"> 66</span></a><span class="sd">    using harmonic regression for the seasonal component and lowess smoothing/filtering to separate the trend and residual components.</span>
+</span><span id="STL_harmonic-67"><a href="#STL_harmonic-67"><span class="linenos"> 67</span></a><span class="sd">    </span>
+</span><span id="STL_harmonic-68"><a href="#STL_harmonic-68"><span class="linenos"> 68</span></a><span class="sd">    This is similar STL decomposition with the following differences:</span>
+</span><span id="STL_harmonic-69"><a href="#STL_harmonic-69"><span class="linenos"> 69</span></a><span class="sd">    * The seasonal component is modeled using harmonic regression, which guarantees a smooth seasonal cycle. </span>
+</span><span id="STL_harmonic-70"><a href="#STL_harmonic-70"><span class="linenos"> 70</span></a><span class="sd">    * The seasonal cycle is fixed in this decomposition, while it can vary in STL. </span>
+</span><span id="STL_harmonic-71"><a href="#STL_harmonic-71"><span class="linenos"> 71</span></a><span class="sd">    * STL requires regularly spaced data, while this decomposition can handle irregularly spaced data, </span>
+</span><span id="STL_harmonic-72"><a href="#STL_harmonic-72"><span class="linenos"> 72</span></a><span class="sd">    as long as the time variable `x` is provided. Nevertheless, the quality is likely to be better if the time series has no large gaps.</span>
+</span><span id="STL_harmonic-73"><a href="#STL_harmonic-73"><span class="linenos"> 73</span></a>
+</span><span id="STL_harmonic-74"><a href="#STL_harmonic-74"><span class="linenos"> 74</span></a><span class="sd">    Like STL, the decomposition is iterative. The seasonal cycle is fitted to detredended data,</span>
+</span><span id="STL_harmonic-75"><a href="#STL_harmonic-75"><span class="linenos"> 75</span></a><span class="sd">    then the seasonal cycle is subtracted from the data. Lowess is applied to the deseasonalized data to estimate</span>
+</span><span id="STL_harmonic-76"><a href="#STL_harmonic-76"><span class="linenos"> 76</span></a><span class="sd">    the trend. The updated trend is subtracted from the original data and an updated seasonal cycle</span>
+</span><span id="STL_harmonic-77"><a href="#STL_harmonic-77"><span class="linenos"> 77</span></a><span class="sd">    is fitted to the updated detrended data. This process is repeated until the seasonal cycle converges </span>
+</span><span id="STL_harmonic-78"><a href="#STL_harmonic-78"><span class="linenos"> 78</span></a><span class="sd">    or the maximum number of iterations is reached.</span>
+</span><span id="STL_harmonic-79"><a href="#STL_harmonic-79"><span class="linenos"> 79</span></a>
+</span><span id="STL_harmonic-80"><a href="#STL_harmonic-80"><span class="linenos"> 80</span></a><span class="sd">    Parameters</span>
+</span><span id="STL_harmonic-81"><a href="#STL_harmonic-81"><span class="linenos"> 81</span></a><span class="sd">    ----------</span>
+</span><span id="STL_harmonic-82"><a href="#STL_harmonic-82"><span class="linenos"> 82</span></a><span class="sd">    y : array-like, pandas.Series or str</span>
+</span><span id="STL_harmonic-83"><a href="#STL_harmonic-83"><span class="linenos"> 83</span></a><span class="sd">        The time series to decompose. If a string, it is treated as a column name in `data`.</span>
+</span><span id="STL_harmonic-84"><a href="#STL_harmonic-84"><span class="linenos"> 84</span></a><span class="sd">    x : array-like or str, optional</span>
+</span><span id="STL_harmonic-85"><a href="#STL_harmonic-85"><span class="linenos"> 85</span></a><span class="sd">        The time variable corresponding to `y`. If a string, it is treated as a column name in `data`. </span>
+</span><span id="STL_harmonic-86"><a href="#STL_harmonic-86"><span class="linenos"> 86</span></a><span class="sd">        If None (default), the index of `y` is used if it has one, otherwise a range from 0 to len(y)-1 is used.</span>
+</span><span id="STL_harmonic-87"><a href="#STL_harmonic-87"><span class="linenos"> 87</span></a><span class="sd">    data : DataFrame, optional</span>
+</span><span id="STL_harmonic-88"><a href="#STL_harmonic-88"><span class="linenos"> 88</span></a><span class="sd">        A DataFrame containing the data. Required if `y` or `x` are strings referring to column names.</span>
+</span><span id="STL_harmonic-89"><a href="#STL_harmonic-89"><span class="linenos"> 89</span></a><span class="sd">        Not needed if `y` and `x` are array-like.</span>
 </span><span id="STL_harmonic-90"><a href="#STL_harmonic-90"><span class="linenos"> 90</span></a><span class="sd">    period :  float or np.timedelta64 or pd.Timedelta</span>
 </span><span id="STL_harmonic-91"><a href="#STL_harmonic-91"><span class="linenos"> 91</span></a><span class="sd">        The length of the seasonal cycle in the same units as `x`. </span>
 </span><span id="STL_harmonic-92"><a href="#STL_harmonic-92"><span class="linenos"> 92</span></a><span class="sd">        If `x` is datetime-like, `period` should be a np.timedelta64 or pandas.Timedelta, e.g. `pd.Timedelta(days=365.25)` for annual seasonal cycles.</span>
@@ -672,7 +673,8 @@ The time series to decompose. If a string, it is treated as a column name in <co
 The time variable corresponding to <code>y</code>. If a string, it is treated as a column name in <code>data</code>. 
 If None (default), the index of <code>y</code> is used if it has one, otherwise a range from 0 to len(y)-1 is used.</li>
 <li><strong>data</strong> (DataFrame, optional):
-A DataFrame containing the data. Required if <code>y</code> or <code>x</code> are strings referring to column names.</li>
+A DataFrame containing the data. Required if <code>y</code> or <code>x</code> are strings referring to column names.
+Not needed if <code>y</code> and <code>x</code> are array-like.</li>
 <li><strong>period</strong> (float or np.timedelta64 or pd.Timedelta):
 The length of the seasonal cycle in the same units as <code>x</code>. 
 If <code>x</code> is datetime-like, <code>period</code> should be a np.timedelta64 or pandas.Timedelta, e.g. <code>pd.Timedelta(days=365.25)</code> for annual seasonal cycles.
@@ -708,13 +710,13 @@ If True, prints convergence information. Default is False.</li>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">STL_smoother</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">data</span>, </span><span class="param"><span class="n">period</span><span class="o">=</span><span class="mi">12</span>, </span><span class="param"><span class="n">seasonal</span><span class="o">=</span><span class="mi">7</span>, </span><span class="param"><span class="n">seasonal_smooth</span><span class="o">=</span><span class="mi">4</span>, </span><span class="param"><span class="n">robust</span><span class="o">=</span><span class="kc">False</span></span><span class="return-annotation">):</span></span>
+        <span class="name">STL_smoother</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">data</span>, </span><span class="param"><span class="n">period</span><span class="o">=</span><span class="kc">None</span>, </span><span class="param"><span class="n">smooth</span><span class="o">=</span><span class="mi">4</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="STL_smoother-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#STL_smoother"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="STL_smoother-17"><a href="#STL_smoother-17"><span class="linenos">17</span></a><span class="k">def</span><span class="w"> </span><span class="nf">STL_smoother</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">seasonal</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">seasonal_smooth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="STL_smoother-17"><a href="#STL_smoother-17"><span class="linenos">17</span></a><span class="k">def</span><span class="w"> </span><span class="nf">STL_smoother</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 </span><span id="STL_smoother-18"><a href="#STL_smoother-18"><span class="linenos">18</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;STL decomposition of time series into trend, seasonal, and residual components</span>
 </span><span id="STL_smoother-19"><a href="#STL_smoother-19"><span class="linenos">19</span></a><span class="sd">    with additional smoothing of the seasonal component</span>
 </span><span id="STL_smoother-20"><a href="#STL_smoother-20"><span class="linenos">20</span></a><span class="sd">    </span>
@@ -722,41 +724,40 @@ If True, prints convergence information. Default is False.</li>
 </span><span id="STL_smoother-22"><a href="#STL_smoother-22"><span class="linenos">22</span></a><span class="sd">    ----------</span>
 </span><span id="STL_smoother-23"><a href="#STL_smoother-23"><span class="linenos">23</span></a><span class="sd">    data : array_like</span>
 </span><span id="STL_smoother-24"><a href="#STL_smoother-24"><span class="linenos">24</span></a><span class="sd">        time series data to be decomposed</span>
-</span><span id="STL_smoother-25"><a href="#STL_smoother-25"><span class="linenos">25</span></a><span class="sd">    period : float, optional</span>
-</span><span id="STL_smoother-26"><a href="#STL_smoother-26"><span class="linenos">26</span></a><span class="sd">        number of observations per cycle, e.g. 12 for monthly data with yearly seasonality</span>
-</span><span id="STL_smoother-27"><a href="#STL_smoother-27"><span class="linenos">27</span></a><span class="sd">    seasonal : float, optional</span>
-</span><span id="STL_smoother-28"><a href="#STL_smoother-28"><span class="linenos">28</span></a><span class="sd">        length of the seasonal smoother, must be odd, default is 7</span>
-</span><span id="STL_smoother-29"><a href="#STL_smoother-29"><span class="linenos">29</span></a><span class="sd">    seasonal_smooth : int, optional</span>
-</span><span id="STL_smoother-30"><a href="#STL_smoother-30"><span class="linenos">30</span></a><span class="sd">        length of the seasonal smooth smoother, default is 4</span>
-</span><span id="STL_smoother-31"><a href="#STL_smoother-31"><span class="linenos">31</span></a><span class="sd">    robust : bool, optional</span>
-</span><span id="STL_smoother-32"><a href="#STL_smoother-32"><span class="linenos">32</span></a><span class="sd">        whether to use robust fitting to reduce the influence of outliers, default is False</span>
-</span><span id="STL_smoother-33"><a href="#STL_smoother-33"><span class="linenos">33</span></a>
-</span><span id="STL_smoother-34"><a href="#STL_smoother-34"><span class="linenos">34</span></a><span class="sd">    Returns</span>
-</span><span id="STL_smoother-35"><a href="#STL_smoother-35"><span class="linenos">35</span></a><span class="sd">    -------</span>
-</span><span id="STL_smoother-36"><a href="#STL_smoother-36"><span class="linenos">36</span></a><span class="sd">    result : DecomposeResult</span>
-</span><span id="STL_smoother-37"><a href="#STL_smoother-37"><span class="linenos">37</span></a><span class="sd">        object containing the original data, seasonal component, trend component, residuals, and weights (if robust=True)</span>
-</span><span id="STL_smoother-38"><a href="#STL_smoother-38"><span class="linenos">38</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="STL_smoother-39"><a href="#STL_smoother-39"><span class="linenos">39</span></a>
-</span><span id="STL_smoother-40"><a href="#STL_smoother-40"><span class="linenos">40</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">STL</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span> <span class="n">seasonal</span><span class="o">=</span><span class="n">seasonal</span><span class="p">,</span> <span class="n">robust</span><span class="o">=</span><span class="n">robust</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
-</span><span id="STL_smoother-41"><a href="#STL_smoother-41"><span class="linenos">41</span></a>    
-</span><span id="STL_smoother-42"><a href="#STL_smoother-42"><span class="linenos">42</span></a>    <span class="c1">#Additional smoothing of the seasonal component</span>
-</span><span id="STL_smoother-43"><a href="#STL_smoother-43"><span class="linenos">43</span></a>    <span class="n">seasonal_smooth</span> <span class="o">=</span> <span class="n">lowess</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">seasonal</span><span class="p">,</span> 
-</span><span id="STL_smoother-44"><a href="#STL_smoother-44"><span class="linenos">44</span></a>                             <span class="n">result</span><span class="o">.</span><span class="n">seasonal</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> 
-</span><span id="STL_smoother-45"><a href="#STL_smoother-45"><span class="linenos">45</span></a>                             <span class="n">frac</span><span class="o">=</span><span class="n">seasonal_smooth</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> 
-</span><span id="STL_smoother-46"><a href="#STL_smoother-46"><span class="linenos">46</span></a>                             <span class="n">return_sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span><span id="STL_smoother-47"><a href="#STL_smoother-47"><span class="linenos">47</span></a>    <span class="n">seasonal_smooth</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">seasonal_smooth</span><span class="p">,</span> 
-</span><span id="STL_smoother-48"><a href="#STL_smoother-48"><span class="linenos">48</span></a>                                <span class="n">index</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">seasonal</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
-</span><span id="STL_smoother-49"><a href="#STL_smoother-49"><span class="linenos">49</span></a>                                <span class="n">name</span><span class="o">=</span><span class="s1">&#39;seasonal&#39;</span><span class="p">)</span>
-</span><span id="STL_smoother-50"><a href="#STL_smoother-50"><span class="linenos">50</span></a>
+</span><span id="STL_smoother-25"><a href="#STL_smoother-25"><span class="linenos">25</span></a><span class="sd">    period : int</span>
+</span><span id="STL_smoother-26"><a href="#STL_smoother-26"><span class="linenos">26</span></a><span class="sd">        The length of the seasonal cycle</span>
+</span><span id="STL_smoother-27"><a href="#STL_smoother-27"><span class="linenos">27</span></a><span class="sd">    smooth : int, optional</span>
+</span><span id="STL_smoother-28"><a href="#STL_smoother-28"><span class="linenos">28</span></a><span class="sd">        length of the lowess filter applied to the STL seasonal cycle, default is 4</span>
+</span><span id="STL_smoother-29"><a href="#STL_smoother-29"><span class="linenos">29</span></a><span class="sd">    **kwargs :</span>
+</span><span id="STL_smoother-30"><a href="#STL_smoother-30"><span class="linenos">30</span></a><span class="sd">        Additional keyword arguments to pass to the STL function. </span>
+</span><span id="STL_smoother-31"><a href="#STL_smoother-31"><span class="linenos">31</span></a><span class="sd">        For example, robust=True. See the statsmodels documentation for more details</span>
+</span><span id="STL_smoother-32"><a href="#STL_smoother-32"><span class="linenos">32</span></a><span class="sd">        </span>
+</span><span id="STL_smoother-33"><a href="#STL_smoother-33"><span class="linenos">33</span></a><span class="sd">    Returns</span>
+</span><span id="STL_smoother-34"><a href="#STL_smoother-34"><span class="linenos">34</span></a><span class="sd">    -------</span>
+</span><span id="STL_smoother-35"><a href="#STL_smoother-35"><span class="linenos">35</span></a><span class="sd">    result : DecomposeResult</span>
+</span><span id="STL_smoother-36"><a href="#STL_smoother-36"><span class="linenos">36</span></a><span class="sd">        object containing the original data, seasonal component, trend component, residuals, and weights (if robust=True)</span>
+</span><span id="STL_smoother-37"><a href="#STL_smoother-37"><span class="linenos">37</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="STL_smoother-38"><a href="#STL_smoother-38"><span class="linenos">38</span></a>
+</span><span id="STL_smoother-39"><a href="#STL_smoother-39"><span class="linenos">39</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">STL</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</span><span id="STL_smoother-40"><a href="#STL_smoother-40"><span class="linenos">40</span></a>    
+</span><span id="STL_smoother-41"><a href="#STL_smoother-41"><span class="linenos">41</span></a>    <span class="c1">#Additional smoothing of the seasonal component</span>
+</span><span id="STL_smoother-42"><a href="#STL_smoother-42"><span class="linenos">42</span></a>    <span class="n">seasonal_smooth</span> <span class="o">=</span> <span class="n">lowess</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">seasonal</span><span class="p">,</span> 
+</span><span id="STL_smoother-43"><a href="#STL_smoother-43"><span class="linenos">43</span></a>                             <span class="n">result</span><span class="o">.</span><span class="n">seasonal</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> 
+</span><span id="STL_smoother-44"><a href="#STL_smoother-44"><span class="linenos">44</span></a>                             <span class="n">frac</span><span class="o">=</span><span class="n">smooth</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> 
+</span><span id="STL_smoother-45"><a href="#STL_smoother-45"><span class="linenos">45</span></a>                             <span class="n">return_sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span id="STL_smoother-46"><a href="#STL_smoother-46"><span class="linenos">46</span></a>    <span class="n">seasonal_smooth</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">seasonal_smooth</span><span class="p">,</span> 
+</span><span id="STL_smoother-47"><a href="#STL_smoother-47"><span class="linenos">47</span></a>                                <span class="n">index</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">seasonal</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+</span><span id="STL_smoother-48"><a href="#STL_smoother-48"><span class="linenos">48</span></a>                                <span class="n">name</span><span class="o">=</span><span class="s1">&#39;seasonal&#39;</span><span class="p">)</span>
+</span><span id="STL_smoother-49"><a href="#STL_smoother-49"><span class="linenos">49</span></a>
+</span><span id="STL_smoother-50"><a href="#STL_smoother-50"><span class="linenos">50</span></a>    <span class="c1"># Adjust residuals</span>
 </span><span id="STL_smoother-51"><a href="#STL_smoother-51"><span class="linenos">51</span></a>    <span class="n">resid_adjusted</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">resid</span> <span class="o">+</span> <span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">seasonal</span> <span class="o">-</span> <span class="n">seasonal_smooth</span><span class="p">)</span>
 </span><span id="STL_smoother-52"><a href="#STL_smoother-52"><span class="linenos">52</span></a>    <span class="n">resid_adjusted</span> <span class="o">=</span> <span class="n">resid_adjusted</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;resid&#39;</span><span class="p">)</span>
 </span><span id="STL_smoother-53"><a href="#STL_smoother-53"><span class="linenos">53</span></a>    
-</span><span id="STL_smoother-54"><a href="#STL_smoother-54"><span class="linenos">54</span></a>
-</span><span id="STL_smoother-55"><a href="#STL_smoother-55"><span class="linenos">55</span></a>    <span class="k">return</span> <span class="n">DecomposeResult</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> 
-</span><span id="STL_smoother-56"><a href="#STL_smoother-56"><span class="linenos">56</span></a>                            <span class="n">seasonal_smooth</span><span class="p">,</span> 
-</span><span id="STL_smoother-57"><a href="#STL_smoother-57"><span class="linenos">57</span></a>                            <span class="n">result</span><span class="o">.</span><span class="n">trend</span><span class="p">,</span> 
-</span><span id="STL_smoother-58"><a href="#STL_smoother-58"><span class="linenos">58</span></a>                            <span class="n">resid_adjusted</span><span class="p">,</span> 
-</span><span id="STL_smoother-59"><a href="#STL_smoother-59"><span class="linenos">59</span></a>                            <span class="n">weights</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
+</span><span id="STL_smoother-54"><a href="#STL_smoother-54"><span class="linenos">54</span></a>    <span class="k">return</span> <span class="n">DecomposeResult</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> 
+</span><span id="STL_smoother-55"><a href="#STL_smoother-55"><span class="linenos">55</span></a>                            <span class="n">seasonal_smooth</span><span class="p">,</span> 
+</span><span id="STL_smoother-56"><a href="#STL_smoother-56"><span class="linenos">56</span></a>                            <span class="n">result</span><span class="o">.</span><span class="n">trend</span><span class="p">,</span> 
+</span><span id="STL_smoother-57"><a href="#STL_smoother-57"><span class="linenos">57</span></a>                            <span class="n">resid_adjusted</span><span class="p">,</span> 
+</span><span id="STL_smoother-58"><a href="#STL_smoother-58"><span class="linenos">58</span></a>                            <span class="n">weights</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -768,14 +769,12 @@ with additional smoothing of the seasonal component</p>
 <ul>
 <li><strong>data</strong> (array_like):
 time series data to be decomposed</li>
-<li><strong>period</strong> (float, optional):
-number of observations per cycle, e.g. 12 for monthly data with yearly seasonality</li>
-<li><strong>seasonal</strong> (float, optional):
-length of the seasonal smoother, must be odd, default is 7</li>
-<li><strong>seasonal_smooth</strong> (int, optional):
-length of the seasonal smooth smoother, default is 4</li>
-<li><strong>robust</strong> (bool, optional):
-whether to use robust fitting to reduce the influence of outliers, default is False</li>
+<li><strong>period</strong> (int):
+The length of the seasonal cycle</li>
+<li><strong>smooth</strong> (int, optional):
+length of the lowess filter applied to the STL seasonal cycle, default is 4</li>
+<li><strong>**kwargs :</strong>: Additional keyword arguments to pass to the STL function. 
+For example, robust=True. See the statsmodels documentation for more details</li>
 </ul>
 
 <h6 id="returns">Returns</h6>
