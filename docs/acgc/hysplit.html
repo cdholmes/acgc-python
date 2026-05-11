@@ -129,18 +129,18 @@ All directories are archived meteorology except for "forecast/" directory.</p>
 </span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="sd">```</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>
-</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="kn">import</span> <span class="nn">os</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="kn">import</span> <span class="nn">glob</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="kn">import</span> <span class="nn">warnings</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="kn">import</span> <span class="nn">numpy</span>  <span class="k">as</span> <span class="nn">np</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">netcdf</span> <span class="k">as</span> <span class="n">nct</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w">  </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">netcdf</span> <span class="k">as</span> <span class="n">nct</span>
 </span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>
 </span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="n">METROOT</span> <span class="o">=</span> <span class="s1">&#39;/data/MetData/ARL/&#39;</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="sd">&#39;&#39;&#39;Default location for ARL met data&#39;&#39;&#39;</span>
 </span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>
-</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="k">def</span> <span class="nf">check_METROOT</span><span class="p">():</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="k">def</span><span class="w"> </span><span class="nf">check_METROOT</span><span class="p">():</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Check if METROOT is a valid directory path&#39;&#39;&#39;</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">METROOT</span><span class="p">):</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
@@ -149,7 +149,7 @@ All directories are archived meteorology except for "forecast/" directory.</p>
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>            <span class="o">+</span><span class="s1">&#39;Use set_METROOT(path) to set the correct directory path.&#39;</span> 
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>            <span class="p">)</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="k">def</span> <span class="nf">set_METROOT</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s1">&#39;/data/MetData/ARL/&#39;</span><span class="p">):</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="k">def</span><span class="w"> </span><span class="nf">set_METROOT</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s1">&#39;/data/MetData/ARL/&#39;</span><span class="p">):</span>
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Set METROOT, the directory for ARL meteorology data</span>
 </span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="sd">    </span>
 </span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="sd">    Parameters</span>
@@ -169,7 +169,7 @@ All directories are archived meteorology except for "forecast/" directory.</p>
 </span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>    <span class="c1"># Set the path</span>
 </span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>    <span class="n">METROOT</span><span class="o">=</span><span class="n">path</span>
 </span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="k">def</span> <span class="nf">tdump2nc</span><span class="p">(</span> <span class="n">inFile</span><span class="p">,</span> <span class="n">outFile</span><span class="p">,</span> <span class="n">clobber</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">globalAtt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="k">def</span><span class="w"> </span><span class="nf">tdump2nc</span><span class="p">(</span> <span class="n">inFile</span><span class="p">,</span> <span class="n">outFile</span><span class="p">,</span> <span class="n">clobber</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">globalAtt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
 </span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>             <span class="n">altIsMSL</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dropOneTime</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pack</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
 </span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Convert a HYSPLIT tdump file to netCDF</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="sd">    Works with single point or ensemble trajectories</span>
@@ -414,7 +414,7 @@ All directories are archived meteorology except for "forecast/" directory.</p>
 </span><span id="L-301"><a href="#L-301"><span class="linenos">301</span></a>        <span class="n">globalAtt</span><span class="o">=</span><span class="n">gAtt</span><span class="p">,</span>
 </span><span id="L-302"><a href="#L-302"><span class="linenos">302</span></a>        <span class="n">nc4</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">classic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clobber</span><span class="o">=</span><span class="n">clobber</span> <span class="p">)</span>
 </span><span id="L-303"><a href="#L-303"><span class="linenos">303</span></a>
-</span><span id="L-304"><a href="#L-304"><span class="linenos">304</span></a><span class="k">def</span> <span class="nf">read_tdump</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+</span><span id="L-304"><a href="#L-304"><span class="linenos">304</span></a><span class="k">def</span><span class="w"> </span><span class="nf">read_tdump</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
 </span><span id="L-305"><a href="#L-305"><span class="linenos">305</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Read trajectory file output from HYSPLIT</span>
 </span><span id="L-306"><a href="#L-306"><span class="linenos">306</span></a><span class="sd">    </span>
 </span><span id="L-307"><a href="#L-307"><span class="linenos">307</span></a><span class="sd">    Parameters</span>
@@ -476,7 +476,7 @@ All directories are archived meteorology except for "forecast/" directory.</p>
 </span><span id="L-363"><a href="#L-363"><span class="linenos">363</span></a>        <span class="c1">#print(df.iloc[-1,:])</span>
 </span><span id="L-364"><a href="#L-364"><span class="linenos">364</span></a>        <span class="k">return</span> <span class="n">df</span>
 </span><span id="L-365"><a href="#L-365"><span class="linenos">365</span></a>
-</span><span id="L-366"><a href="#L-366"><span class="linenos">366</span></a><span class="k">def</span> <span class="nf">_get_gdas1_filename</span><span class="p">(</span> <span class="n">time</span> <span class="p">):</span>
+</span><span id="L-366"><a href="#L-366"><span class="linenos">366</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_get_gdas1_filename</span><span class="p">(</span> <span class="n">time</span> <span class="p">):</span>
 </span><span id="L-367"><a href="#L-367"><span class="linenos">367</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Directory and File names for GDAS 1 degree meteorology, for given date&#39;&#39;&#39;</span>
 </span><span id="L-368"><a href="#L-368"><span class="linenos">368</span></a>
 </span><span id="L-369"><a href="#L-369"><span class="linenos">369</span></a>    <span class="c1"># Directory for GDAS 1 degree</span>
@@ -493,7 +493,7 @@ All directories are archived meteorology except for "forecast/" directory.</p>
 </span><span id="L-380"><a href="#L-380"><span class="linenos">380</span></a>
 </span><span id="L-381"><a href="#L-381"><span class="linenos">381</span></a>    <span class="k">return</span> <span class="n">filename</span>
 </span><span id="L-382"><a href="#L-382"><span class="linenos">382</span></a>
-</span><span id="L-383"><a href="#L-383"><span class="linenos">383</span></a><span class="k">def</span> <span class="nf">_get_hrrr_filename</span><span class="p">(</span> <span class="n">time</span> <span class="p">):</span>
+</span><span id="L-383"><a href="#L-383"><span class="linenos">383</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_get_hrrr_filename</span><span class="p">(</span> <span class="n">time</span> <span class="p">):</span>
 </span><span id="L-384"><a href="#L-384"><span class="linenos">384</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Directory and File names for HRRR meteorology, for given date&#39;&#39;&#39;</span>
 </span><span id="L-385"><a href="#L-385"><span class="linenos">385</span></a>
 </span><span id="L-386"><a href="#L-386"><span class="linenos">386</span></a>    <span class="c1"># Directory</span>
@@ -509,7 +509,7 @@ All directories are archived meteorology except for "forecast/" directory.</p>
 </span><span id="L-396"><a href="#L-396"><span class="linenos">396</span></a>    <span class="c1"># Return</span>
 </span><span id="L-397"><a href="#L-397"><span class="linenos">397</span></a>    <span class="k">return</span> <span class="n">filenames</span>
 </span><span id="L-398"><a href="#L-398"><span class="linenos">398</span></a>
-</span><span id="L-399"><a href="#L-399"><span class="linenos">399</span></a><span class="k">def</span> <span class="nf">_get_met_filename</span><span class="p">(</span> <span class="n">metmodel</span><span class="p">,</span> <span class="n">time</span> <span class="p">):</span>
+</span><span id="L-399"><a href="#L-399"><span class="linenos">399</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_get_met_filename</span><span class="p">(</span> <span class="n">metmodel</span><span class="p">,</span> <span class="n">time</span> <span class="p">):</span>
 </span><span id="L-400"><a href="#L-400"><span class="linenos">400</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Directory and file names for given meteorology and date</span>
 </span><span id="L-401"><a href="#L-401"><span class="linenos">401</span></a><span class="sd">    </span>
 </span><span id="L-402"><a href="#L-402"><span class="linenos">402</span></a><span class="sd">    Parameters</span>
@@ -560,7 +560,7 @@ All directories are archived meteorology except for "forecast/" directory.</p>
 </span><span id="L-447"><a href="#L-447"><span class="linenos">447</span></a>
 </span><span id="L-448"><a href="#L-448"><span class="linenos">448</span></a>    <span class="k">return</span> <span class="n">filename</span>
 </span><span id="L-449"><a href="#L-449"><span class="linenos">449</span></a>
-</span><span id="L-450"><a href="#L-450"><span class="linenos">450</span></a><span class="k">def</span> <span class="nf">_get_archive_filelist</span><span class="p">(</span> <span class="n">metmodels</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">useAll</span><span class="o">=</span><span class="kc">True</span> <span class="p">):</span>
+</span><span id="L-450"><a href="#L-450"><span class="linenos">450</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_get_archive_filelist</span><span class="p">(</span> <span class="n">metmodels</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">useAll</span><span class="o">=</span><span class="kc">True</span> <span class="p">):</span>
 </span><span id="L-451"><a href="#L-451"><span class="linenos">451</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Get a list of met directories and files</span>
 </span><span id="L-452"><a href="#L-452"><span class="linenos">452</span></a><span class="sd">    When there are two met version provided, the first result will be used</span>
 </span><span id="L-453"><a href="#L-453"><span class="linenos">453</span></a><span class="sd">    </span>
@@ -646,7 +646,7 @@ All directories are archived meteorology except for "forecast/" directory.</p>
 </span><span id="L-533"><a href="#L-533"><span class="linenos">533</span></a>
 </span><span id="L-534"><a href="#L-534"><span class="linenos">534</span></a>    <span class="k">return</span> <span class="n">filename</span>
 </span><span id="L-535"><a href="#L-535"><span class="linenos">535</span></a>
-</span><span id="L-536"><a href="#L-536"><span class="linenos">536</span></a><span class="k">def</span> <span class="nf">_get_hybrid_filelist</span><span class="p">(</span> <span class="n">metmodels</span><span class="p">,</span> <span class="n">time</span> <span class="p">):</span>
+</span><span id="L-536"><a href="#L-536"><span class="linenos">536</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_get_hybrid_filelist</span><span class="p">(</span> <span class="n">metmodels</span><span class="p">,</span> <span class="n">time</span> <span class="p">):</span>
 </span><span id="L-537"><a href="#L-537"><span class="linenos">537</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Get list of met files combining archive and forecast</span>
 </span><span id="L-538"><a href="#L-538"><span class="linenos">538</span></a><span class="sd">    </span>
 </span><span id="L-539"><a href="#L-539"><span class="linenos">539</span></a><span class="sd">    Starting 1 day before &#39;time&#39; and extending 10 days ahead, find all archived analysis</span>
@@ -717,7 +717,7 @@ All directories are archived meteorology except for "forecast/" directory.</p>
 </span><span id="L-604"><a href="#L-604"><span class="linenos">604</span></a>
 </span><span id="L-605"><a href="#L-605"><span class="linenos">605</span></a>    <span class="k">return</span> <span class="n">metfiles</span>
 </span><span id="L-606"><a href="#L-606"><span class="linenos">606</span></a>
-</span><span id="L-607"><a href="#L-607"><span class="linenos">607</span></a><span class="k">def</span> <span class="nf">_get_forecast_template</span><span class="p">(</span> <span class="n">metmodel</span> <span class="p">):</span>
+</span><span id="L-607"><a href="#L-607"><span class="linenos">607</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_get_forecast_template</span><span class="p">(</span> <span class="n">metmodel</span> <span class="p">):</span>
 </span><span id="L-608"><a href="#L-608"><span class="linenos">608</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Get filename template for forecast meteorology</span>
 </span><span id="L-609"><a href="#L-609"><span class="linenos">609</span></a>
 </span><span id="L-610"><a href="#L-610"><span class="linenos">610</span></a><span class="sd">    Parameters</span>
@@ -743,7 +743,7 @@ All directories are archived meteorology except for "forecast/" directory.</p>
 </span><span id="L-630"><a href="#L-630"><span class="linenos">630</span></a>
 </span><span id="L-631"><a href="#L-631"><span class="linenos">631</span></a>    <span class="k">return</span> <span class="n">filetemplate</span><span class="p">,</span> <span class="n">nexpected</span>
 </span><span id="L-632"><a href="#L-632"><span class="linenos">632</span></a>
-</span><span id="L-633"><a href="#L-633"><span class="linenos">633</span></a><span class="k">def</span> <span class="nf">_get_forecast_filename</span><span class="p">(</span> <span class="n">metmodel</span><span class="p">,</span> <span class="n">cycle</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
+</span><span id="L-633"><a href="#L-633"><span class="linenos">633</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_get_forecast_filename</span><span class="p">(</span> <span class="n">metmodel</span><span class="p">,</span> <span class="n">cycle</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
 </span><span id="L-634"><a href="#L-634"><span class="linenos">634</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Find files for a particular met model and forecast cycle</span>
 </span><span id="L-635"><a href="#L-635"><span class="linenos">635</span></a><span class="sd">    </span>
 </span><span id="L-636"><a href="#L-636"><span class="linenos">636</span></a><span class="sd">    Parameters</span>
@@ -783,7 +783,7 @@ All directories are archived meteorology except for "forecast/" directory.</p>
 </span><span id="L-670"><a href="#L-670"><span class="linenos">670</span></a>    <span class="c1"># Raise an error if no forecasts are found</span>
 </span><span id="L-671"><a href="#L-671"><span class="linenos">671</span></a>    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;ARL forecast meteorology found&#39;</span> <span class="p">)</span>
 </span><span id="L-672"><a href="#L-672"><span class="linenos">672</span></a>
-</span><span id="L-673"><a href="#L-673"><span class="linenos">673</span></a><span class="k">def</span> <span class="nf">_get_forecast_filename_latest</span><span class="p">(</span> <span class="n">metmodel</span> <span class="p">):</span>
+</span><span id="L-673"><a href="#L-673"><span class="linenos">673</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_get_forecast_filename_latest</span><span class="p">(</span> <span class="n">metmodel</span> <span class="p">):</span>
 </span><span id="L-674"><a href="#L-674"><span class="linenos">674</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Find files for the latest available forecast cycle for the requested met version.</span>
 </span><span id="L-675"><a href="#L-675"><span class="linenos">675</span></a><span class="sd">    </span>
 </span><span id="L-676"><a href="#L-676"><span class="linenos">676</span></a><span class="sd">    Requires a complete set of forecast files for a cycle</span>
@@ -828,7 +828,7 @@ All directories are archived meteorology except for "forecast/" directory.</p>
 </span><span id="L-715"><a href="#L-715"><span class="linenos">715</span></a>    <span class="c1"># Raise an error if no forecasts are found</span>
 </span><span id="L-716"><a href="#L-716"><span class="linenos">716</span></a>    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;No ARL forecast meteorology found&#39;</span> <span class="p">)</span>
 </span><span id="L-717"><a href="#L-717"><span class="linenos">717</span></a>
-</span><span id="L-718"><a href="#L-718"><span class="linenos">718</span></a><span class="k">def</span> <span class="nf">_get_forecast_filelist</span><span class="p">(</span> <span class="n">metmodels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cycle</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+</span><span id="L-718"><a href="#L-718"><span class="linenos">718</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_get_forecast_filelist</span><span class="p">(</span> <span class="n">metmodels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cycle</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="L-719"><a href="#L-719"><span class="linenos">719</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Get list of filenames for forecast cycle</span>
 </span><span id="L-720"><a href="#L-720"><span class="linenos">720</span></a><span class="sd">    </span>
 </span><span id="L-721"><a href="#L-721"><span class="linenos">721</span></a><span class="sd">    This function calls itself recursively</span>
@@ -873,7 +873,7 @@ All directories are archived meteorology except for "forecast/" directory.</p>
 </span><span id="L-760"><a href="#L-760"><span class="linenos">760</span></a>
 </span><span id="L-761"><a href="#L-761"><span class="linenos">761</span></a>    <span class="k">return</span> <span class="n">filenames</span>
 </span><span id="L-762"><a href="#L-762"><span class="linenos">762</span></a>
-</span><span id="L-763"><a href="#L-763"><span class="linenos">763</span></a><span class="k">def</span> <span class="nf">find_arl_metfiles</span><span class="p">(</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">ndays</span><span class="p">,</span> <span class="n">back</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metmodels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="L-763"><a href="#L-763"><span class="linenos">763</span></a><span class="k">def</span><span class="w"> </span><span class="nf">find_arl_metfiles</span><span class="p">(</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">ndays</span><span class="p">,</span> <span class="n">back</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metmodels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="L-764"><a href="#L-764"><span class="linenos">764</span></a>                       <span class="n">forecast</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">forecastcycle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hybrid</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
 </span><span id="L-765"><a href="#L-765"><span class="linenos">765</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Find ARL meteorology files for specified dates, models, forecast and archive</span>
 </span><span id="L-766"><a href="#L-766"><span class="linenos">766</span></a><span class="sd">    </span>
@@ -973,7 +973,7 @@ All directories are archived meteorology except for "forecast/" directory.</p>
 </span><span id="L-860"><a href="#L-860"><span class="linenos">860</span></a>
 </span><span id="L-861"><a href="#L-861"><span class="linenos">861</span></a>    <span class="k">return</span> <span class="n">metfiles</span>
 </span><span id="L-862"><a href="#L-862"><span class="linenos">862</span></a>
-</span><span id="L-863"><a href="#L-863"><span class="linenos">863</span></a><span class="k">def</span> <span class="nf">write_control</span><span class="p">(</span> <span class="n">time</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">trajhours</span><span class="p">,</span>
+</span><span id="L-863"><a href="#L-863"><span class="linenos">863</span></a><span class="k">def</span><span class="w"> </span><span class="nf">write_control</span><span class="p">(</span> <span class="n">time</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">trajhours</span><span class="p">,</span>
 </span><span id="L-864"><a href="#L-864"><span class="linenos">864</span></a>                   <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;CONTROL.000&#39;</span><span class="p">,</span> <span class="n">clobber</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="L-865"><a href="#L-865"><span class="linenos">865</span></a>                   <span class="n">maxheight</span><span class="o">=</span><span class="mf">15000.</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="s1">&#39;./&#39;</span><span class="p">,</span> <span class="n">tfile</span><span class="o">=</span><span class="s1">&#39;tdump&#39;</span><span class="p">,</span>
 </span><span id="L-866"><a href="#L-866"><span class="linenos">866</span></a>                   <span class="n">metfiles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exacttime</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
@@ -1109,7 +1109,7 @@ All directories are archived meteorology except for "forecast/" directory.</p>
 
     </div>
     <a class="headerlink" href="#check_METROOT"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="check_METROOT-31"><a href="#check_METROOT-31"><span class="linenos">31</span></a><span class="k">def</span> <span class="nf">check_METROOT</span><span class="p">():</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="check_METROOT-31"><a href="#check_METROOT-31"><span class="linenos">31</span></a><span class="k">def</span><span class="w"> </span><span class="nf">check_METROOT</span><span class="p">():</span>
 </span><span id="check_METROOT-32"><a href="#check_METROOT-32"><span class="linenos">32</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Check if METROOT is a valid directory path&#39;&#39;&#39;</span>
 </span><span id="check_METROOT-33"><a href="#check_METROOT-33"><span class="linenos">33</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">METROOT</span><span class="p">):</span>
 </span><span id="check_METROOT-34"><a href="#check_METROOT-34"><span class="linenos">34</span></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
@@ -1136,7 +1136,7 @@ All directories are archived meteorology except for "forecast/" directory.</p>
 
     </div>
     <a class="headerlink" href="#set_METROOT"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="set_METROOT-40"><a href="#set_METROOT-40"><span class="linenos">40</span></a><span class="k">def</span> <span class="nf">set_METROOT</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s1">&#39;/data/MetData/ARL/&#39;</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="set_METROOT-40"><a href="#set_METROOT-40"><span class="linenos">40</span></a><span class="k">def</span><span class="w"> </span><span class="nf">set_METROOT</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s1">&#39;/data/MetData/ARL/&#39;</span><span class="p">):</span>
 </span><span id="set_METROOT-41"><a href="#set_METROOT-41"><span class="linenos">41</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Set METROOT, the directory for ARL meteorology data</span>
 </span><span id="set_METROOT-42"><a href="#set_METROOT-42"><span class="linenos">42</span></a><span class="sd">    </span>
 </span><span id="set_METROOT-43"><a href="#set_METROOT-43"><span class="linenos">43</span></a><span class="sd">    Parameters</span>
@@ -1181,7 +1181,7 @@ absolute path</li>
 
     </div>
     <a class="headerlink" href="#tdump2nc"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="tdump2nc-60"><a href="#tdump2nc-60"><span class="linenos"> 60</span></a><span class="k">def</span> <span class="nf">tdump2nc</span><span class="p">(</span> <span class="n">inFile</span><span class="p">,</span> <span class="n">outFile</span><span class="p">,</span> <span class="n">clobber</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">globalAtt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+            <div class="pdoc-code codehilite"><pre><span></span><span id="tdump2nc-60"><a href="#tdump2nc-60"><span class="linenos"> 60</span></a><span class="k">def</span><span class="w"> </span><span class="nf">tdump2nc</span><span class="p">(</span> <span class="n">inFile</span><span class="p">,</span> <span class="n">outFile</span><span class="p">,</span> <span class="n">clobber</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">globalAtt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
 </span><span id="tdump2nc-61"><a href="#tdump2nc-61"><span class="linenos"> 61</span></a>             <span class="n">altIsMSL</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dropOneTime</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pack</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
 </span><span id="tdump2nc-62"><a href="#tdump2nc-62"><span class="linenos"> 62</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Convert a HYSPLIT tdump file to netCDF</span>
 </span><span id="tdump2nc-63"><a href="#tdump2nc-63"><span class="linenos"> 63</span></a><span class="sd">    Works with single point or ensemble trajectories</span>
@@ -1470,7 +1470,7 @@ integer packing.</li>
 
     </div>
     <a class="headerlink" href="#read_tdump"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="read_tdump-305"><a href="#read_tdump-305"><span class="linenos">305</span></a><span class="k">def</span> <span class="nf">read_tdump</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="read_tdump-305"><a href="#read_tdump-305"><span class="linenos">305</span></a><span class="k">def</span><span class="w"> </span><span class="nf">read_tdump</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
 </span><span id="read_tdump-306"><a href="#read_tdump-306"><span class="linenos">306</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Read trajectory file output from HYSPLIT</span>
 </span><span id="read_tdump-307"><a href="#read_tdump-307"><span class="linenos">307</span></a><span class="sd">    </span>
 </span><span id="read_tdump-308"><a href="#read_tdump-308"><span class="linenos">308</span></a><span class="sd">    Parameters</span>
@@ -1575,7 +1575,7 @@ see tdump file for corresponding file paths</li>
 
     </div>
     <a class="headerlink" href="#find_arl_metfiles"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="find_arl_metfiles-764"><a href="#find_arl_metfiles-764"><span class="linenos">764</span></a><span class="k">def</span> <span class="nf">find_arl_metfiles</span><span class="p">(</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">ndays</span><span class="p">,</span> <span class="n">back</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metmodels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="find_arl_metfiles-764"><a href="#find_arl_metfiles-764"><span class="linenos">764</span></a><span class="k">def</span><span class="w"> </span><span class="nf">find_arl_metfiles</span><span class="p">(</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">ndays</span><span class="p">,</span> <span class="n">back</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metmodels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="find_arl_metfiles-765"><a href="#find_arl_metfiles-765"><span class="linenos">765</span></a>                       <span class="n">forecast</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">forecastcycle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hybrid</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
 </span><span id="find_arl_metfiles-766"><a href="#find_arl_metfiles-766"><span class="linenos">766</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Find ARL meteorology files for specified dates, models, forecast and archive</span>
 </span><span id="find_arl_metfiles-767"><a href="#find_arl_metfiles-767"><span class="linenos">767</span></a><span class="sd">    </span>
@@ -1726,7 +1726,7 @@ path to meteorology files meeting the criteria</li>
 
     </div>
     <a class="headerlink" href="#write_control"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="write_control-864"><a href="#write_control-864"><span class="linenos">864</span></a><span class="k">def</span> <span class="nf">write_control</span><span class="p">(</span> <span class="n">time</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">trajhours</span><span class="p">,</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="write_control-864"><a href="#write_control-864"><span class="linenos">864</span></a><span class="k">def</span><span class="w"> </span><span class="nf">write_control</span><span class="p">(</span> <span class="n">time</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">trajhours</span><span class="p">,</span>
 </span><span id="write_control-865"><a href="#write_control-865"><span class="linenos">865</span></a>                   <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;CONTROL.000&#39;</span><span class="p">,</span> <span class="n">clobber</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="write_control-866"><a href="#write_control-866"><span class="linenos">866</span></a>                   <span class="n">maxheight</span><span class="o">=</span><span class="mf">15000.</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="s1">&#39;./&#39;</span><span class="p">,</span> <span class="n">tfile</span><span class="o">=</span><span class="s1">&#39;tdump&#39;</span><span class="p">,</span>
 </span><span id="write_control-867"><a href="#write_control-867"><span class="linenos">867</span></a>                   <span class="n">metfiles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exacttime</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>

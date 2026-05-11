@@ -242,13 +242,13 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="sd">https://gml.noaa.gov/grad/solcalc/calcdetails.html</span>
 </span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="kn">import</span> <span class="nn">warnings</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="k">def</span> <span class="nf">insolation_toa</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="k">def</span><span class="w"> </span><span class="nf">insolation_toa</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Insolation at top of the atmosphere, accounting for solar zenith angle</span>
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="sd">    </span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="sd">    Parameters</span>
@@ -278,7 +278,7 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>
 </span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>    <span class="k">return</span> <span class="n">S</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">sza</span><span class="p">)</span>
 </span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="k">def</span> <span class="nf">solar_azimuth_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_azimuth_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Solar azimuth angle (degrees) for a latitude, longitude, date and time</span>
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="sd">    </span>
 </span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">    SAA is degrees clockwise from north.</span>
@@ -319,7 +319,7 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>    <span class="c1"># Change range [-180,180] to [0,360]</span>
 </span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span> <span class="n">saa</span><span class="o">+</span><span class="mi">360</span><span class="p">,</span> <span class="mi">360</span> <span class="p">)</span>
 </span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="k">def</span> <span class="nf">solar_elevation_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">alt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_elevation_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">alt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
 </span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>                        <span class="n">refraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.</span><span class="p">,</span>
 </span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>                        <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Solar elevation angle (degrees) above the horizon</span>
@@ -374,7 +374,7 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>
 </span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>    <span class="k">return</span> <span class="n">sea</span>
 </span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>
-</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a><span class="k">def</span> <span class="nf">solar_zenith_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span>
+</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_zenith_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span>
 </span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>                        <span class="n">refraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.</span><span class="p">,</span>
 </span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a>                        <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Solar zenith angle (degrees) for a given latitude, longitude, date and time.</span>
@@ -437,35 +437,35 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-218"><a href="#L-218"><span class="linenos">218</span></a>
 </span><span id="L-219"><a href="#L-219"><span class="linenos">219</span></a>    <span class="k">return</span> <span class="n">sza</span>
 </span><span id="L-220"><a href="#L-220"><span class="linenos">220</span></a>
-</span><span id="L-221"><a href="#L-221"><span class="linenos">221</span></a><span class="k">def</span> <span class="nf">sunrise_time</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+</span><span id="L-221"><a href="#L-221"><span class="linenos">221</span></a><span class="k">def</span><span class="w"> </span><span class="nf">sunrise_time</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
 </span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute sunrise time</span>
 </span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a><span class="sd">    </span>
 </span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a><span class="sd">    See `sun_times` for Parameters.&#39;&#39;&#39;</span>
 </span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">sun_times</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
 </span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a>    <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a>
-</span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a><span class="k">def</span> <span class="nf">sunset_time</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+</span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a><span class="k">def</span><span class="w"> </span><span class="nf">sunset_time</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
 </span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute sunset time</span>
 </span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a><span class="sd">    </span>
 </span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a><span class="sd">    See `sun_times` for Parameters.&#39;&#39;&#39;</span>
 </span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">sun_times</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
 </span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a>    <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 </span><span id="L-234"><a href="#L-234"><span class="linenos">234</span></a>
-</span><span id="L-235"><a href="#L-235"><span class="linenos">235</span></a><span class="k">def</span> <span class="nf">day_length</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+</span><span id="L-235"><a href="#L-235"><span class="linenos">235</span></a><span class="k">def</span><span class="w"> </span><span class="nf">day_length</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
 </span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute length of daylight</span>
 </span><span id="L-237"><a href="#L-237"><span class="linenos">237</span></a><span class="sd">    </span>
 </span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a><span class="sd">    See `sun_times` for Parameters.&#39;&#39;&#39;</span>
 </span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">sun_times</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
 </span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a>    <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 </span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a>
-</span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a><span class="k">def</span> <span class="nf">solar_noon</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+</span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_noon</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
 </span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute time of solar noon (meridian transit)</span>
 </span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a><span class="sd">    </span>
 </span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a><span class="sd">    See `sun_times` for Parameters.&#39;&#39;&#39;</span>
 </span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">sun_times</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
 </span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a>    <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
 </span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a>
-</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a><span class="k">def</span> <span class="nf">solar_constant</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_constant</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute solar constant for specific date or dates</span>
 </span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a><span class="sd">    </span>
 </span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a><span class="sd">    Parameters</span>
@@ -486,7 +486,7 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a>
 </span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a>    <span class="k">return</span> <span class="n">S</span>
 </span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a>
-</span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a><span class="k">def</span> <span class="nf">solar_declination</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">fast</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+</span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_declination</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">fast</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Calculate solar declination (degrees) for specified date</span>
 </span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a><span class="sd">        </span>
 </span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a><span class="sd">    Parameters</span>
@@ -545,7 +545,7 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-326"><a href="#L-326"><span class="linenos">326</span></a>
 </span><span id="L-327"><a href="#L-327"><span class="linenos">327</span></a>    <span class="k">return</span> <span class="n">dec</span>
 </span><span id="L-328"><a href="#L-328"><span class="linenos">328</span></a>
-</span><span id="L-329"><a href="#L-329"><span class="linenos">329</span></a><span class="k">def</span> <span class="nf">solar_latitude</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+</span><span id="L-329"><a href="#L-329"><span class="linenos">329</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_latitude</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
 </span><span id="L-330"><a href="#L-330"><span class="linenos">330</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Latitude of the subsolar point, degrees</span>
 </span><span id="L-331"><a href="#L-331"><span class="linenos">331</span></a><span class="sd">    </span>
 </span><span id="L-332"><a href="#L-332"><span class="linenos">332</span></a><span class="sd">    Parameters</span>
@@ -565,7 +565,7 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-346"><a href="#L-346"><span class="linenos">346</span></a><span class="sd">    &#39;&#39;&#39;</span>
 </span><span id="L-347"><a href="#L-347"><span class="linenos">347</span></a>    <span class="k">return</span> <span class="n">solar_declination</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
 </span><span id="L-348"><a href="#L-348"><span class="linenos">348</span></a>
-</span><span id="L-349"><a href="#L-349"><span class="linenos">349</span></a><span class="k">def</span> <span class="nf">solar_longitude</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+</span><span id="L-349"><a href="#L-349"><span class="linenos">349</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_longitude</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="L-350"><a href="#L-350"><span class="linenos">350</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Longitude of the subsolar point, degrees</span>
 </span><span id="L-351"><a href="#L-351"><span class="linenos">351</span></a><span class="sd">    </span>
 </span><span id="L-352"><a href="#L-352"><span class="linenos">352</span></a><span class="sd">    Parameters</span>
@@ -605,7 +605,7 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-386"><a href="#L-386"><span class="linenos">386</span></a>
 </span><span id="L-387"><a href="#L-387"><span class="linenos">387</span></a>    <span class="k">return</span> <span class="n">solar_lon</span>
 </span><span id="L-388"><a href="#L-388"><span class="linenos">388</span></a>
-</span><span id="L-389"><a href="#L-389"><span class="linenos">389</span></a><span class="k">def</span> <span class="nf">solar_hour_angle</span><span class="p">(</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+</span><span id="L-389"><a href="#L-389"><span class="linenos">389</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_hour_angle</span><span class="p">(</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="L-390"><a href="#L-390"><span class="linenos">390</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Solar hour angle (degrees) for specified longitude, date and time</span>
 </span><span id="L-391"><a href="#L-391"><span class="linenos">391</span></a>
 </span><span id="L-392"><a href="#L-392"><span class="linenos">392</span></a><span class="sd">    Hour angle is the angular displacement of the sun from the local meridian.</span>
@@ -635,7 +635,7 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-416"><a href="#L-416"><span class="linenos">416</span></a>
 </span><span id="L-417"><a href="#L-417"><span class="linenos">417</span></a>    <span class="k">return</span> <span class="n">Ha</span>
 </span><span id="L-418"><a href="#L-418"><span class="linenos">418</span></a>
-</span><span id="L-419"><a href="#L-419"><span class="linenos">419</span></a><span class="k">def</span> <span class="nf">equation_of_time</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fast</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
+</span><span id="L-419"><a href="#L-419"><span class="linenos">419</span></a><span class="k">def</span><span class="w"> </span><span class="nf">equation_of_time</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fast</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
 </span><span id="L-420"><a href="#L-420"><span class="linenos">420</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Equation of time for specified date</span>
 </span><span id="L-421"><a href="#L-421"><span class="linenos">421</span></a><span class="sd">    </span>
 </span><span id="L-422"><a href="#L-422"><span class="linenos">422</span></a><span class="sd">    Accounts for the solar day being slightly different from 24 hours</span>
@@ -691,7 +691,7 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-472"><a href="#L-472"><span class="linenos">472</span></a>
 </span><span id="L-473"><a href="#L-473"><span class="linenos">473</span></a>    <span class="k">return</span> <span class="n">eot</span>
 </span><span id="L-474"><a href="#L-474"><span class="linenos">474</span></a>
-</span><span id="L-475"><a href="#L-475"><span class="linenos">475</span></a><span class="k">def</span> <span class="nf">solar_position</span><span class="p">(</span> <span class="n">datetime</span> <span class="p">):</span>
+</span><span id="L-475"><a href="#L-475"><span class="linenos">475</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_position</span><span class="p">(</span> <span class="n">datetime</span> <span class="p">):</span>
 </span><span id="L-476"><a href="#L-476"><span class="linenos">476</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute position of sun (declination, right ascension, equation of time, distance)) on specified date</span>
 </span><span id="L-477"><a href="#L-477"><span class="linenos">477</span></a><span class="sd">    </span>
 </span><span id="L-478"><a href="#L-478"><span class="linenos">478</span></a><span class="sd">    Calculations follow the NOAA solar calculator spreadsheet</span>
@@ -793,7 +793,7 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-574"><a href="#L-574"><span class="linenos">574</span></a>
 </span><span id="L-575"><a href="#L-575"><span class="linenos">575</span></a>    <span class="k">return</span> <span class="n">result</span>
 </span><span id="L-576"><a href="#L-576"><span class="linenos">576</span></a>
-</span><span id="L-577"><a href="#L-577"><span class="linenos">577</span></a><span class="k">def</span> <span class="nf">sun_times</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">tz_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sza_sunrise</span><span class="o">=</span><span class="mf">90.833</span><span class="p">,</span>
+</span><span id="L-577"><a href="#L-577"><span class="linenos">577</span></a><span class="k">def</span><span class="w"> </span><span class="nf">sun_times</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">tz_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sza_sunrise</span><span class="o">=</span><span class="mf">90.833</span><span class="p">,</span>
 </span><span id="L-578"><a href="#L-578"><span class="linenos">578</span></a>              <span class="n">fast</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="L-579"><a href="#L-579"><span class="linenos">579</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute times of sunrise, sunset, solar noon, and day length</span>
 </span><span id="L-580"><a href="#L-580"><span class="linenos">580</span></a><span class="sd">    </span>
@@ -929,7 +929,7 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-710"><a href="#L-710"><span class="linenos">710</span></a>
 </span><span id="L-711"><a href="#L-711"><span class="linenos">711</span></a>    <span class="k">return</span> <span class="n">result</span>
 </span><span id="L-712"><a href="#L-712"><span class="linenos">712</span></a>
-</span><span id="L-713"><a href="#L-713"><span class="linenos">713</span></a><span class="k">def</span> <span class="nf">horizon_zenith_angle</span><span class="p">(</span> <span class="n">alt</span> <span class="p">):</span>
+</span><span id="L-713"><a href="#L-713"><span class="linenos">713</span></a><span class="k">def</span><span class="w"> </span><span class="nf">horizon_zenith_angle</span><span class="p">(</span> <span class="n">alt</span> <span class="p">):</span>
 </span><span id="L-714"><a href="#L-714"><span class="linenos">714</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Angle from the zenith to the horizon</span>
 </span><span id="L-715"><a href="#L-715"><span class="linenos">715</span></a><span class="sd">    </span>
 </span><span id="L-716"><a href="#L-716"><span class="linenos">716</span></a><span class="sd">    The horizon is the locii of points where a line from the </span>
@@ -980,7 +980,7 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-761"><a href="#L-761"><span class="linenos">761</span></a>
 </span><span id="L-762"><a href="#L-762"><span class="linenos">762</span></a>    <span class="k">return</span> <span class="n">hza</span>
 </span><span id="L-763"><a href="#L-763"><span class="linenos">763</span></a>
-</span><span id="L-764"><a href="#L-764"><span class="linenos">764</span></a><span class="k">def</span> <span class="nf">refraction_angle</span><span class="p">(</span> <span class="n">true_elevation_angle</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.</span><span class="p">,</span> <span class="n">temperature_celsius</span><span class="o">=</span><span class="mf">10.</span> <span class="p">):</span>
+</span><span id="L-764"><a href="#L-764"><span class="linenos">764</span></a><span class="k">def</span><span class="w"> </span><span class="nf">refraction_angle</span><span class="p">(</span> <span class="n">true_elevation_angle</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.</span><span class="p">,</span> <span class="n">temperature_celsius</span><span class="o">=</span><span class="mf">10.</span> <span class="p">):</span>
 </span><span id="L-765"><a href="#L-765"><span class="linenos">765</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Atmospheric refraction angle for light passing through Earth&#39;s atmosphere</span>
 </span><span id="L-766"><a href="#L-766"><span class="linenos">766</span></a>
 </span><span id="L-767"><a href="#L-767"><span class="linenos">767</span></a><span class="sd">    The apparent locations in the sky of objects outsides Earth&#39;s atmosphere </span>
@@ -1026,7 +1026,7 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-807"><a href="#L-807"><span class="linenos">807</span></a>
 </span><span id="L-808"><a href="#L-808"><span class="linenos">808</span></a>    <span class="k">return</span> <span class="n">refraction_angle</span>
 </span><span id="L-809"><a href="#L-809"><span class="linenos">809</span></a>
-</span><span id="L-810"><a href="#L-810"><span class="linenos">810</span></a><span class="k">def</span> <span class="nf">_to_datetime</span><span class="p">(</span><span class="n">time_in</span><span class="p">):</span>
+</span><span id="L-810"><a href="#L-810"><span class="linenos">810</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_to_datetime</span><span class="p">(</span><span class="n">time_in</span><span class="p">):</span>
 </span><span id="L-811"><a href="#L-811"><span class="linenos">811</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Convert to Timestamp, Series of datetime64, or DataArray of datetime64 </span>
 </span><span id="L-812"><a href="#L-812"><span class="linenos">812</span></a><span class="sd">    </span>
 </span><span id="L-813"><a href="#L-813"><span class="linenos">813</span></a><span class="sd">    Parameters</span>
@@ -1054,7 +1054,7 @@ where a small angular displacement results in a large azimuthal change.</p>
 </span><span id="L-835"><a href="#L-835"><span class="linenos">835</span></a>
 </span><span id="L-836"><a href="#L-836"><span class="linenos">836</span></a>    <span class="k">return</span> <span class="n">time_out</span>
 </span><span id="L-837"><a href="#L-837"><span class="linenos">837</span></a>
-</span><span id="L-838"><a href="#L-838"><span class="linenos">838</span></a><span class="k">def</span> <span class="nf">_to_datetime_utc</span><span class="p">(</span> <span class="n">datetime_in</span> <span class="p">):</span>
+</span><span id="L-838"><a href="#L-838"><span class="linenos">838</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_to_datetime_utc</span><span class="p">(</span> <span class="n">datetime_in</span> <span class="p">):</span>
 </span><span id="L-839"><a href="#L-839"><span class="linenos">839</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Convert to Timestamp, Series of datetime64, or DataArray of datetime64 and in UTC</span>
 </span><span id="L-840"><a href="#L-840"><span class="linenos">840</span></a><span class="sd">    </span>
 </span><span id="L-841"><a href="#L-841"><span class="linenos">841</span></a><span class="sd">    Parameters</span>
@@ -1163,7 +1163,7 @@ where a small angular displacement results in a large azimuthal change.</p>
 
     </div>
     <a class="headerlink" href="#insolation_toa"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="insolation_toa-33"><a href="#insolation_toa-33"><span class="linenos">33</span></a><span class="k">def</span> <span class="nf">insolation_toa</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="insolation_toa-33"><a href="#insolation_toa-33"><span class="linenos">33</span></a><span class="k">def</span><span class="w"> </span><span class="nf">insolation_toa</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
 </span><span id="insolation_toa-34"><a href="#insolation_toa-34"><span class="linenos">34</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Insolation at top of the atmosphere, accounting for solar zenith angle</span>
 </span><span id="insolation_toa-35"><a href="#insolation_toa-35"><span class="linenos">35</span></a><span class="sd">    </span>
 </span><span id="insolation_toa-36"><a href="#insolation_toa-36"><span class="linenos">36</span></a><span class="sd">    Parameters</span>
@@ -1233,7 +1233,7 @@ radiation flux density accounting for solar zenith angle, W/m2</li>
 
     </div>
     <a class="headerlink" href="#solar_azimuth_angle"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_azimuth_angle-63"><a href="#solar_azimuth_angle-63"><span class="linenos"> 63</span></a><span class="k">def</span> <span class="nf">solar_azimuth_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_azimuth_angle-63"><a href="#solar_azimuth_angle-63"><span class="linenos"> 63</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_azimuth_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="solar_azimuth_angle-64"><a href="#solar_azimuth_angle-64"><span class="linenos"> 64</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Solar azimuth angle (degrees) for a latitude, longitude, date and time</span>
 </span><span id="solar_azimuth_angle-65"><a href="#solar_azimuth_angle-65"><span class="linenos"> 65</span></a><span class="sd">    </span>
 </span><span id="solar_azimuth_angle-66"><a href="#solar_azimuth_angle-66"><span class="linenos"> 66</span></a><span class="sd">    SAA is degrees clockwise from north.</span>
@@ -1315,7 +1315,7 @@ solar azimuth angle in degrees (clockwise from north)</li>
 
     </div>
     <a class="headerlink" href="#solar_elevation_angle"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_elevation_angle-104"><a href="#solar_elevation_angle-104"><span class="linenos">104</span></a><span class="k">def</span> <span class="nf">solar_elevation_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">alt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_elevation_angle-104"><a href="#solar_elevation_angle-104"><span class="linenos">104</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_elevation_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">alt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
 </span><span id="solar_elevation_angle-105"><a href="#solar_elevation_angle-105"><span class="linenos">105</span></a>                        <span class="n">refraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.</span><span class="p">,</span>
 </span><span id="solar_elevation_angle-106"><a href="#solar_elevation_angle-106"><span class="linenos">106</span></a>                        <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="solar_elevation_angle-107"><a href="#solar_elevation_angle-107"><span class="linenos">107</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Solar elevation angle (degrees) above the horizon</span>
@@ -1428,7 +1428,7 @@ If refraction=True, this is the apparent solar elevation angle</li>
 
     </div>
     <a class="headerlink" href="#solar_zenith_angle"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_zenith_angle-159"><a href="#solar_zenith_angle-159"><span class="linenos">159</span></a><span class="k">def</span> <span class="nf">solar_zenith_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_zenith_angle-159"><a href="#solar_zenith_angle-159"><span class="linenos">159</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_zenith_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span>
 </span><span id="solar_zenith_angle-160"><a href="#solar_zenith_angle-160"><span class="linenos">160</span></a>                        <span class="n">refraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.</span><span class="p">,</span>
 </span><span id="solar_zenith_angle-161"><a href="#solar_zenith_angle-161"><span class="linenos">161</span></a>                        <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="solar_zenith_angle-162"><a href="#solar_zenith_angle-162"><span class="linenos">162</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Solar zenith angle (degrees) for a given latitude, longitude, date and time.</span>
@@ -1545,7 +1545,7 @@ If refraction=True, this is the apparent solar zenith angle</li>
 
     </div>
     <a class="headerlink" href="#sunrise_time"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="sunrise_time-222"><a href="#sunrise_time-222"><span class="linenos">222</span></a><span class="k">def</span> <span class="nf">sunrise_time</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="sunrise_time-222"><a href="#sunrise_time-222"><span class="linenos">222</span></a><span class="k">def</span><span class="w"> </span><span class="nf">sunrise_time</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
 </span><span id="sunrise_time-223"><a href="#sunrise_time-223"><span class="linenos">223</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute sunrise time</span>
 </span><span id="sunrise_time-224"><a href="#sunrise_time-224"><span class="linenos">224</span></a><span class="sd">    </span>
 </span><span id="sunrise_time-225"><a href="#sunrise_time-225"><span class="linenos">225</span></a><span class="sd">    See `sun_times` for Parameters.&#39;&#39;&#39;</span>
@@ -1572,7 +1572,7 @@ If refraction=True, this is the apparent solar zenith angle</li>
 
     </div>
     <a class="headerlink" href="#sunset_time"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="sunset_time-229"><a href="#sunset_time-229"><span class="linenos">229</span></a><span class="k">def</span> <span class="nf">sunset_time</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="sunset_time-229"><a href="#sunset_time-229"><span class="linenos">229</span></a><span class="k">def</span><span class="w"> </span><span class="nf">sunset_time</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
 </span><span id="sunset_time-230"><a href="#sunset_time-230"><span class="linenos">230</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute sunset time</span>
 </span><span id="sunset_time-231"><a href="#sunset_time-231"><span class="linenos">231</span></a><span class="sd">    </span>
 </span><span id="sunset_time-232"><a href="#sunset_time-232"><span class="linenos">232</span></a><span class="sd">    See `sun_times` for Parameters.&#39;&#39;&#39;</span>
@@ -1599,7 +1599,7 @@ If refraction=True, this is the apparent solar zenith angle</li>
 
     </div>
     <a class="headerlink" href="#day_length"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="day_length-236"><a href="#day_length-236"><span class="linenos">236</span></a><span class="k">def</span> <span class="nf">day_length</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="day_length-236"><a href="#day_length-236"><span class="linenos">236</span></a><span class="k">def</span><span class="w"> </span><span class="nf">day_length</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
 </span><span id="day_length-237"><a href="#day_length-237"><span class="linenos">237</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute length of daylight</span>
 </span><span id="day_length-238"><a href="#day_length-238"><span class="linenos">238</span></a><span class="sd">    </span>
 </span><span id="day_length-239"><a href="#day_length-239"><span class="linenos">239</span></a><span class="sd">    See `sun_times` for Parameters.&#39;&#39;&#39;</span>
@@ -1626,7 +1626,7 @@ If refraction=True, this is the apparent solar zenith angle</li>
 
     </div>
     <a class="headerlink" href="#solar_noon"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_noon-243"><a href="#solar_noon-243"><span class="linenos">243</span></a><span class="k">def</span> <span class="nf">solar_noon</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_noon-243"><a href="#solar_noon-243"><span class="linenos">243</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_noon</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
 </span><span id="solar_noon-244"><a href="#solar_noon-244"><span class="linenos">244</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute time of solar noon (meridian transit)</span>
 </span><span id="solar_noon-245"><a href="#solar_noon-245"><span class="linenos">245</span></a><span class="sd">    </span>
 </span><span id="solar_noon-246"><a href="#solar_noon-246"><span class="linenos">246</span></a><span class="sd">    See `sun_times` for Parameters.&#39;&#39;&#39;</span>
@@ -1653,7 +1653,7 @@ If refraction=True, this is the apparent solar zenith angle</li>
 
     </div>
     <a class="headerlink" href="#solar_constant"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_constant-250"><a href="#solar_constant-250"><span class="linenos">250</span></a><span class="k">def</span> <span class="nf">solar_constant</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_constant-250"><a href="#solar_constant-250"><span class="linenos">250</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_constant</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="solar_constant-251"><a href="#solar_constant-251"><span class="linenos">251</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute solar constant for specific date or dates</span>
 </span><span id="solar_constant-252"><a href="#solar_constant-252"><span class="linenos">252</span></a><span class="sd">    </span>
 </span><span id="solar_constant-253"><a href="#solar_constant-253"><span class="linenos">253</span></a><span class="sd">    Parameters</span>
@@ -1708,7 +1708,7 @@ Solar direct beam radiation flux density, W/m2</li>
 
     </div>
     <a class="headerlink" href="#solar_declination"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_declination-271"><a href="#solar_declination-271"><span class="linenos">271</span></a><span class="k">def</span> <span class="nf">solar_declination</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">fast</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_declination-271"><a href="#solar_declination-271"><span class="linenos">271</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_declination</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">fast</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="solar_declination-272"><a href="#solar_declination-272"><span class="linenos">272</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Calculate solar declination (degrees) for specified date</span>
 </span><span id="solar_declination-273"><a href="#solar_declination-273"><span class="linenos">273</span></a><span class="sd">        </span>
 </span><span id="solar_declination-274"><a href="#solar_declination-274"><span class="linenos">274</span></a><span class="sd">    Parameters</span>
@@ -1804,7 +1804,7 @@ solar declination in degrees at the specified date</li>
 
     </div>
     <a class="headerlink" href="#solar_latitude"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_latitude-330"><a href="#solar_latitude-330"><span class="linenos">330</span></a><span class="k">def</span> <span class="nf">solar_latitude</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_latitude-330"><a href="#solar_latitude-330"><span class="linenos">330</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_latitude</span><span class="p">(</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
 </span><span id="solar_latitude-331"><a href="#solar_latitude-331"><span class="linenos">331</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Latitude of the subsolar point, degrees</span>
 </span><span id="solar_latitude-332"><a href="#solar_latitude-332"><span class="linenos">332</span></a><span class="sd">    </span>
 </span><span id="solar_latitude-333"><a href="#solar_latitude-333"><span class="linenos">333</span></a><span class="sd">    Parameters</span>
@@ -1861,7 +1861,7 @@ degrees of latitude</li>
 
     </div>
     <a class="headerlink" href="#solar_longitude"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_longitude-350"><a href="#solar_longitude-350"><span class="linenos">350</span></a><span class="k">def</span> <span class="nf">solar_longitude</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_longitude-350"><a href="#solar_longitude-350"><span class="linenos">350</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_longitude</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="solar_longitude-351"><a href="#solar_longitude-351"><span class="linenos">351</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Longitude of the subsolar point, degrees</span>
 </span><span id="solar_longitude-352"><a href="#solar_longitude-352"><span class="linenos">352</span></a><span class="sd">    </span>
 </span><span id="solar_longitude-353"><a href="#solar_longitude-353"><span class="linenos">353</span></a><span class="sd">    Parameters</span>
@@ -1936,7 +1936,7 @@ degrees of longitude</li>
 
     </div>
     <a class="headerlink" href="#solar_hour_angle"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_hour_angle-390"><a href="#solar_hour_angle-390"><span class="linenos">390</span></a><span class="k">def</span> <span class="nf">solar_hour_angle</span><span class="p">(</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_hour_angle-390"><a href="#solar_hour_angle-390"><span class="linenos">390</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_hour_angle</span><span class="p">(</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="solar_hour_angle-391"><a href="#solar_hour_angle-391"><span class="linenos">391</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Solar hour angle (degrees) for specified longitude, date and time</span>
 </span><span id="solar_hour_angle-392"><a href="#solar_hour_angle-392"><span class="linenos">392</span></a>
 </span><span id="solar_hour_angle-393"><a href="#solar_hour_angle-393"><span class="linenos">393</span></a><span class="sd">    Hour angle is the angular displacement of the sun from the local meridian.</span>
@@ -2006,7 +2006,7 @@ hour angle in degrees at the specified location and time</li>
 
     </div>
     <a class="headerlink" href="#equation_of_time"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="equation_of_time-420"><a href="#equation_of_time-420"><span class="linenos">420</span></a><span class="k">def</span> <span class="nf">equation_of_time</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fast</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="equation_of_time-420"><a href="#equation_of_time-420"><span class="linenos">420</span></a><span class="k">def</span><span class="w"> </span><span class="nf">equation_of_time</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fast</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
 </span><span id="equation_of_time-421"><a href="#equation_of_time-421"><span class="linenos">421</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Equation of time for specified date</span>
 </span><span id="equation_of_time-422"><a href="#equation_of_time-422"><span class="linenos">422</span></a><span class="sd">    </span>
 </span><span id="equation_of_time-423"><a href="#equation_of_time-423"><span class="linenos">423</span></a><span class="sd">    Accounts for the solar day being slightly different from 24 hours</span>
@@ -2101,7 +2101,7 @@ equation of time on the specified date, degrees or minutes</li>
 
     </div>
     <a class="headerlink" href="#solar_position"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_position-476"><a href="#solar_position-476"><span class="linenos">476</span></a><span class="k">def</span> <span class="nf">solar_position</span><span class="p">(</span> <span class="n">datetime</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="solar_position-476"><a href="#solar_position-476"><span class="linenos">476</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_position</span><span class="p">(</span> <span class="n">datetime</span> <span class="p">):</span>
 </span><span id="solar_position-477"><a href="#solar_position-477"><span class="linenos">477</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute position of sun (declination, right ascension, equation of time, distance)) on specified date</span>
 </span><span id="solar_position-478"><a href="#solar_position-478"><span class="linenos">478</span></a><span class="sd">    </span>
 </span><span id="solar_position-479"><a href="#solar_position-479"><span class="linenos">479</span></a><span class="sd">    Calculations follow the NOAA solar calculator spreadsheet</span>
@@ -2238,7 +2238,7 @@ declination, right ascension, equation of time, Earth-sun distance, datetime</li
 
     </div>
     <a class="headerlink" href="#sun_times"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="sun_times-578"><a href="#sun_times-578"><span class="linenos">578</span></a><span class="k">def</span> <span class="nf">sun_times</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">tz_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sza_sunrise</span><span class="o">=</span><span class="mf">90.833</span><span class="p">,</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="sun_times-578"><a href="#sun_times-578"><span class="linenos">578</span></a><span class="k">def</span><span class="w"> </span><span class="nf">sun_times</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">tz_out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sza_sunrise</span><span class="o">=</span><span class="mf">90.833</span><span class="p">,</span>
 </span><span id="sun_times-579"><a href="#sun_times-579"><span class="linenos">579</span></a>              <span class="n">fast</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="sun_times-580"><a href="#sun_times-580"><span class="linenos">580</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute times of sunrise, sunset, solar noon, and day length</span>
 </span><span id="sun_times-581"><a href="#sun_times-581"><span class="linenos">581</span></a><span class="sd">    </span>
@@ -2431,7 +2431,7 @@ times of sunrise, sunset, solar noon, and day length</li>
 
     </div>
     <a class="headerlink" href="#horizon_zenith_angle"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="horizon_zenith_angle-714"><a href="#horizon_zenith_angle-714"><span class="linenos">714</span></a><span class="k">def</span> <span class="nf">horizon_zenith_angle</span><span class="p">(</span> <span class="n">alt</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="horizon_zenith_angle-714"><a href="#horizon_zenith_angle-714"><span class="linenos">714</span></a><span class="k">def</span><span class="w"> </span><span class="nf">horizon_zenith_angle</span><span class="p">(</span> <span class="n">alt</span> <span class="p">):</span>
 </span><span id="horizon_zenith_angle-715"><a href="#horizon_zenith_angle-715"><span class="linenos">715</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Angle from the zenith to the horizon</span>
 </span><span id="horizon_zenith_angle-716"><a href="#horizon_zenith_angle-716"><span class="linenos">716</span></a><span class="sd">    </span>
 </span><span id="horizon_zenith_angle-717"><a href="#horizon_zenith_angle-717"><span class="linenos">717</span></a><span class="sd">    The horizon is the locii of points where a line from the </span>
@@ -2532,7 +2532,7 @@ horizon zenith angle in degrees</li>
 
     </div>
     <a class="headerlink" href="#refraction_angle"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="refraction_angle-765"><a href="#refraction_angle-765"><span class="linenos">765</span></a><span class="k">def</span> <span class="nf">refraction_angle</span><span class="p">(</span> <span class="n">true_elevation_angle</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.</span><span class="p">,</span> <span class="n">temperature_celsius</span><span class="o">=</span><span class="mf">10.</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="refraction_angle-765"><a href="#refraction_angle-765"><span class="linenos">765</span></a><span class="k">def</span><span class="w"> </span><span class="nf">refraction_angle</span><span class="p">(</span> <span class="n">true_elevation_angle</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.</span><span class="p">,</span> <span class="n">temperature_celsius</span><span class="o">=</span><span class="mf">10.</span> <span class="p">):</span>
 </span><span id="refraction_angle-766"><a href="#refraction_angle-766"><span class="linenos">766</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Atmospheric refraction angle for light passing through Earth&#39;s atmosphere</span>
 </span><span id="refraction_angle-767"><a href="#refraction_angle-767"><span class="linenos">767</span></a>
 </span><span id="refraction_angle-768"><a href="#refraction_angle-768"><span class="linenos">768</span></a><span class="sd">    The apparent locations in the sky of objects outsides Earth&#39;s atmosphere </span>
@@ -2883,7 +2883,7 @@ date and time input for calculations, UTC</li>
 
     </div>
     <a class="headerlink" href="#sza"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="sza-159"><a href="#sza-159"><span class="linenos">159</span></a><span class="k">def</span> <span class="nf">solar_zenith_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="sza-159"><a href="#sza-159"><span class="linenos">159</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_zenith_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span>
 </span><span id="sza-160"><a href="#sza-160"><span class="linenos">160</span></a>                        <span class="n">refraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.</span><span class="p">,</span>
 </span><span id="sza-161"><a href="#sza-161"><span class="linenos">161</span></a>                        <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="sza-162"><a href="#sza-162"><span class="linenos">162</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Solar zenith angle (degrees) for a given latitude, longitude, date and time.</span>
@@ -2964,7 +2964,7 @@ date and time input for calculations, UTC</li>
 
     </div>
     <a class="headerlink" href="#saa"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="saa-63"><a href="#saa-63"><span class="linenos"> 63</span></a><span class="k">def</span> <span class="nf">solar_azimuth_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="saa-63"><a href="#saa-63"><span class="linenos"> 63</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_azimuth_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="saa-64"><a href="#saa-64"><span class="linenos"> 64</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Solar azimuth angle (degrees) for a latitude, longitude, date and time</span>
 </span><span id="saa-65"><a href="#saa-65"><span class="linenos"> 65</span></a><span class="sd">    </span>
 </span><span id="saa-66"><a href="#saa-66"><span class="linenos"> 66</span></a><span class="sd">    SAA is degrees clockwise from north.</span>
@@ -3023,7 +3023,7 @@ date and time input for calculations, UTC</li>
 
     </div>
     <a class="headerlink" href="#sea"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="sea-104"><a href="#sea-104"><span class="linenos">104</span></a><span class="k">def</span> <span class="nf">solar_elevation_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">alt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="sea-104"><a href="#sea-104"><span class="linenos">104</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_elevation_angle</span><span class="p">(</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">alt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
 </span><span id="sea-105"><a href="#sea-105"><span class="linenos">105</span></a>                        <span class="n">refraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.</span><span class="p">,</span>
 </span><span id="sea-106"><a href="#sea-106"><span class="linenos">106</span></a>                        <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="sea-107"><a href="#sea-107"><span class="linenos">107</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Solar elevation angle (degrees) above the horizon</span>
@@ -3096,7 +3096,7 @@ date and time input for calculations, UTC</li>
 
     </div>
     <a class="headerlink" href="#equationOfTime"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="equationOfTime-420"><a href="#equationOfTime-420"><span class="linenos">420</span></a><span class="k">def</span> <span class="nf">equation_of_time</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fast</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="equationOfTime-420"><a href="#equationOfTime-420"><span class="linenos">420</span></a><span class="k">def</span><span class="w"> </span><span class="nf">equation_of_time</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fast</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
 </span><span id="equationOfTime-421"><a href="#equationOfTime-421"><span class="linenos">421</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Equation of time for specified date</span>
 </span><span id="equationOfTime-422"><a href="#equationOfTime-422"><span class="linenos">422</span></a><span class="sd">    </span>
 </span><span id="equationOfTime-423"><a href="#equationOfTime-423"><span class="linenos">423</span></a><span class="sd">    Accounts for the solar day being slightly different from 24 hours</span>
@@ -3170,7 +3170,7 @@ date and time input for calculations, UTC</li>
 
     </div>
     <a class="headerlink" href="#solarDeclination"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="solarDeclination-271"><a href="#solarDeclination-271"><span class="linenos">271</span></a><span class="k">def</span> <span class="nf">solar_declination</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">fast</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="solarDeclination-271"><a href="#solarDeclination-271"><span class="linenos">271</span></a><span class="k">def</span><span class="w"> </span><span class="nf">solar_declination</span><span class="p">(</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">fast</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">solar_pos</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
 </span><span id="solarDeclination-272"><a href="#solarDeclination-272"><span class="linenos">272</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Calculate solar declination (degrees) for specified date</span>
 </span><span id="solarDeclination-273"><a href="#solarDeclination-273"><span class="linenos">273</span></a><span class="sd">        </span>
 </span><span id="solarDeclination-274"><a href="#solarDeclination-274"><span class="linenos">274</span></a><span class="sd">    Parameters</span>

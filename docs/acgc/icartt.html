@@ -87,11 +87,11 @@
 </span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="sd">&#39;&#39;&#39;Read and write ICARTT (ffi1001) format files</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">import</span> <span class="nn">os</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>
 </span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="k">def</span> <span class="nf">read_icartt</span><span class="p">(</span> <span class="n">files</span><span class="p">,</span> <span class="n">usePickle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeIndex</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="k">def</span><span class="w"> </span><span class="nf">read_icartt</span><span class="p">(</span> <span class="n">files</span><span class="p">,</span> <span class="n">usePickle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeIndex</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Read ICARTT file or files into a pandas DataFrame</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="sd">    </span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="sd">    Parameters</span>
@@ -224,7 +224,7 @@
 </span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>
 </span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>    <span class="k">return</span> <span class="n">obs</span>
 </span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>
-</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a><span class="k">def</span> <span class="nf">_get</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">default_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_get</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">default_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Get value from either attribute or key `name` </span>
 </span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a><span class="sd">    </span>
 </span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a><span class="sd">    Parameters</span>
@@ -252,7 +252,7 @@
 </span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>            <span class="n">value</span> <span class="o">=</span> <span class="n">default_value</span>
 </span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a>    <span class="k">return</span> <span class="n">value</span>
 </span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>
-</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a><span class="k">def</span> <span class="nf">write_icartt</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a><span class="k">def</span><span class="w"> </span><span class="nf">write_icartt</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 </span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Write an ICARTT ffi1001 file</span>
 </span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>
 </span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a><span class="sd">    The contents of a pandas DataFrame (``df``) are written to a text file in ICARTT format</span>
@@ -487,7 +487,7 @@
 
     </div>
     <a class="headerlink" href="#read_icartt"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="read_icartt-11"><a href="#read_icartt-11"><span class="linenos"> 11</span></a><span class="k">def</span> <span class="nf">read_icartt</span><span class="p">(</span> <span class="n">files</span><span class="p">,</span> <span class="n">usePickle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeIndex</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="read_icartt-11"><a href="#read_icartt-11"><span class="linenos"> 11</span></a><span class="k">def</span><span class="w"> </span><span class="nf">read_icartt</span><span class="p">(</span> <span class="n">files</span><span class="p">,</span> <span class="n">usePickle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeIndex</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
 </span><span id="read_icartt-12"><a href="#read_icartt-12"><span class="linenos"> 12</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Read ICARTT file or files into a pandas DataFrame</span>
 </span><span id="read_icartt-13"><a href="#read_icartt-13"><span class="linenos"> 13</span></a><span class="sd">    </span>
 </span><span id="read_icartt-14"><a href="#read_icartt-14"><span class="linenos"> 14</span></a><span class="sd">    Parameters</span>
@@ -660,7 +660,7 @@ the DataFrame columns also include 'time' in pandas.DatetimeIndex format and
 
     </div>
     <a class="headerlink" href="#write_icartt"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="write_icartt-172"><a href="#write_icartt-172"><span class="linenos">172</span></a><span class="k">def</span> <span class="nf">write_icartt</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="write_icartt-172"><a href="#write_icartt-172"><span class="linenos">172</span></a><span class="k">def</span><span class="w"> </span><span class="nf">write_icartt</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 </span><span id="write_icartt-173"><a href="#write_icartt-173"><span class="linenos">173</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Write an ICARTT ffi1001 file</span>
 </span><span id="write_icartt-174"><a href="#write_icartt-174"><span class="linenos">174</span></a>
 </span><span id="write_icartt-175"><a href="#write_icartt-175"><span class="linenos">175</span></a><span class="sd">    The contents of a pandas DataFrame (``df``) are written to a text file in ICARTT format</span>

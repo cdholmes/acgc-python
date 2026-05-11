@@ -95,15 +95,15 @@ functions should give the same results.</p>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="sd">functions should give the same results.</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>
 </span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="k">as</span> <span class="nn">la</span> 
-</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">la</span> 
+</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">stats</span>
 </span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>
 </span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="c1">#from numba import jit</span>
 </span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a>
 </span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sma_warton&#39;</span><span class="p">]</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>
-</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="k">def</span> <span class="nf">sma_warton</span><span class="p">(</span><span class="n">X0</span><span class="p">,</span><span class="n">Y0</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span><span class="n">intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">wartonrobust</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="k">def</span><span class="w"> </span><span class="nf">sma_warton</span><span class="p">(</span><span class="n">X0</span><span class="p">,</span><span class="n">Y0</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span><span class="n">intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">wartonrobust</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Standard major axis, aka reduced major axis</span>
 </span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="sd">    </span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="sd">    The main advantage of this is that the best fit</span>
@@ -176,7 +176,7 @@ functions should give the same results.</p>
 </span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>
 </span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>    <span class="k">if</span> <span class="n">robust</span><span class="p">:</span>
 </span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>        <span class="kn">from</span> <span class="nn">sklearn.covariance</span> <span class="kn">import</span> <span class="n">MinCovDet</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinCovDet</span>
 </span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>
 </span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>        <span class="n">rcov</span> <span class="o">=</span> <span class="n">MinCovDet</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">])</span><span class="o">.</span><span class="n">T</span> <span class="p">)</span>
 </span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>
@@ -259,7 +259,7 @@ functions should give the same results.</p>
 </span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a>    <span class="k">return</span> <span class="n">slope</span><span class="p">,</span> <span class="n">Intercept</span><span class="p">,</span> <span class="n">ste_slope</span><span class="p">,</span> <span class="n">ste_int</span><span class="p">,</span> <span class="n">ci_slope</span><span class="p">,</span> <span class="n">ci_int</span>
 </span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>
 </span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a><span class="c1">#@jit</span>
-</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a><span class="k">def</span> <span class="nf">_robust_factor</span><span class="p">(</span> <span class="n">X</span><span class="p">,</span> <span class="n">rm</span><span class="p">,</span> <span class="n">rcov</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">0.777</span> <span class="p">):</span>
+</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_robust_factor</span><span class="p">(</span> <span class="n">X</span><span class="p">,</span> <span class="n">rm</span><span class="p">,</span> <span class="n">rcov</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">0.777</span> <span class="p">):</span>
 </span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Robust factor defined by Taskinen and Warton (2013)&#39;&#39;&#39;</span>
 </span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a>
 </span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a>    <span class="n">rfac1</span><span class="o">=</span><span class="mi">1</span>
@@ -288,7 +288,7 @@ functions should give the same results.</p>
 </span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a>    
 </span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a>    <span class="k">return</span> <span class="n">rfac1</span><span class="p">,</span> <span class="n">rfac2</span>
 </span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a>
-</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a><span class="k">def</span> <span class="nf">_alpha_fun</span><span class="p">(</span> <span class="n">r</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">q</span> <span class="p">):</span>
+</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_alpha_fun</span><span class="p">(</span> <span class="n">r</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">q</span> <span class="p">):</span>
 </span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Alpha function from Taskinen and Warton (2013)&#39;&#39;&#39;</span>
 </span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a>    
 </span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a>    <span class="n">c</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">chi2</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
@@ -308,7 +308,7 @@ functions should give the same results.</p>
 </span><span id="L-221"><a href="#L-221"><span class="linenos">221</span></a>    
 </span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a>    <span class="k">return</span> <span class="n">alpha</span>
 </span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a>
-</span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a><span class="k">def</span> <span class="nf">_gamma_fun</span><span class="p">(</span> <span class="n">r</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">q</span> <span class="p">):</span>
+</span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_gamma_fun</span><span class="p">(</span> <span class="n">r</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">q</span> <span class="p">):</span>
 </span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Gamma function from Taskinen and Warton (2013)&#39;&#39;&#39;</span>
 </span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a>    
 </span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a>    <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">stats</span><span class="o">.</span><span class="n">chi2</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="p">)</span>
@@ -325,7 +325,7 @@ functions should give the same results.</p>
 </span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a>    <span class="k">return</span> <span class="n">gamma</span>
 </span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a>
 </span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a><span class="c1">#@jit</span>
-</span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a><span class="k">def</span> <span class="nf">_huber_cov</span><span class="p">(</span> <span class="n">X</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">1.73</span><span class="p">):</span>
+</span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_huber_cov</span><span class="p">(</span> <span class="n">X</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">1.73</span><span class="p">):</span>
 </span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Huber&#39;s M robust estimator for mean and covariance </span>
 </span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a><span class="sd">    </span>
 </span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a><span class="sd">    Method is from Taskinen and Warton, 2013&#39;&#39;&#39;</span>
@@ -409,7 +409,7 @@ functions should give the same results.</p>
 </span><span id="L-322"><a href="#L-322"><span class="linenos">322</span></a>
 </span><span id="L-323"><a href="#L-323"><span class="linenos">323</span></a>    <span class="k">return</span> <span class="n">rm</span><span class="p">,</span> <span class="n">rcov</span>
 </span><span id="L-324"><a href="#L-324"><span class="linenos">324</span></a>
-</span><span id="L-325"><a href="#L-325"><span class="linenos">325</span></a><span class="k">def</span> <span class="nf">_huber_cov_old</span><span class="p">(</span> <span class="n">X</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">1.73</span><span class="p">):</span>
+</span><span id="L-325"><a href="#L-325"><span class="linenos">325</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_huber_cov_old</span><span class="p">(</span> <span class="n">X</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">1.73</span><span class="p">):</span>
 </span><span id="L-326"><a href="#L-326"><span class="linenos">326</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Huber&#39;s M robust estimator for mean and covariance, old version</span>
 </span><span id="L-327"><a href="#L-327"><span class="linenos">327</span></a><span class="sd">    </span>
 </span><span id="L-328"><a href="#L-328"><span class="linenos">328</span></a><span class="sd">    Method is from Taskinen and Warton, 2013&#39;&#39;&#39;</span>
@@ -487,7 +487,7 @@ functions should give the same results.</p>
 
     </div>
     <a class="headerlink" href="#sma_warton"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="sma_warton-20"><a href="#sma_warton-20"><span class="linenos"> 20</span></a><span class="k">def</span> <span class="nf">sma_warton</span><span class="p">(</span><span class="n">X0</span><span class="p">,</span><span class="n">Y0</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span><span class="n">intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">wartonrobust</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="sma_warton-20"><a href="#sma_warton-20"><span class="linenos"> 20</span></a><span class="k">def</span><span class="w"> </span><span class="nf">sma_warton</span><span class="p">(</span><span class="n">X0</span><span class="p">,</span><span class="n">Y0</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span><span class="n">intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">robust</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">wartonrobust</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 </span><span id="sma_warton-21"><a href="#sma_warton-21"><span class="linenos"> 21</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Standard major axis, aka reduced major axis</span>
 </span><span id="sma_warton-22"><a href="#sma_warton-22"><span class="linenos"> 22</span></a><span class="sd">    </span>
 </span><span id="sma_warton-23"><a href="#sma_warton-23"><span class="linenos"> 23</span></a><span class="sd">    The main advantage of this is that the best fit</span>
@@ -560,7 +560,7 @@ functions should give the same results.</p>
 </span><span id="sma_warton-90"><a href="#sma_warton-90"><span class="linenos"> 90</span></a>
 </span><span id="sma_warton-91"><a href="#sma_warton-91"><span class="linenos"> 91</span></a>    <span class="k">if</span> <span class="n">robust</span><span class="p">:</span>
 </span><span id="sma_warton-92"><a href="#sma_warton-92"><span class="linenos"> 92</span></a>
-</span><span id="sma_warton-93"><a href="#sma_warton-93"><span class="linenos"> 93</span></a>        <span class="kn">from</span> <span class="nn">sklearn.covariance</span> <span class="kn">import</span> <span class="n">MinCovDet</span>
+</span><span id="sma_warton-93"><a href="#sma_warton-93"><span class="linenos"> 93</span></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinCovDet</span>
 </span><span id="sma_warton-94"><a href="#sma_warton-94"><span class="linenos"> 94</span></a>
 </span><span id="sma_warton-95"><a href="#sma_warton-95"><span class="linenos"> 95</span></a>        <span class="n">rcov</span> <span class="o">=</span> <span class="n">MinCovDet</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">])</span><span class="o">.</span><span class="n">T</span> <span class="p">)</span>
 </span><span id="sma_warton-96"><a href="#sma_warton-96"><span class="linenos"> 96</span></a>

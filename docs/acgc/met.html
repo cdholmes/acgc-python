@@ -91,9 +91,9 @@
 </span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a>
 </span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="k">def</span> <span class="nf">pbl_bulk_richardson</span><span class="p">(</span> <span class="n">z</span><span class="p">,</span> <span class="n">thetav</span><span class="p">,</span> <span class="n">ws</span><span class="p">,</span> <span class="n">crit</span><span class="o">=</span><span class="mf">0.25</span><span class="p">):</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="k">def</span><span class="w"> </span><span class="nf">pbl_bulk_richardson</span><span class="p">(</span> <span class="n">z</span><span class="p">,</span> <span class="n">thetav</span><span class="p">,</span> <span class="n">ws</span><span class="p">,</span> <span class="n">crit</span><span class="o">=</span><span class="mf">0.25</span><span class="p">):</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute PBL mixing height from critical value of bulk Richardson number</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="sd">    </span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="sd">    Arguments</span>
@@ -150,7 +150,7 @@
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>    <span class="k">return</span> <span class="n">zpbl</span><span class="p">,</span> <span class="n">L</span>
 </span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="k">def</span> <span class="nf">pbl_parcel</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">thetav</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.5</span> <span class="p">):</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="k">def</span><span class="w"> </span><span class="nf">pbl_parcel</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">thetav</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.5</span> <span class="p">):</span>
 </span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute PBL mixing height with parcel method</span>
 </span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>
 </span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">    The mixing height is defined as the altitude where a rising parcel of air</span>
@@ -201,7 +201,7 @@
 </span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>
 </span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>    <span class="k">return</span> <span class="n">zpbl</span><span class="p">,</span> <span class="n">L</span>
 </span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="k">def</span> <span class="nf">mo_wind</span><span class="p">(</span><span class="n">surfaceP</span><span class="p">,</span> <span class="n">q2m</span><span class="p">,</span> <span class="n">temp2m</span><span class="p">,</span> <span class="n">ustar</span><span class="p">,</span> <span class="n">shf</span><span class="p">,</span> <span class="n">lhf</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="k">def</span><span class="w"> </span><span class="nf">mo_wind</span><span class="p">(</span><span class="n">surfaceP</span><span class="p">,</span> <span class="n">q2m</span><span class="p">,</span> <span class="n">temp2m</span><span class="p">,</span> <span class="n">ustar</span><span class="p">,</span> <span class="n">shf</span><span class="p">,</span> <span class="n">lhf</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
 </span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Predict wind speed at altitude z using Monin-Obukhov similarity theory</span>
 </span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>
 </span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="sd">    Arguments</span>
@@ -299,7 +299,7 @@
 
     </div>
     <a class="headerlink" href="#pbl_bulk_richardson"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="pbl_bulk_richardson-10"><a href="#pbl_bulk_richardson-10"><span class="linenos">10</span></a><span class="k">def</span> <span class="nf">pbl_bulk_richardson</span><span class="p">(</span> <span class="n">z</span><span class="p">,</span> <span class="n">thetav</span><span class="p">,</span> <span class="n">ws</span><span class="p">,</span> <span class="n">crit</span><span class="o">=</span><span class="mf">0.25</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="pbl_bulk_richardson-10"><a href="#pbl_bulk_richardson-10"><span class="linenos">10</span></a><span class="k">def</span><span class="w"> </span><span class="nf">pbl_bulk_richardson</span><span class="p">(</span> <span class="n">z</span><span class="p">,</span> <span class="n">thetav</span><span class="p">,</span> <span class="n">ws</span><span class="p">,</span> <span class="n">crit</span><span class="o">=</span><span class="mf">0.25</span><span class="p">):</span>
 </span><span id="pbl_bulk_richardson-11"><a href="#pbl_bulk_richardson-11"><span class="linenos">11</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute PBL mixing height from critical value of bulk Richardson number</span>
 </span><span id="pbl_bulk_richardson-12"><a href="#pbl_bulk_richardson-12"><span class="linenos">12</span></a><span class="sd">    </span>
 </span><span id="pbl_bulk_richardson-13"><a href="#pbl_bulk_richardson-13"><span class="linenos">13</span></a><span class="sd">    Arguments</span>
@@ -394,7 +394,7 @@ level number within z array corresponding to altitude zpbl</li>
 
     </div>
     <a class="headerlink" href="#pbl_parcel"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="pbl_parcel-67"><a href="#pbl_parcel-67"><span class="linenos"> 67</span></a><span class="k">def</span> <span class="nf">pbl_parcel</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">thetav</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.5</span> <span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="pbl_parcel-67"><a href="#pbl_parcel-67"><span class="linenos"> 67</span></a><span class="k">def</span><span class="w"> </span><span class="nf">pbl_parcel</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">thetav</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.5</span> <span class="p">):</span>
 </span><span id="pbl_parcel-68"><a href="#pbl_parcel-68"><span class="linenos"> 68</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Compute PBL mixing height with parcel method</span>
 </span><span id="pbl_parcel-69"><a href="#pbl_parcel-69"><span class="linenos"> 69</span></a>
 </span><span id="pbl_parcel-70"><a href="#pbl_parcel-70"><span class="linenos"> 70</span></a><span class="sd">    The mixing height is defined as the altitude where a rising parcel of air</span>
@@ -485,7 +485,7 @@ level number within z array corresponding to altitude zpbl</li>
 
     </div>
     <a class="headerlink" href="#mo_wind"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="mo_wind-118"><a href="#mo_wind-118"><span class="linenos">118</span></a><span class="k">def</span> <span class="nf">mo_wind</span><span class="p">(</span><span class="n">surfaceP</span><span class="p">,</span> <span class="n">q2m</span><span class="p">,</span> <span class="n">temp2m</span><span class="p">,</span> <span class="n">ustar</span><span class="p">,</span> <span class="n">shf</span><span class="p">,</span> <span class="n">lhf</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="mo_wind-118"><a href="#mo_wind-118"><span class="linenos">118</span></a><span class="k">def</span><span class="w"> </span><span class="nf">mo_wind</span><span class="p">(</span><span class="n">surfaceP</span><span class="p">,</span> <span class="n">q2m</span><span class="p">,</span> <span class="n">temp2m</span><span class="p">,</span> <span class="n">ustar</span><span class="p">,</span> <span class="n">shf</span><span class="p">,</span> <span class="n">lhf</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
 </span><span id="mo_wind-119"><a href="#mo_wind-119"><span class="linenos">119</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Predict wind speed at altitude z using Monin-Obukhov similarity theory</span>
 </span><span id="mo_wind-120"><a href="#mo_wind-120"><span class="linenos">120</span></a>
 </span><span id="mo_wind-121"><a href="#mo_wind-121"><span class="linenos">121</span></a><span class="sd">    Arguments</span>

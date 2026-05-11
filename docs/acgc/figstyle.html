@@ -133,18 +133,18 @@ Turn these off and on with <code><a href="#grid_off">grid_off</a></code> and <co
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="sd">(https://github.com/callumrollo/cmcrameri).</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>
-</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="kn">import</span> <span class="nn">os</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="kn">import</span> <span class="nn">warnings</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="kn">import</span> <span class="nn">matplotlib.style</span> <span class="k">as</span> <span class="nn">mstyle</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="kn">import</span> <span class="nn">matplotlib.font_manager</span> <span class="k">as</span> <span class="nn">mfonts</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpl</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.style</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mstyle</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.font_manager</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mfonts</span>
 </span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="k">if</span> <span class="s1">&#39;inline&#39;</span> <span class="ow">in</span> <span class="n">mpl</span><span class="o">.</span><span class="n">get_backend</span><span class="p">():</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>    <span class="kn">import</span> <span class="nn">matplotlib_inline</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib_inline</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>
 </span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="c1"># Path to this module</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="n">_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="k">def</span> <span class="nf">activate_style</span><span class="p">(</span><span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">gridaxis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span><span class="n">mathfont</span><span class="o">=</span><span class="s1">&#39;regular&#39;</span><span class="p">):</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="k">def</span><span class="w"> </span><span class="nf">activate_style</span><span class="p">(</span><span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">gridaxis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span><span class="n">mathfont</span><span class="o">=</span><span class="s1">&#39;regular&#39;</span><span class="p">):</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Activate style sheet </span>
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="sd">    </span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="sd">    Parameters</span>
@@ -172,11 +172,11 @@ Turn these off and on with <code><a href="#grid_off">grid_off</a></code> and <co
 </span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>    <span class="k">if</span> <span class="s1">&#39;inline&#39;</span> <span class="ow">in</span> <span class="n">mpl</span><span class="o">.</span><span class="n">get_backend</span><span class="p">():</span>
 </span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>        <span class="n">matplotlib_inline</span><span class="o">.</span><span class="n">backend_inline</span><span class="o">.</span><span class="n">set_matplotlib_formats</span><span class="p">(</span><span class="s1">&#39;retina&#39;</span><span class="p">)</span>
 </span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="k">def</span> <span class="nf">deactivate_style</span><span class="p">():</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="k">def</span><span class="w"> </span><span class="nf">deactivate_style</span><span class="p">():</span>
 </span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Restore rcParams prior to importing figstyle&#39;&#39;&#39;</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span> <span class="o">=</span> <span class="n">_rcParams_old</span>
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="k">def</span> <span class="nf">set_mathfont</span><span class="p">(</span><span class="n">fontname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="k">def</span><span class="w"> </span><span class="nf">set_mathfont</span><span class="p">(</span><span class="n">fontname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Set the font used for typsetting math in Matplotlib</span>
 </span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>
 </span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd">    Parameters</span>
@@ -224,11 +224,11 @@ Turn these off and on with <code><a href="#grid_off">grid_off</a></code> and <co
 </span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>        <span class="c1"># Set the math font to the value provided</span>
 </span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>        <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;mathtext.fontset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fontname</span>
 </span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="k">def</span> <span class="nf">grid_off</span><span class="p">():</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="k">def</span><span class="w"> </span><span class="nf">grid_off</span><span class="p">():</span>
 </span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Turn off grid lines&#39;&#39;&#39;</span>
 </span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 </span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="k">def</span> <span class="nf">grid_on</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">):</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="k">def</span><span class="w"> </span><span class="nf">grid_on</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">):</span>
 </span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Turn on grid lines</span>
 </span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="sd">    </span>
 </span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="sd">    Parameters</span>
@@ -239,7 +239,7 @@ Turn these off and on with <code><a href="#grid_off">grid_off</a></code> and <co
 </span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 </span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.grid.axis&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">axis</span>
 </span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="k">def</span> <span class="nf">load_fonts</span><span class="p">():</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="k">def</span><span class="w"> </span><span class="nf">load_fonts</span><span class="p">():</span>
 </span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Load fonts contained in the acgc/fonts subdirectory&#39;&#39;&#39;</span>
 </span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>
 </span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>    <span class="c1"># User fonts</span>
@@ -267,7 +267,7 @@ Turn these off and on with <code><a href="#grid_off">grid_off</a></code> and <co
 </span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>                    <span class="p">)</span>
 </span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>        <span class="n">mfonts</span><span class="o">.</span><span class="n">json_dump</span><span class="p">(</span><span class="n">mfonts</span><span class="o">.</span><span class="n">fontManager</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span>
 </span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>
-</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a><span class="k">def</span> <span class="nf">load_crameri_colormaps</span><span class="p">(</span><span class="n">noprefix</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a><span class="k">def</span><span class="w"> </span><span class="nf">load_crameri_colormaps</span><span class="p">(</span><span class="n">noprefix</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 </span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Load Fabio Crameri&#39;s Scientific color maps</span>
 </span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>
 </span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a><span class="sd">    https://www.fabiocrameri.ch/colourmaps/</span>
@@ -281,7 +281,7 @@ Turn these off and on with <code><a href="#grid_off">grid_off</a></code> and <co
 </span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a>
 </span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a>    <span class="c1"># Import the colormaps; The registered names will be prefixed with &#39;cmc.&#39;</span>
 </span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a>        <span class="kn">from</span> <span class="nn">cmcrameri</span> <span class="kn">import</span> <span class="n">cm</span>
+</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">cmcrameri</span><span class="w"> </span><span class="kn">import</span> <span class="n">cm</span>
 </span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
 </span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Scientific colormaps not found. Install with `conda install cmcrameri` if desired.&#39;</span><span class="p">,</span> <span class="ne">ImportWarning</span><span class="p">)</span>
 </span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a>        <span class="k">return</span>
@@ -320,7 +320,7 @@ Turn these off and on with <code><a href="#grid_off">grid_off</a></code> and <co
 
     </div>
     <a class="headerlink" href="#activate_style"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="activate_style-33"><a href="#activate_style-33"><span class="linenos">33</span></a><span class="k">def</span> <span class="nf">activate_style</span><span class="p">(</span><span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">gridaxis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span><span class="n">mathfont</span><span class="o">=</span><span class="s1">&#39;regular&#39;</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="activate_style-33"><a href="#activate_style-33"><span class="linenos">33</span></a><span class="k">def</span><span class="w"> </span><span class="nf">activate_style</span><span class="p">(</span><span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">gridaxis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span><span class="n">mathfont</span><span class="o">=</span><span class="s1">&#39;regular&#39;</span><span class="p">):</span>
 </span><span id="activate_style-34"><a href="#activate_style-34"><span class="linenos">34</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Activate style sheet </span>
 </span><span id="activate_style-35"><a href="#activate_style-35"><span class="linenos">35</span></a><span class="sd">    </span>
 </span><span id="activate_style-36"><a href="#activate_style-36"><span class="linenos">36</span></a><span class="sd">    Parameters</span>
@@ -378,7 +378,7 @@ see <code><a href="#set_mathfont">set_mathfont</a></code> for all options</li>
 
     </div>
     <a class="headerlink" href="#deactivate_style"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="deactivate_style-61"><a href="#deactivate_style-61"><span class="linenos">61</span></a><span class="k">def</span> <span class="nf">deactivate_style</span><span class="p">():</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="deactivate_style-61"><a href="#deactivate_style-61"><span class="linenos">61</span></a><span class="k">def</span><span class="w"> </span><span class="nf">deactivate_style</span><span class="p">():</span>
 </span><span id="deactivate_style-62"><a href="#deactivate_style-62"><span class="linenos">62</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Restore rcParams prior to importing figstyle&#39;&#39;&#39;</span>
 </span><span id="deactivate_style-63"><a href="#deactivate_style-63"><span class="linenos">63</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span> <span class="o">=</span> <span class="n">_rcParams_old</span>
 </span></pre></div>
@@ -400,7 +400,7 @@ see <code><a href="#set_mathfont">set_mathfont</a></code> for all options</li>
 
     </div>
     <a class="headerlink" href="#set_mathfont"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="set_mathfont-65"><a href="#set_mathfont-65"><span class="linenos"> 65</span></a><span class="k">def</span> <span class="nf">set_mathfont</span><span class="p">(</span><span class="n">fontname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="set_mathfont-65"><a href="#set_mathfont-65"><span class="linenos"> 65</span></a><span class="k">def</span><span class="w"> </span><span class="nf">set_mathfont</span><span class="p">(</span><span class="n">fontname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="set_mathfont-66"><a href="#set_mathfont-66"><span class="linenos"> 66</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Set the font used for typsetting math in Matplotlib</span>
 </span><span id="set_mathfont-67"><a href="#set_mathfont-67"><span class="linenos"> 67</span></a>
 </span><span id="set_mathfont-68"><a href="#set_mathfont-68"><span class="linenos"> 68</span></a><span class="sd">    Parameters</span>
@@ -488,7 +488,7 @@ mathtext.rm in rcParams.</li>
 
     </div>
     <a class="headerlink" href="#grid_off"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="grid_off-113"><a href="#grid_off-113"><span class="linenos">113</span></a><span class="k">def</span> <span class="nf">grid_off</span><span class="p">():</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="grid_off-113"><a href="#grid_off-113"><span class="linenos">113</span></a><span class="k">def</span><span class="w"> </span><span class="nf">grid_off</span><span class="p">():</span>
 </span><span id="grid_off-114"><a href="#grid_off-114"><span class="linenos">114</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Turn off grid lines&#39;&#39;&#39;</span>
 </span><span id="grid_off-115"><a href="#grid_off-115"><span class="linenos">115</span></a>    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 </span></pre></div>
@@ -510,7 +510,7 @@ mathtext.rm in rcParams.</li>
 
     </div>
     <a class="headerlink" href="#grid_on"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="grid_on-117"><a href="#grid_on-117"><span class="linenos">117</span></a><span class="k">def</span> <span class="nf">grid_on</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="grid_on-117"><a href="#grid_on-117"><span class="linenos">117</span></a><span class="k">def</span><span class="w"> </span><span class="nf">grid_on</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">):</span>
 </span><span id="grid_on-118"><a href="#grid_on-118"><span class="linenos">118</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Turn on grid lines</span>
 </span><span id="grid_on-119"><a href="#grid_on-119"><span class="linenos">119</span></a><span class="sd">    </span>
 </span><span id="grid_on-120"><a href="#grid_on-120"><span class="linenos">120</span></a><span class="sd">    Parameters</span>
@@ -546,7 +546,7 @@ specifies which axes should have grid lines</li>
 
     </div>
     <a class="headerlink" href="#load_fonts"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="load_fonts-128"><a href="#load_fonts-128"><span class="linenos">128</span></a><span class="k">def</span> <span class="nf">load_fonts</span><span class="p">():</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="load_fonts-128"><a href="#load_fonts-128"><span class="linenos">128</span></a><span class="k">def</span><span class="w"> </span><span class="nf">load_fonts</span><span class="p">():</span>
 </span><span id="load_fonts-129"><a href="#load_fonts-129"><span class="linenos">129</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Load fonts contained in the acgc/fonts subdirectory&#39;&#39;&#39;</span>
 </span><span id="load_fonts-130"><a href="#load_fonts-130"><span class="linenos">130</span></a>
 </span><span id="load_fonts-131"><a href="#load_fonts-131"><span class="linenos">131</span></a>    <span class="c1"># User fonts</span>
@@ -592,7 +592,7 @@ specifies which axes should have grid lines</li>
 
     </div>
     <a class="headerlink" href="#load_crameri_colormaps"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="load_crameri_colormaps-156"><a href="#load_crameri_colormaps-156"><span class="linenos">156</span></a><span class="k">def</span> <span class="nf">load_crameri_colormaps</span><span class="p">(</span><span class="n">noprefix</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="load_crameri_colormaps-156"><a href="#load_crameri_colormaps-156"><span class="linenos">156</span></a><span class="k">def</span><span class="w"> </span><span class="nf">load_crameri_colormaps</span><span class="p">(</span><span class="n">noprefix</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 </span><span id="load_crameri_colormaps-157"><a href="#load_crameri_colormaps-157"><span class="linenos">157</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;Load Fabio Crameri&#39;s Scientific color maps</span>
 </span><span id="load_crameri_colormaps-158"><a href="#load_crameri_colormaps-158"><span class="linenos">158</span></a>
 </span><span id="load_crameri_colormaps-159"><a href="#load_crameri_colormaps-159"><span class="linenos">159</span></a><span class="sd">    https://www.fabiocrameri.ch/colourmaps/</span>
@@ -606,7 +606,7 @@ specifies which axes should have grid lines</li>
 </span><span id="load_crameri_colormaps-167"><a href="#load_crameri_colormaps-167"><span class="linenos">167</span></a>
 </span><span id="load_crameri_colormaps-168"><a href="#load_crameri_colormaps-168"><span class="linenos">168</span></a>    <span class="c1"># Import the colormaps; The registered names will be prefixed with &#39;cmc.&#39;</span>
 </span><span id="load_crameri_colormaps-169"><a href="#load_crameri_colormaps-169"><span class="linenos">169</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="load_crameri_colormaps-170"><a href="#load_crameri_colormaps-170"><span class="linenos">170</span></a>        <span class="kn">from</span> <span class="nn">cmcrameri</span> <span class="kn">import</span> <span class="n">cm</span>
+</span><span id="load_crameri_colormaps-170"><a href="#load_crameri_colormaps-170"><span class="linenos">170</span></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">cmcrameri</span><span class="w"> </span><span class="kn">import</span> <span class="n">cm</span>
 </span><span id="load_crameri_colormaps-171"><a href="#load_crameri_colormaps-171"><span class="linenos">171</span></a>    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
 </span><span id="load_crameri_colormaps-172"><a href="#load_crameri_colormaps-172"><span class="linenos">172</span></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Scientific colormaps not found. Install with `conda install cmcrameri` if desired.&#39;</span><span class="p">,</span> <span class="ne">ImportWarning</span><span class="p">)</span>
 </span><span id="load_crameri_colormaps-173"><a href="#load_crameri_colormaps-173"><span class="linenos">173</span></a>        <span class="k">return</span>
