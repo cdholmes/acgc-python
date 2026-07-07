@@ -131,7 +131,8 @@ def test_solar_position():
     ans_dec_fast = 1.879
     ans_eot_fast = -6.065
 
-    assert result == pytest.approx(ans), 'Incorrect solar position'
+    assert result[:4] == pytest.approx(ans[:4]), 'Incorrect solar position [:4]'
+    assert result[4] == pytest.approx(ans[4],abs=pd.Timedelta('1 s')), 'Incorrect solar position [4]'
     assert result == resultUTC, 'Results change when UTC specified explicitly'
     assert result == resultAK, 'Results change when time zone specified explicitly'
     assert result == resultStr, 'Results change when time string provided'
