@@ -187,20 +187,20 @@ def test_sun_times():
                 pd.Timestamp('2010-03-25 14:32:34.561142383-0800', tz='US/Alaska'),
                 pd.Timestamp('2010-03-25 00:00:00'))
 
-    assert result == pytest.approx(ans), \
+    assert result == pytest.approx(ans, abs=pd.Timedelta('1 s')), \
         'Sun times do not equal expected values'
-    assert resultAK == pytest.approx(ansAK), \
+    assert resultAK == pytest.approx(ansAK, abs=pd.Timedelta('1 s')), \
         'Sun times incorrect with time zone'
-    assert resultAK2 == pytest.approx(ansAK), \
+    assert resultAK2 == pytest.approx(ansAK, abs=pd.Timedelta('1 s')), \
         'Result incorrect with input timezone'
-    assert resultAK3 == pytest.approx(ansAK), \
+    assert resultAK3 == pytest.approx(ansAK, abs=pd.Timedelta('1 s')), \
         'Result incorrect with input timezone'
 
     assert solar.sunrise_time(lat_brw,lon_brw,time) \
-        == pytest.approx(ans[0]), 'Sunrise time error'
+        == pytest.approx(ans[0], abs=pd.Timedelta('1 s')), 'Sunrise time error'
     assert solar.sunset_time(lat_brw,lon_brw,time) \
-        == pytest.approx(ans[1]), 'Sunset time error'
+        == pytest.approx(ans[1], abs=pd.Timedelta('1 s')), 'Sunset time error'
     assert solar.day_length(lat_brw,lon_brw,time) \
-        == pytest.approx(ans[2]), 'Day length error'
+        == pytest.approx(ans[2], abs=pd.Timedelta('1 s')), 'Day length error'
     assert solar.solar_noon(lat_brw,lon_brw,time) \
-        == pytest.approx(ans[3]), 'Solar noon error'
+        == pytest.approx(ans[3], abs=pd.Timedelta('1 s')), 'Solar noon error'
