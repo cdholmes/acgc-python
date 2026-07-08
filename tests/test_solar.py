@@ -161,32 +161,19 @@ def test_sun_times():
 
     # Expected answer depends on pandas version
     # In version 3.0+, timestamps are rounded down to the nearest second
-    if pd.__version__ >= '3.0':
-        # Expected answer
-        ans = (pd.Timestamp('2010-03-25 16:02:08'),
-                pd.Timestamp('2010-03-26 05:03:00'),
-                pd.Timedelta('0 days 13:00:52'),
-                pd.Timestamp('2010-03-25 22:32:34'),
-                pd.Timestamp('2010-03-25 00:00:00'))
-        # Answer in AK time
-        ansAK = (pd.Timestamp('2010-03-25 08:02:08-0800', tz='US/Alaska'), 
-                pd.Timestamp('2010-03-25 21:03:00-0800', tz='US/Alaska'), 
-                pd.Timedelta('0 days 13:00:52'),
-                pd.Timestamp('2010-03-25 14:32:34-0800', tz='US/Alaska'),
-                pd.Timestamp('2010-03-25 00:00:00'))
-    else:
-                # Expected answer
-        ans = (pd.Timestamp('2010-03-25 16:02:08.205409628'),
-                pd.Timestamp('2010-03-26 05:03:00.916875138'),
-                pd.Timedelta('0 days 13:00:52.711465510'),
-                pd.Timestamp('2010-03-25 22:32:34.561142383'),
-                pd.Timestamp('2010-03-25 00:00:00'))
-        # Answer in AK time
-        ansAK = (pd.Timestamp('2010-03-25 08:02:08.205409628-0800', tz='US/Alaska'), 
-                pd.Timestamp('2010-03-25 21:03:00.916875138-0800', tz='US/Alaska'), 
-                pd.Timedelta('0 days 13:00:52.711465510'),
-                pd.Timestamp('2010-03-25 14:32:34.561142383-0800', tz='US/Alaska'),
-                pd.Timestamp('2010-03-25 00:00:00'))
+
+    # Expected answer
+    ans = (pd.Timestamp('2010-03-25 16:02:08.205409628'),
+            pd.Timestamp('2010-03-26 05:03:00.916875138'),
+            pd.Timedelta('0 days 13:00:52.711465510'),
+            pd.Timestamp('2010-03-25 22:32:34.561142383'),
+            pd.Timestamp('2010-03-25 00:00:00'))
+    # Answer in AK time
+    ansAK = (pd.Timestamp('2010-03-25 08:02:08.205409628-0800', tz='US/Alaska'), 
+            pd.Timestamp('2010-03-25 21:03:00.916875138-0800', tz='US/Alaska'), 
+            pd.Timedelta('0 days 13:00:52.711465510'),
+            pd.Timestamp('2010-03-25 14:32:34.561142383-0800', tz='US/Alaska'),
+            pd.Timestamp('2010-03-25 00:00:00'))
 
     assert result == pytest.approx(ans, abs=pd.Timedelta('1 s')), \
         'Sun times do not equal expected values'
